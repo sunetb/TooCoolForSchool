@@ -234,9 +234,9 @@ public class Util {
         }
     }
 
-    public static void skrivTekstliste (ArrayList<Tekst> liste, String filename, Context c) {
+    public static void gemTekstliste (ArrayList<Tekst> liste, String filename, Context c) {
         p("skrivTekstliste("+filename+")");
-        File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "serlization");
+        File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
 
         if (!directory.exists()) {
             directory.mkdirs();
@@ -254,11 +254,11 @@ public class Util {
         }
     }
 
-    static ArrayList<Tekst> læsTekstliste (String filename, Context c) {
+    static ArrayList<Tekst> hentTekstliste (String filename, Context c) {
         p("læsTekstliste("+filename+")");
         ObjectInputStream input = null;
         ArrayList<Tekst> mitArray = null;
-        File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "serlization");
+        File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
 
         p("læsTekstliste_Filen eksisterer? "+directory.exists());
         if (directory.exists()){
@@ -282,6 +282,53 @@ public class Util {
         return mitArray;
     }
 
+    public static void gemTekst (Tekst t, String filename, Context c) {
+        p("skrivTekstliste("+filename+")");
+        File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
+
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        ObjectOutput out = null;
+
+        try {
+            out = new ObjectOutputStream(new FileOutputStream(directory+ File.separator + filename));
+            out.writeObject(t);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();p(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();p(e.getMessage());
+        }
+    }
+
+    static Tekst hentTekst (String filename, Context c) {
+        p("læsTekstliste("+filename+")");
+        ObjectInputStream input = null;
+        Tekst minTekst = null;
+        File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
+
+        p("læsTekstliste_Filen eksisterer? "+directory.exists());
+        if (directory.exists()){
+
+            try {
+                input = new ObjectInputStream(new FileInputStream(directory+ File.separator + filename));
+                minTekst = (Tekst) input.readObject();
+                input.close();
+            } catch (StreamCorruptedException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        if (minTekst != null)  p("hentTekst(): Teksten var null)");
+
+        return minTekst;
+    }
     static void p(Object o){
 
         String kl = "Util.";

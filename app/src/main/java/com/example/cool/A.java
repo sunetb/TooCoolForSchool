@@ -20,7 +20,7 @@ public class A extends Application {
 
     static A a;
 	SharedPreferences pref;
-	
+	Context ctx;
 
 //////////---------- TEKSTFRAGMENT DATA ----------//////////
 	
@@ -30,9 +30,10 @@ public class A extends Application {
     ArrayList<String> overskrifter = new ArrayList<>();
     ArrayList<String> links = new ArrayList<>();
 
-	ArrayList<Tekst> synligeTekster = new ArrayList();
-	
-	
+    ArrayList<Tekst> synligeTekster = new ArrayList();
+    ArrayList<Tekst> htekster = new ArrayList();
+
+
     public String henteurl = "http://www.lightspeople.net/sune/skole/teksterny.xml";
     public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
 
@@ -85,15 +86,23 @@ public class A extends Application {
         super.onCreate();
         System.out.println("A.oncreate() kaldt");
         a= this;
+        ctx=this;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         int modenhed = tjekModenhed();
-        p(modenhed);
+        p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 		if (modenhed > MODENHED_HELT_FRISK) {
 			
 			ArrayList<Tekst> temp = hentsynligeTekster();
 			if (temp !=null){
 				synligeTekster = temp; 
 				//temp=null;
+                new AsyncTask() {
+                    @Override
+                    protected Object doInBackground(Object[] params) {
+                        htekster = Util.hentTekstliste("htekster", ctx);
+                        return null;
+                    }
+                }.execute();
 			}
 		}
 
@@ -143,7 +152,12 @@ public class A extends Application {
 					ArrayList<Tekst> otekster = alleTekster[0];
 					Tekst t = otekster.get(0);
 					synligeTekster.add(t);
+                    gemSynligeTekster();
+
+                    Tekst nr2 = otekster.get(1);
+                    Util.gemTekst(nr2, "otekst2", ctx);
 					ArrayList<Tekst> htekster = alleTekster[3];
+                    Util.gemTekstliste(htekster, "htekster", ctx);
 
                 }
 				
@@ -151,6 +165,17 @@ public class A extends Application {
             }.execute();
 
 
+        }
+        else if (modenhed == MODENHED_FØRSTE_DAG) {
+            //hhmm
+        }
+        else if (modenhed == MODENHED_ANDEN_DAG) {
+            if (pref.getBoolean("andenDagFørsteGang", true)) {
+                Tekst t = Util.hentTekst("otekst2", ctx);
+                synligeTekster.add(t);
+                gemSynligeTekster();
+                pref.edit().putBoolean("andenDagFørsteGang", false).apply();
+            }
         }
 
     }
@@ -165,13 +190,13 @@ public class A extends Application {
 	
 	private ArrayList<Tekst> hentsynligeTekster(){
 		//new Asynctask
-		return Util.læsTekstliste("synligeTekster",this);
+		return Util.hentTekstliste("synligeTekster",this);
 		
 	}
 	
 	public void gemSynligeTekster(){
 		//new async ?
-		Util.skrivTekstliste(synligeTekster, "synligeTekster", this);
+		Util.gemTekstliste(synligeTekster, "synligeTekster", this);
 	}
 	
 	//kaldes kun fra baggrundstråd
@@ -200,8 +225,8 @@ public class A extends Application {
 
     private int tjekModenhed() {
 		
-		//test:
-		if (true) return 0;
+		//test: bypass
+		//if (true) return 0;
 		
 //IKKE TESTET
         int moden = pref.getInt("modenhed", MODENHED_HELT_FRISK);

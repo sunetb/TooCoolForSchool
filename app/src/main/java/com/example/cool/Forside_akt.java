@@ -86,6 +86,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         super.onStop();
 
         prefs.edit().putInt("seneste position", vp.getCurrentItem()).apply();
+        a.gemSynligeTekster();
+
     }
 
 
