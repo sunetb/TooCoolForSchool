@@ -82,23 +82,23 @@ public class Util {
                                 break;
                             }
                             else {
-                                p("Værdi: "+txt);
+                               // p("Værdi: "+txt);
                                 String type= txt.substring(0,1);
                                 tempTekst.kategori = type;
-                                p("Type: "+type);
+                               // p("Type: "+type);
                                 if (txt.length() > 1) {
                                     String dato = txt.substring(1);
                                     int længde = dato.length();
 
                                     String tmpÅr = dato.substring(længde - 4, længde);
                                     int år = tryParseInt(tmpÅr);
-                                    p("År: "+år);
+                                   // p("År: "+år);
                                     String tmpMåned = dato.substring(længde-6, længde-4);
                                     int måned = tryParseInt(tmpMåned);
-                                    p("Måned: "+måned);
+                                    //p("Måned: "+måned);
                                     String tmpDag = dato.substring(0, længde-6);
                                     int dag = tryParseInt(tmpDag);
-                                    p("Dag: "+dag);
+                                    //p("Dag: "+dag);
 
                                     if (måned > 12) { //Fejl: dag og måned er ombyttet
                                         if (dag < 13)tempTekst.dato = new DateTime(år,dag,måned,1,0);

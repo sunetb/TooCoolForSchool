@@ -24,7 +24,8 @@ public class Tekst implements Serializable {
 	}
 
 	public Tekst(String over, String brød, String katg, DateTime d) {
-		dato = d;
+		if (katg.equalsIgnoreCase("h")) dato = d.minusDays(7);
+		else dato = d;
 		kategori = katg;
 		overskrift =over;
 		brødtekst=brød;
@@ -61,7 +62,7 @@ public class Tekst implements Serializable {
 		s+=måned;
 		s+= dato.getYear();
 
-		System.out.println("tjek lavIdStreng(): "+s);
+		//System.out.println("tjek lavIdStreng(): "+s);
 
 		return s;
 	}
