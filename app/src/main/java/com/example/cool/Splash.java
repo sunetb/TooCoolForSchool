@@ -25,12 +25,16 @@ public class Splash extends AppCompatActivity implements Runnable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
         sp = PreferenceManager.getDefaultSharedPreferences(this);
+
         animLængde1 = sp.getInt("animLængde1", 3400);
         animLængde2 = sp.getInt("animLængde2", 2100);
+
         if (animLængde1 == 3400) gemKortereVærdier();
 
         iv = (ImageView) findViewById(R.id.billede);
+
         Animation a = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
         a.setDuration(animLængde1);
         iv.startAnimation(a);
@@ -44,12 +48,12 @@ public class Splash extends AppCompatActivity implements Runnable {
                 iv.startAnimation(b);
 
             }
-        }, (animLængde1+animLængde2)+1000);
+        }, animLængde1);
 
 
 
         if (savedInstanceState == null) {
-            handler.postDelayed(this, (animLængde1+animLængde2)+1000);
+            handler.postDelayed(this, (animLængde1+animLængde2)-500);
         }
         splashAktivitet = this;
     }
@@ -64,8 +68,6 @@ public class Splash extends AppCompatActivity implements Runnable {
     @Override
     public void run() {
         startActivity(new Intent(this, Forside_akt.class));
-        //overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-
         splashAktivitet.finish();
         splashAktivitet = null;
     }

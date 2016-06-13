@@ -90,34 +90,24 @@ public class A extends Application {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         int modenhed = tjekModenhed();
         p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
-		if (modenhed > MODENHED_HELT_FRISK) {
-			
-			ArrayList<Tekst> temp = hentsynligeTekster();
-			if (temp !=null){
-				synligeTekster = temp; 
-				//temp=null;
-                new AsyncTask() {
-                    @Override
-                    protected Object doInBackground(Object[] params) {
-                        htekster = Util.hentTekstliste("htekster", ctx);
-                        return null;
-                    }
-                }.execute();
-			}
-		}
 
         if (modenhed == MODENHED_MODEN) {
+
+            skalTekstlistenOpdateres();
+
             new AsyncTask() {
+
+
 
                 @Override
                 protected Object doInBackground(Object[] params) {
                     findesNyTekst = tjekTekstversion();
-					p("Findes ny tekstversion? "+findesNyTekst);
+                    p("Findes ny tekstversion? "+findesNyTekst);
                     if (findesNyTekst) {
                         alleTekster = hentTeksterOnline();
-						//TODO: erstat synlige. giv adapter besked. gem synlige. 
-						//nyt versionsnr gemmes i tjektekstversion
-						
+                        //TODO: erstat synlige. giv adapter besked. gem synlige.
+                        //nyt versionsnr gemmes i tjektekstversion
+
                     }
                     return null;
                 }
@@ -130,11 +120,32 @@ public class A extends Application {
             }.execute();
 
         }
+        else if (modenhed > MODENHED_HELT_FRISK) {
+//Ryk evt til splash
+			ArrayList<Tekst> temp = hentsynligeTekster();
+			if (temp !=null){
+				synligeTekster = temp; 
+				//temp=null;
+                new AsyncTask() {
+                    @Override
+                    protected Object doInBackground(Object[] params) {
+                        htekster = Util.hentTekstliste("htekster", ctx);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Object o) {
+                        super.onPostExecute(o);
+
+                        ///for (Tekst t : htekster) p("Tjekker Htekster: " + t.toString(1));
+                    }
+                }.execute();
+			}
+		}
+
+
 
         else if (modenhed == MODENHED_HELT_FRISK) {
-          //  dummyInit();
-			//overskrift = pref.getString("overskrift", "Vent et øjeblik");
-			//brødtekst = pref.getString("brødtekst", "...der indlæses tekst");
 			
             new AsyncTask() {
 
@@ -166,10 +177,13 @@ public class A extends Application {
 
 
         }
+
         else if (modenhed == MODENHED_FØRSTE_DAG) {
             //hhmm
         }
+
         else if (modenhed == MODENHED_ANDEN_DAG) {
+
             if (pref.getBoolean("andenDagFørsteGang", true)) {
                 Tekst t = Util.hentTekst("otekst2", ctx);
                 synligeTekster.add(t);
@@ -180,15 +194,13 @@ public class A extends Application {
 
     }
 
-	// bruges ikke. kan evt bruges til preloading..
-	void gemSynligTekst(){
-		pref.edit()
-		.putString("overskrift", overskrift)
-		.putString("brødtekst", brødtekst)
-		.apply();
-	}
-	
-	private ArrayList<Tekst> hentsynligeTekster(){
+    private boolean skalTekstlistenOpdateres() {
+
+
+        return false;
+    }
+
+    private ArrayList<Tekst> hentsynligeTekster(){
 		//new Asynctask
 		return Util.hentTekstliste("synligeTekster",this);
 		
