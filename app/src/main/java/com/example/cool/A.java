@@ -203,18 +203,16 @@ public class A extends Application {
 		//test:
 		if (true) return 0;
 		
-		
-        int moden = pref.getInt("modenhed", 0);
-		
-		if (moden == MODENHED_MODEN) return 4;
+//IKKE TESTET
+        int moden = pref.getInt("modenhed", MODENHED_HELT_FRISK);
+
+		if (moden == MODENHED_MODEN) return MODENHED_MODEN;
 		
 		int idag = Util.lavDato(new Date());
 		
         if (moden == MODENHED_HELT_FRISK) {
-            
-			
 			pref.edit()
-				.putInt("modenhed", 1)
+				.putInt("modenhed", MODENHED_FØRSTE_DAG)
 				.putInt("installationsdato", idag)
 				.apply();
 			
@@ -222,20 +220,32 @@ public class A extends Application {
         }
         else if (moden == MODENHED_FØRSTE_DAG){
 			int instDato  = pref.getInt("installationsdato", 0);
-			if (idag == instDato) return 1;
+			if (idag == instDato) return MODENHED_FØRSTE_DAG;
 			else {
 				pref.edit()
-					.putInt("modenhed", 2)
+					.putInt("modenhed", MODENHED_ANDEN_DAG)
 					.putInt("installationsdato2", idag)
 					.apply();
 				return 2;
 			}
-			
 		}
+        else if (moden == MODENHED_ANDEN_DAG){
+            int instDatoPlusEn = pref.getInt("installationsdato2", 0);
+            if (idag == instDatoPlusEn) return MODENHED_ANDEN_DAG;
+            else pref.edit().putInt("modenhed", MODENHED_MODEN);
+            return MODENHED_MODEN;
+        }
 
-
-        return 3;
+        return MODENHED_MODEN;
     }
+
+    /*
+    *  1102016
+    * 11012016
+    *
+    * 20161001
+    * 20160111
+    * */
 
 
     private boolean tjekTekstversion() {
@@ -277,6 +287,11 @@ public class A extends Application {
     boolean tjekTekstRul () {
 
         return true;
+    }
+
+    private void indlæsTekster()  {
+
+        //TODO
     }
 
     private void dummyInit() {

@@ -67,8 +67,25 @@ public class Tekst implements Serializable {
 	}
 
 	public int lavIntId() {
-
-		int i = (dato.getYear()*10000)+(dato.getMonthOfYear()*100)+dato.getDayOfMonth();
+		/*
+		2016-11-01
+		*  20160000
+		* +    1100
+		* +       1
+		* =20161101
+		*
+		*	>
+		*
+		* 2016-01-11
+		*  20160000
+		* +     100
+		* +      11
+		* =20160111
+		*
+		* */
+		int dag = dato.getDayOfMonth();
+		int mrd = dato.getMonthOfYear();
+		int i = (dato.getYear()*10000)+(mrd*100)+dag;
 
 		int typekode = 0;
 		if 		(kategori.equalsIgnoreCase("o")) typekode= 1;
