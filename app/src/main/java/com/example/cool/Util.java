@@ -187,7 +187,7 @@ public class Util {
             for (int i = 0; i < ind.size() - 1; i++) {
 
                 Tekst b = ind.get(i + 1);
-                if (a.datokode() > b.datokode()) {
+                if (a.tekstid > b.tekstid) {
                     a = b;
                     ix=i+1;
                 }

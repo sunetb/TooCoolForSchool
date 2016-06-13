@@ -13,6 +13,8 @@ import java.util.*;
 
 import android.support.v4.app.Fragment;
 
+import org.joda.time.DateTime;
+
 /**
  * Created by sune on 5/31/16.
  */
@@ -130,6 +132,7 @@ public class A extends Application {
                     @Override
                     protected Object doInBackground(Object[] params) {
                         htekster = Util.hentTekstliste("htekster", ctx);
+                        gemAlleNyeTekster();
                         return null;
                     }
 
@@ -192,6 +195,26 @@ public class A extends Application {
             }
         }
 
+    }
+
+    private void gemAlleNyeTekster() {
+        Tekst dummyTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "t", new DateTime());
+        dummyTekst.lavId();
+
+        ArrayList<Tekst> itekster = Util.sorterStigende(alleTekster[1]);
+
+        Set <String> alleteksterSæt = pref.getStringSet("alletekster", new HashSet<String>());
+
+
+        for (int i = 0; i < itekster.size(); i++) {
+            Tekst itekst = itekster.get(i);
+
+            if (itekst.tekstid >= dummyTekst.tekstid) {
+                Util.gemTekst(itekst,""+itekst.tekstid,ctx);
+                alleteksterSæt.add(""+itekst.tekstid);
+                //Der er lige noget med at de to ældre tekster
+            }
+        }
     }
 
     private boolean skalTekstlistenOpdateres() {
