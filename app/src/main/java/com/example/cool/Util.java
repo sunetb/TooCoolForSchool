@@ -240,7 +240,7 @@ public class Util {
     }
 
     public static void gemTekstliste (ArrayList<Tekst> liste, String filename, Context c) {
-        p("skrivTekstliste("+filename+")");
+        p("gemTekstliste("+filename+")");
         File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
 
         if (!directory.exists()) {
@@ -260,12 +260,11 @@ public class Util {
     }
 
     static ArrayList<Tekst> hentTekstliste (String filename, Context c) {
-        p("læsTekstliste("+filename+")");
+        p("hentTekstliste("+filename+")");
         ObjectInputStream input = null;
         ArrayList<Tekst> mitArray = null;
         File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
 
-        p("læsTekstliste_Filen eksisterer? "+directory.exists());
         if (directory.exists()){
 
             try {
@@ -288,7 +287,7 @@ public class Util {
     }
 
     public static void gemTekst (Tekst t, String filename, Context c) {
-        p("skrivTekstliste("+filename+")");
+        p("gemTekst("+filename+")");
         File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
 
         if (!directory.exists()) {
@@ -308,12 +307,11 @@ public class Util {
     }
 
     static Tekst hentTekst (String filename, Context c) {
-        p("læsTekstliste("+filename+")");
+        p("hentTekst("+filename+")");
         ObjectInputStream input = null;
         Tekst minTekst = null;
         File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
 
-        p("læsTekstliste_Filen eksisterer? "+directory.exists());
         if (directory.exists()){
 
             try {

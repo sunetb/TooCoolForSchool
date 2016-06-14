@@ -19,84 +19,21 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     A a;
     SharedPreferences prefs;
     ImageButton frem, tilbage, del, kontakt, extras;
+    ViewPager.OnPageChangeListener sideLytter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forside);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setIcon(R.drawable.cool_nobkgr_50x50_rund);
-        }
-        else p("FEJL: getSupportActionbar gav null");
+        getSupportActionBar().setIcon(R.drawable.cool_nobkgr_50x50_rund);
 
         p("oncreate() kaldt");
         a = A.a;
 
-            prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            vp = (ViewPager) findViewById(R.id.pager);
-            pa = new PagerAdapter(getSupportFragmentManager());
-            vp.setAdapter(pa);
-            vp.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                    knapstatus(position, a.synligeTekster.size()-1);
-                }
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-                @Override
-                public void onPageSelected(int position) {
-
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-
-                }
-            });
-
-            initKnapper();
-
-
-
+        initUI();
     }
-
-    private void initKnapper() {
-
-        tilbage = (ImageButton) findViewById(R.id.tilbage);
-        tilbage.setOnClickListener(this);
-        frem = (ImageButton) findViewById(R.id.frem);
-        frem.setOnClickListener(this);
-        del = (ImageButton) findViewById(R.id.anbefal);
-        del.setOnClickListener(this);
-        kontakt = (ImageButton) findViewById(R.id.redigerFeedback);
-        kontakt.setOnClickListener(this);
-        extras = (ImageButton) findViewById(R.id.extras);
-        extras.setOnClickListener(this);
-
-    }
-
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        int visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
-        vp.setCurrentItem(visPosition);
-		knapstatus(visPosition, a.synligeTekster.size()-1);
-
-		
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        prefs.edit().putInt("seneste position", vp.getCurrentItem()).apply();
-        a.gemSynligeTekster();
-
-    }
-
-
 
     @Override
     public void onClick(View v) {
@@ -109,7 +46,60 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else if (v == frem && positionNu != maxPosition){
             vp.setCurrentItem(++positionNu);
         }
+        //TODO Lav de andrre knapper
+        else t("Ikke implementeret");
         knapstatus (vp.getCurrentItem(), maxPosition);
+
+    }
+
+    private void initUI() {
+        vp = (ViewPager) findViewById(R.id.pager);
+        pa = new PagerAdapter(getSupportFragmentManager());
+        vp.setAdapter(pa);
+
+        tilbage = (ImageButton) findViewById(R.id.tilbage);
+        tilbage.setOnClickListener(this);
+        frem = (ImageButton) findViewById(R.id.frem);
+        frem.setOnClickListener(this);
+        del = (ImageButton) findViewById(R.id.anbefal);
+        del.setOnClickListener(this);
+        kontakt = (ImageButton) findViewById(R.id.redigerFeedback);
+        kontakt.setOnClickListener(this);
+        extras = (ImageButton) findViewById(R.id.extras);
+        extras.setOnClickListener(this);
+
+        sideLytter = new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+            @Override
+            public void onPageSelected(int position) {
+                knapstatus(position, a.synligeTekster.size()-1);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {}
+        };
+    }
+
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        vp.addOnPageChangeListener(sideLytter);
+        int visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
+        vp.setCurrentItem(visPosition);
+		knapstatus(visPosition, a.synligeTekster.size()-1);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        vp.removeOnPageChangeListener(sideLytter);
+        prefs.edit().putInt("seneste position", vp.getCurrentItem()).apply();
+        a.gemSynligeTekster();
 
     }
 
@@ -117,9 +107,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 		p("knapstatus: nu="+nu+" max="+max);
         //husk tilfælde hvor nu og max begge er nul
 
-        //husk hTekster
+        //TODO husk hTekster
 
-        if (nu == (max)) {
+        if (nu == max) {
             frem.setEnabled(false);
             frem.getBackground().setAlpha(100);
         }
@@ -148,6 +138,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     void t(String s){
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
+
 
 
 }

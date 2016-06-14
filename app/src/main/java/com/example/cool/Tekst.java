@@ -94,16 +94,10 @@ public class Tekst implements Serializable {
 		else if (kategori.equalsIgnoreCase("m")) typekode= 3;
 		else if (kategori.equalsIgnoreCase("h")) typekode= 4;
 		else typekode= 5;
-		/*
-		* Otekst kode 100.000
-		* Itekst kode 200.000
-		* Mteskt kode 300.000
-		* Htekst kode 400.000
-		* Test   kode 500.000
-		* */
 
 
-		return (typekode * 100000) + i;
+
+		return (typekode * 100000000) + i;
 
 	}
 	//Sikring
