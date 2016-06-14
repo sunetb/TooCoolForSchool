@@ -25,31 +25,19 @@ public class A extends Application {
 	Context ctx;
 
 //////////---------- TEKSTFRAGMENT DATA ----------//////////
-	
-	int antalTekster = 0;
-	
-    ArrayList<String> tekster = new ArrayList<>();
-    ArrayList<String> overskrifter = new ArrayList<>();
-    ArrayList<String> links = new ArrayList<>();
+
 
     ArrayList<Tekst> synligeTekster = new ArrayList();
     ArrayList<Tekst> htekster = new ArrayList();
 
-
     public String henteurl = "http://www.lightspeople.net/sune/skole/teksterny.xml";
     public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
 
-	
-    
 //////////-------------------------//////////
 	
 
 //////////---------- VISES NU ----------//////////
 	
-	String overskrift="";
-	String brødtekst ="";
-	int side = -1;
-	static WebView wa;
 
 	//todo  scroll, zoom, 
 //////////-------------------------//////////
@@ -77,29 +65,33 @@ public class A extends Application {
 //////////-------------------------//////////
 	
 	
-////TEST////////////////////////////////////////////////
-    String htmlStreng =  "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"><html><head><meta content=\"text/html; charset=ISO-8859-1\" http-equiv=\"content-type\"><title>o17092016.txt</title></head><body><h2 style=\"text-align: center;\">Overskift</h2>Prødtekst bla bla bla<br>loårwij vfvåoijdsd åvoij såoigjb åfsoji gvåoifjob idfj obåijfd boåijfdobigj fdoibjåfdoijgb åfdoij båojfdpi gbåjopidf åboji dfåobji dfåojibåfdjop båpdfjo hbåpjiodf <span style=\"font-weight: bold;\">fed tekst inde i teksten</span>oæbhijd fåpjoib fdoji bådfoipj båpdoijo bhåpjoi dfåppjoihb åpdjfoihbåijpod fåbboijp dfåojhip båpdfjio cgåpoijb ådfpojg cbpojv dfåpgojbojfd gcb<br><br>&nbsp;vpfdoijb åpfjdoi bpåfodj ågbpoijfd ågpoj båfdopijgbbåpjo fpågojbpofjd gbvjpodfø gopbjk fodjx bpöjkf gxobkj vfokgxbo fkxgpobk pokgxxbpok fpovkb ogdfk gpbök fdpogkvcb pofdkg bcpok dfogxkb dofkg bc<br><br style=\"font-weight: bold;\"><div style=\"text-align: center;\"><span style=\"font-weight: bold;\">denne line skal være fed og centreret</span><br></div><br>OG her kommer mere almindelig tekst doijf våorwij fvåojiper pbogvijerrpoijvbgv åjeroip bgåiopjet gvåoipje tpbvogj etpogbkj etåpojgb petojgboijet gboijet gboåij tepogbj etåoibjt <br><br><div style=\"text-align: center; font-weight: bold;\">Og her fler lininer som er fed og cwentreret <br>denne er med <br>denne ogr også med<br></div><br>OG mere helt almindelig tekst åoij åoijgb dåfjiop bpoj ghbojgdj&#7719;pokg<br>\"gdøopbkjk pokjbh prgonh pfoknh rgonkn hrf<br><br></body></html>";
+////TEST / DEBUGGING////////////////////////////////////////////////
+    //String htmlStreng =  "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"><html><head><meta content=\"text/html; charset=ISO-8859-1\" http-equiv=\"content-type\"><title>o17092016.txt</title></head><body><h2 style=\"text-align: center;\">Overskift</h2>Prødtekst bla bla bla<br>loårwij vfvåoijdsd åvoij såoigjb åfsoji gvåoifjob idfj obåijfd boåijfdobigj fdoibjåfdoijgb åfdoij båojfdpi gbåjopidf åboji dfåobji dfåojibåfdjop båpdfjo hbåpjiodf <span style=\"font-weight: bold;\">fed tekst inde i teksten</span>oæbhijd fåpjoib fdoji bådfoipj båpdoijo bhåpjoi dfåppjoihb åpdjfoihbåijpod fåbboijp dfåojhip båpdfjio cgåpoijb ådfpojg cbpojv dfåpgojbojfd gcb<br><br>&nbsp;vpfdoijb åpfjdoi bpåfodj ågbpoijfd ågpoj båfdopijgbbåpjo fpågojbpofjd gbvjpodfø gopbjk fodjx bpöjkf gxobkj vfokgxbo fkxgpobk pokgxxbpok fpovkb ogdfk gpbök fdpogkvcb pofdkg bcpok dfogxkb dofkg bc<br><br style=\"font-weight: bold;\"><div style=\"text-align: center;\"><span style=\"font-weight: bold;\">denne line skal være fed og centreret</span><br></div><br>OG her kommer mere almindelig tekst doijf våorwij fvåojiper pbogvijerrpoijvbgv åjeroip bgåiopjet gvåoipje tpbvogj etpogbkj etåpojgb petojgboijet gboijet gboåij tepogbj etåoibjt <br><br><div style=\"text-align: center; font-weight: bold;\">Og her fler lininer som er fed og cwentreret <br>denne er med <br>denne ogr også med<br></div><br>OG mere helt almindelig tekst åoij åoijgb dåfjiop bpoj ghbojgdj&#7719;pokg<br>\"gdøopbkjk pokjbh prgonh pfoknh rgonkn hrf<br><br></body></html>";
 
-    
+    static String debugmsg;
 
-    public Fragment fragSomVises;
 //////////-------------------------//////////
 	
 
     @Override
     public void onCreate() {
         super.onCreate();
-        System.out.println("A.oncreate() kaldt");
+        Util.starttid = System.currentTimeMillis();
+        p("A.oncreate() kaldt");
         a= this;
         ctx=this;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         modenhed = tjekModenhed();
         p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
+        //Ryk evt til splash
         if (modenhed > MODENHED_HELT_FRISK) {
-//Ryk evt til splash
+
             if (tredjeDagFørsteGang){
+
+                p("tredje dag første gang!! ");
                 synligeTekster = Util.hentTekstliste("tempsynligeTekster", this);
+                p("Synligetekster længde: "+ synligeTekster.size());
                 gemSynligeTekster();
 
             }
@@ -232,20 +224,26 @@ public class A extends Application {
         }.execute();
     }
 
+
+
     private void gemAlleNyeTekster() {
 
         new AsyncTask() {
 
+
+
             @Override
             protected Object doInBackground(Object[] params) {
-
+                ArrayList<Tekst> itekster;
 
                 Tekst dummyTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "t", new DateTime());
                 dummyTekst.lavId();
-				
-                ArrayList<Tekst> itekster = Util.sorterStigende(alleTekster[1]);
 
-                Set<String> alleteksterSæt = pref.getStringSet("alletekster", new HashSet<String>());
+
+                itekster = Util.sorterStigende(alleTekster[1]);
+                p("itekster længde: "+ itekster.size());
+
+                Set<String> alleteksterSæt = new HashSet<String>();
 
                 ArrayList<Tekst> tempSynlige = new ArrayList<>();
 
@@ -269,7 +267,7 @@ public class A extends Application {
                             tempSynlige.add(itekster.get(i));
 
                         } else if (!iFundet) {
-
+                            p("I ineksakt match");
                             iFundet = true;
                             tempSynlige.add(itekster.get(i - 3));
                             tempSynlige.add(itekster.get(i - 2));
@@ -284,6 +282,7 @@ public class A extends Application {
 
                 ArrayList<Tekst> mtekster = Util.sorterStigende(alleTekster[2]);
 
+                p("Mtekster længde: "+mtekster.size());
 
                 for (int i = 0; i < mtekster.size(); i++) {
                     Tekst mtekst = mtekster.get(i);
@@ -300,7 +299,10 @@ public class A extends Application {
                                 tempSynlige.add(mtekst);
 
 
-                            } else tempSynlige.add(mtekst);
+                            } else {
+                                tempSynlige.add(mtekst);
+                                p("ineksakt match mtekst");
+                            }
                             mFundet = true;
                         }
 
@@ -407,13 +409,6 @@ public class A extends Application {
         return MODENHED_MODEN;
     }
 
-    /*
-    *  1102016
-    * 11012016
-    *
-    * 20161001
-    * 20160111
-    * */
 
 
     private boolean tjekTekstversion() {
@@ -452,47 +447,15 @@ public class A extends Application {
         return (gemtTekstversion < version);
     }
 
-    boolean tjekTekstRul () {
-
-        return true;
-    }
-
-    private void indlæsTekster()  {
-
-        //TODO
-    }
-
-    private void dummyInit() {
-
-        //bruges under parsing
-        htmlStreng = htmlStreng.replaceFirst("<title", "<!--title");
-        htmlStreng = htmlStreng.replaceFirst("</title>", "title-->");
-        htmlStreng = htmlStreng.replaceFirst("<body", "<body style=\"color: white; background-color: black;\"");
-
-        tekster.add("Tekst1 overskrift");
-        tekster.add("Tekst2 overskrift");//"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"><html><head><meta content=\"text/html; charset=ISO-8859-1\" http-equiv=\"content-type\"><title>o17092016.txt</title></head><body><h2 style=\"text-align: center;\">Overskift</h2>Prødtekst bla bla bla<br>loårwij vfvåoijdsd åvoij såoigjb åfsoji gvåoifjob idfj obåijfd boåijfdobigj fdoibjåfdoijgb åfdoij båojfdpi gbåjopidf åboji dfåobji dfåojibåfdjop båpdfjo hbåpjiodf <span style=\"font-weight: bold;\">fed tekst inde i teksten</span>oæbhijd fåpjoib fdoji bådfoipj båpdoijo bhåpjoi dfåppjoihb åpdjfoihbåijpod fåbboijp dfåojhip båpdfjio cgåpoijb ådfpojg cbpojv dfåpgojbojfd gcb<br><br>&nbsp;vpfdoijb åpfjdoi bpåfodj ågbpoijfd ågpoj båfdopijgbbåpjo fpågojbpofjd gbvjpodfø gopbjk fodjx bpöjkf gxobkj vfokgxbo fkxgpobk pokgxxbpok fpovkb ogdfk gpbök fdpogkvcb pofdkg bcpok dfogxkb dofkg bc<br><br style=\"font-weight: bold;\"><div style=\"text-align: center;\"><span style=\"font-weight: bold;\">denne line skal være fed og centreret</span><br></div><br>OG her kommer mere almindelig tekst doijf våorwij fvåojiper pbogvijerrpoijvbgv åjeroip bgåiopjet gvåoipje tpbvogj etpogbkj etåpojgb petojgboijet gboijet gboåij tepogbj etåoibjt <br><br><div style=\"text-align: center; font-weight: bold;\">Og her fler lininer som er fed og cwentreret <br>denne er med <br>denne ogr også med<br></div><br>OG mere helt almindelig tekst åoij åoijgb dåfjiop bpoj ghbojgdj&#7719;pokg<br>\"gdøopbkjk pokjbh prgonh pfoknh rgonkn hrf<br><br></body></html>");
-        tekster.add("Tekst3 overskrift");
-        tekster.add("Tekst4 overskrift");
-        tekster.add("Tekst5 overskrift");
-
-        overskrifter.add("1 En meget lang overskrift der nok er for bred til skærmen");
-        overskrifter.add("2 En kortere overskrift ");
-        overskrifter.add("3 En meget lang overskrift der nok er for bred til skærmen");
-        overskrifter.add("4 En overskrift");
-        overskrifter.add("5 En meget lang overskrift der nok er for bred til skærmen");
-
-
-
-    }
 
     void t(String s){
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
     void p(Object o){
         String kl = "A.";
-        kl += o ;//+ "   #t:" + String.format("%.3f", sec);
+        kl += o +"   #t:" + Util.tid();
         System.out.println(kl);
-        //this.debugmsg += kl +"\n";
+        A.debugmsg += kl +"\n";
     }
 
 }

@@ -30,25 +30,31 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }
         else p("FEJL: getSupportActionbar gav null");
 
-        System.out.println("forside.oncreate() kaldt");
+        p("oncreate() kaldt");
         a = A.a;
 
-
-
-
-
-
-
-      //  if ( savedInstanceState == null){
-            //init viewPager
             prefs = PreferenceManager.getDefaultSharedPreferences(this);
             vp = (ViewPager) findViewById(R.id.pager);
             pa = new PagerAdapter(getSupportFragmentManager());
             vp.setAdapter(pa);
+            vp.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    knapstatus(position, a.synligeTekster.size()-1);
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
 
             initKnapper();
-			
-       // }
 
 
 
@@ -92,39 +98,23 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
 
 
-    void p(Object o){
-        String kl = "Forside.";
-                kl += o + "   #t:";
-        System.out.println(kl);
-       // instans.debugmsg += kl +"\n";
-    }
-
-
-    void t(String s){
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-    }
-
     @Override
     public void onClick(View v) {
         int positionNu = vp.getCurrentItem();
         int maxPosition = a.synligeTekster.size()-1;
 
-
-        p("onclick()");
         if (v==tilbage && positionNu > 0) {
-            p("tilbage");
             vp.setCurrentItem(--positionNu);
         }
         else if (v == frem && positionNu != maxPosition){
             vp.setCurrentItem(++positionNu);
         }
-
         knapstatus (vp.getCurrentItem(), maxPosition);
 
     }
 
     public void knapstatus (int nu, int max) {
-		System.out.println("knapstatus: nu="+nu+" max="+max);
+		p("knapstatus: nu="+nu+" max="+max);
         //husk tilfælde hvor nu og max begge er nul
 
         //husk hTekster
@@ -148,4 +138,16 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
 
     }
+
+    void p(Object o){
+        String kl = "Forside.";
+        kl += o +"   #t:" + Util.tid();
+        System.out.println(kl);
+        A.debugmsg += kl +"\n";
+    }
+    void t(String s){
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+    }
+
+
 }

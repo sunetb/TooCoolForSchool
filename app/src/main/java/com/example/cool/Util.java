@@ -12,6 +12,11 @@ import org.xmlpull.v1.*;
 public class Util {
 
 
+    static long starttid = 0;
+
+    static double tid (){
+        return (double) (System.currentTimeMillis()-starttid)/1000.0;
+    }
 
     static ArrayList[] parseXML (String xml, String kaldtFra) {
         p("--parseXML kaldt fra "+kaldtFra);
@@ -329,11 +334,12 @@ public class Util {
 
         return minTekst;
     }
-    static void p(Object o){
 
+    static void p(Object o){
         String kl = "Util.";
-        System.out.println(kl +o);// "   #t:" + t);;
-        //instans.debugmsg += kl +o +"\n";
+        kl += o +"   #t:" + Util.tid();
+        System.out.println(kl);
+        A.debugmsg += kl +"\n";
     }
 
 

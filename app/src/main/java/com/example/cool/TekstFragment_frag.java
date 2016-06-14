@@ -13,9 +13,7 @@ import android.widget.TextView;
 import android.graphics.*;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class TekstFragment_frag extends Fragment {
 
 	WebView w;
@@ -34,33 +32,25 @@ public class TekstFragment_frag extends Fragment {
 		position = getArguments().getInt("pos", 0);
 		tekst= a.synligeTekster.get(position);
 		
-        System.out.println("Fragment oncreate "+position);
-		//WebView temp = new WebView(getActivity());
-		//temp.loadData(a.synligeTekster.get(position).brødtekst, "text/html; charset=utf-8", "UTF-8"); //"UTF-8");
-		
+        p("Fragment oncreate "+position);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        System.out.println("Fragment oncreateView");
-
-        //position = getArguments().getInt("pos", 0);
-
+        p("Fragment oncreateView");
 
         View v = inflater.inflate(R.layout.fragment_tekst_fragment_frag, container, false);
         TextView t = (TextView) v.findViewById(R.id.overskrift);
-        t.setText(Html.fromHtml(tekst.overskrift));//a.synligeTekster.get(position).overskrift));//a.tekster.get(position)));
-
-		//w = (WebView) v.findViewById(R.id.brodtekstweb);
+        t.setText(Html.fromHtml(tekst.overskrift));
 		w = (WebView) v.findViewById(R.id.brodtekstweb);
-		w.setBackgroundColor(Color.BLACK);
+		w.setBackgroundColor(Color.BLACK); //forhindrer hvidt blink ved skærmvending
 
        if (savedInstanceState == null) {
 		   
 			w.loadData(tekst.brødtekst, "text/html; charset=utf-8", "UTF-8"); //"UTF-8");
 
 		}
-		//else w = a.wa;
+
 		
         return  v;
     }
@@ -68,8 +58,7 @@ public class TekstFragment_frag extends Fragment {
 	@Override
 	public void onPause()
 	{
-		// TODO: Implement this method
-		//a.gemSynligTekst();
+
 		super.onPause();
 		
 	}
@@ -79,21 +68,28 @@ public class TekstFragment_frag extends Fragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState)
 	{
-		// TODO: Implement this method
+
 		w.saveState(outState);
 		super.onSaveInstanceState(outState);
-		//w.saveState(outState);
+
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
-		// TODO: Implement this method
+
 		super.onActivityCreated(savedInstanceState);
 		w.restoreState(savedInstanceState);
 		
 	}
-	
-	
-	//web.restoreState(savedInstanceState);
+
+	void p(Object o){
+		String kl = "TekstFragment.";
+		kl += o +"   #t:" + Util.tid();
+		System.out.println(kl);
+		A.debugmsg += kl +"\n";
+	}
+
+
+
 }
