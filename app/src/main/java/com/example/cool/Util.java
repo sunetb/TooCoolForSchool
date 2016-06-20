@@ -20,6 +20,7 @@ public class Util {
 
     static ArrayList[] parseXML (String xml, String kaldtFra) {
         p("--parseXML kaldt fra "+kaldtFra);
+        p("Xml længde: "+xml.length());
 
         ArrayList<Tekst> oteksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> teksterTmp = new ArrayList<Tekst>();
@@ -124,16 +125,27 @@ public class Util {
                         else if (celletæller == 3) {
 
                             put  = put.replaceFirst("<title", "<!--title")
-                                    .replaceFirst("</title>", "title-->")
+                                    .replaceFirst("</title>", "<title-->")
                                     .replaceFirst("<body", "<body style=\"color: white; background-color: black;\"");
 
-                            tempTekst.brødtekst = put.replaceAll("<cft>", "");
+                            tempTekst.brødtekst = put;
 						    tempTekst.lavId();
 							
                             if      (tempTekst.kategori.equalsIgnoreCase("o")) oteksterTmp.add(tempTekst);
                             else if (tempTekst.kategori.equalsIgnoreCase("i")) teksterTmp.add(tempTekst);
                             else if (tempTekst.kategori.equalsIgnoreCase("m")) mteksterTmp.add(tempTekst);
-                            else if (tempTekst.kategori.equalsIgnoreCase("h")) hteksterTmp.add(tempTekst);
+                            else if (tempTekst.kategori.equalsIgnoreCase("h")) {
+
+                               /* //MEGET ad hoc
+                                String nybrød = "<html><head><meta content=\"text/html; charset=ISO-8859-1\"http-equiv=\"content-type\"></head><body style=\"color: white; background-color: black;\">"+
+                                        tempTekst.brødtekst+
+                                        "</body></html>";
+                                 tempTekst.brødtekst = nybrød;
+                                //hertil
+                                */
+
+                                hteksterTmp.add(tempTekst);
+                            }
                             
                         }
 
@@ -154,8 +166,8 @@ public class Util {
             ex.printStackTrace();
             p(ex.getMessage());}
 
-        ArrayList[] data = {oteksterTmp, sorterStigende(teksterTmp), sorterStigende(mteksterTmp), hteksterTmp};
-
+        ArrayList[] data = {oteksterTmp, teksterTmp, mteksterTmp, hteksterTmp};
+        p("Data længde: "+ data.length + " | o: "+oteksterTmp.size() + " | i: "+teksterTmp.size() + " | m: "+mteksterTmp.size() + " | h: "+hteksterTmp.size());
         return data;
     }
 
@@ -241,6 +253,8 @@ public class Util {
 
     public static void gemTekstliste (ArrayList<Tekst> liste, String filename, Context c) {
         p("gemTekstliste("+filename+")");
+
+
         File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
 
         if (!directory.exists()) {
@@ -333,11 +347,24 @@ public class Util {
         return minTekst;
     }
 
+    static ArrayList<Tekst> erstatAfsnit(ArrayList<Tekst>  input){
+        ArrayList<Tekst> temp = new ArrayList<Tekst>();
+
+        for (Tekst t : input) {
+            String nyBrødtekst = t.brødtekst.replaceAll("\n", " ");
+
+            t.brødtekst = nyBrødtekst;
+            temp.add(t);
+        }
+
+        return temp;
+    }
+
     static void p(Object o){
         String kl = "Util.";
         kl += o +"   #t:" + Util.tid();
         System.out.println(kl);
-        A.debugmsg += kl +"\n";
+        A.debugmsg += kl +"<br>";
     }
 
 

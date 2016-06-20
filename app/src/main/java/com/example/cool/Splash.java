@@ -81,7 +81,7 @@ public class Splash extends AppCompatActivity implements Runnable {
         String kl = "Splash.";
         kl += o +"   #t:" + Util.tid();
         System.out.println(kl);
-        A.debugmsg += kl +"\n";
+        A.debugmsg += kl +"<br>";
     }
 
 

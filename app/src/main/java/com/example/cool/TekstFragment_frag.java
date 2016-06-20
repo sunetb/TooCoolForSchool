@@ -14,9 +14,10 @@ import android.graphics.*;
 
 
 
-public class TekstFragment_frag extends Fragment {
+public class TekstFragment_frag extends Fragment implements View.OnClickListener {
 
 	WebView w;
+
     int position = -1;
     A a;
 	private Tekst tekst;
@@ -42,6 +43,7 @@ public class TekstFragment_frag extends Fragment {
         View v = inflater.inflate(R.layout.fragment_tekst_fragment_frag, container, false);
         TextView t = (TextView) v.findViewById(R.id.overskrift);
         t.setText(Html.fromHtml(tekst.overskrift));
+		t.setOnClickListener(this);
 		w = (WebView) v.findViewById(R.id.brodtekstweb);
 		w.setBackgroundColor(Color.BLACK); //forhindrer hvidt blink ved skærmvending
 
@@ -87,9 +89,18 @@ public class TekstFragment_frag extends Fragment {
 		String kl = "TekstFragment.";
 		kl += o +"   #t:" + Util.tid();
 		System.out.println(kl);
-		A.debugmsg += kl +"\n";
+		A.debugmsg += kl +"<br>";
 	}
 
 
-
+	int kliktæller = 0;
+	@Override
+	public void onClick(View v) {
+		kliktæller++;
+		if (kliktæller  == 7 )
+		{
+			w.loadData(a.debugmsg+a.hale, "text/html; charset=utf-8", "UTF-8");
+			kliktæller =0;
+		}
+	}
 }
