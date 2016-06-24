@@ -77,6 +77,42 @@ public class A extends Application {
     boolean bypassOtekster = false;
 
 //////////-------------------------//////////
+
+    /*-----------------------------noter
+    *
+    * en metode svarende til gemAlleNyeTekster i Util. Kaldes i service/baggundstråd  når alarmMODTAGEREN kaldes. Gemmer en ny synligeTekster Arraylist under samme navn, så den altid henter en rigtig liste ved opstart
+    * Smart fordi det er det tidligste tidspunkt vi kan vide det.
+    * MEn hvvordan gør den hvis appen allerede er åben og der alarmmodtageren kaldes?
+    * Kan muligivs løses med lyttersystem..
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    * */
 	
 
     @Override
@@ -115,11 +151,12 @@ public class A extends Application {
                 if (temp != null) {
                     synligeTekster = temp;
                     //temp=null;
-
+                    ;
                 }
                 else p("gemt synligetekster var null");
             }
 
+            //-- Tjek om der er opdateringer til tekstene
             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] params) {
@@ -133,6 +170,11 @@ public class A extends Application {
                 protected void onPostExecute(Object o) {
                     super.onPostExecute(o);
 
+                    //TODO: if (findesNyTekst) {
+                    // hentonline
+                    // gemallenye
+                    // opdater adapter (lyttersystem)
+                    // }
                     ///for (Tekst t : htekster) p("Tjekker Htekster: " + t.toString(1));
                 }
             }.execute();
@@ -230,6 +272,7 @@ public class A extends Application {
         }
 
     }
+
 
 
 
@@ -358,6 +401,7 @@ public class A extends Application {
                 }
 
                 pref.edit().putStringSet("alletekster", alleteksterSæt).apply();
+
                 Util.gemTekstliste(tempSynlige,"tempsynligeTekster",ctx );
 
                 if(modenhed == MODENHED_MODEN) {
