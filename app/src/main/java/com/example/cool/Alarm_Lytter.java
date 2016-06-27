@@ -55,7 +55,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         //ingen effekt.setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
         ;
 
-        Intent resultIntent = new Intent(context, MainActivity.class);
+        Intent resultIntent = new Intent(context, Forside_akt.class);
         resultIntent.putExtra("overskrift", overskrift);
         resultIntent.putExtra("tekstId", id);
         resultIntent.putExtra("id_int", id_int);

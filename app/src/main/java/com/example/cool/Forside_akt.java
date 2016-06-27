@@ -131,12 +131,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     void p(Object o){
         String kl = "Forside.";
-        kl += o +"   #t:" + Util.tid();
-        System.out.println(kl);
-        A.debugmsg += kl +"<br>";
+        Util.p(kl+o);
     }
     void t(String s){
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+        Util.t(this,s);
     }
 
 

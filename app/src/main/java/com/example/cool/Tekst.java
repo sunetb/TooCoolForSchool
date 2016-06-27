@@ -1,26 +1,24 @@
 package com.example.cool;
 
-import android.text.Html;
-
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class Tekst implements Serializable {
 
 	static final long serialVersionUID = 1234567890;
 
-	int tekstid;
+
 	String kategori;
-	String idTekst;
+	String id;
+	int id_int;
 	String overskrift;
 	String brødtekst;
 
 	DateTime dato;
 
 	public Tekst () {
-		tekstid = 0;
+		id_int = 0;
 	}
 
 	public Tekst(String over, String brød, String katg, DateTime d) {
@@ -43,12 +41,12 @@ public class Tekst implements Serializable {
 
 	public void lavId (){
 		if (kategori.equals("h")) {
-			idTekst = "h";
-			tekstid = 400000;
+			id = "h";
+			id_int = 400000;
 			return;
 		}
-		tekstid = lavIntId();
-		idTekst = lavIdStreng();
+		id_int = lavIntId();
+		id = lavIdStreng();
 	}
 
 
@@ -102,15 +100,15 @@ public class Tekst implements Serializable {
 	}
 	//Sikring
 	public int getId () {
-		if (tekstid == 0) {
+		if (id_int == 0) {
 			lavId();
 		}
-		return tekstid;
+		return id_int;
 	}
 
 	public String toString()
 	{
-		String s = ": Dato: "+datokode() + " id: "+tekstid +
+		String s = ": Dato: "+datokode() + " id: "+ id_int +
 		" | kat: "+kategori +
 		" | overskr:" + overskrift+
 		" | brødtekst:" + brødtekst.substring(0,15)+"...";

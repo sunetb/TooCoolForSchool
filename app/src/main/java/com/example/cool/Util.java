@@ -1,6 +1,12 @@
 package com.example.cool;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.*;
+import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
+import android.widget.Toast;
+
 import java.io.*;
 import java.util.*;
 import org.joda.time.*;
@@ -18,9 +24,80 @@ public class Util {
         return (double) (System.currentTimeMillis()-starttid)/1000.0;
     }
 
+    static void notiBrugt(Context c, Intent intent){
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+
+        //tjek om første opstart
+        boolean førsteOpstart = sp.getBoolean("førstegang", true);
+        ArrayList<String> gamle;
+
+        //Set<String> brugteNotifikationer = sp.getStringSet("gamle", new HashSet<String>());
+        if (førsteOpstart) gamle = new ArrayList<>();
+        else gamle = (ArrayList<String>) IO.læsObj("gamle", c);
+
+        sp.edit().putBoolean("førstegang", false).apply();
+
+        String id = intent.getExtras().getString("tekstId", "");
+        int id_int = intent.getExtras().getInt("id_int", 0);
+
+        p("Util.notiBrugt modtog: id: "+id + "id_int: "+id_int);
+
+        boolean føradd = gamle.contains(id);
+        gamle.add(id);
+        //sp.edit().putStringSet("gamle", gamle).apply();
+        IO.gemObj(gamle, "gamle", c);
+        boolean efteradd = gamle.contains(id);
+
+        p("Util.notiBrugt tjek sættet:");
+        for (String s : gamle) System.out.println(s);
+
+        t(c,"notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
+        p("Util.notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
+
+        PendingIntent i = PendingIntent.getBroadcast(c, id_int, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alm = A.alm;
+        if (alm == null) alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+        else p("Util.notiBrugt(): alarmManager ekisterer");
+        i.cancel();
+
+        alm.cancel(i);
+
+    }
+
+
+    static void startAlarm (Context c, Tekst t) {
+        p("Util.startAlarm() modtog "+t.overskrift);
+
+        ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
+        PackageManager pm = c.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+        AlarmManager alarmMgr = A.alm;
+        PendingIntent alarmIntent;
+
+        if (alarmMgr == null)  alarmMgr = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+        else p("Util.startAlarm()  alarmManager eksisterer");
+        Intent intent = new Intent(c, Alarm_Lytter.class);
+
+        intent.putExtra("id_int", t.id_int);
+        intent.putExtra("tekstId", t.id);
+        intent.putExtra("overskrift", t.overskrift);
+        //intent.setAction("com.example.notitest.START_ALARM"); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+//com.example.notitest.START_ALARM
+        //int id_int = Util.tekstTilTal(id);
+
+        alarmIntent = PendingIntent.getBroadcast(c, t.id_int, intent,  PendingIntent.FLAG_UPDATE_CURRENT);
+
+        p("Util.startAlarm() Dato: "+t.dato.toString());
+
+        alarmMgr.set(AlarmManager.RTC, t.dato.getMillis(), alarmIntent);
+    }
+
     static ArrayList[] parseXML (String xml, String kaldtFra) {
-        p("--parseXML kaldt fra "+kaldtFra);
-        p("Xml længde: "+xml.length());
+        p("Util.parseXML kaldt fra "+kaldtFra);
+
 
         ArrayList<Tekst> oteksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> teksterTmp = new ArrayList<Tekst>();
@@ -109,7 +186,7 @@ public class Util {
                                     if (måned > 12) { //Fejl: dag og måned er ombyttet
                                         if (dag < 13)tempTekst.dato = new DateTime(år,dag,måned,1,0);
                                         else {
-                                            p("FEJL: Ugyldig dato");
+                                            p("Util.parseXML(): FEJL: Ugyldig dato");
                                         }
                                     }
                                     else tempTekst.dato = new DateTime(år,måned,dag,1,0);
@@ -125,8 +202,12 @@ public class Util {
                         else if (celletæller == 3) {
 
                             put  = put.replaceFirst("<title", "<!--title")
-                                    .replaceFirst("</title>", "<title-->")
-                                    .replaceFirst("<body", "<body style=\"color: white; background-color: black;\"");
+                                    .replaceFirst("</title>", "<title-->");
+
+                            if (tempTekst.kategori.equalsIgnoreCase("h"))
+                                put =  put.replaceFirst("<body", "<body style=\"color: yellow; background-color: black;\"");
+                            else
+                                put = put.replaceFirst("<body", "<body style=\"color: white; background-color: black;\"");
 
                             tempTekst.brødtekst = put;
 						    tempTekst.lavId();
@@ -167,23 +248,10 @@ public class Util {
             p(ex.getMessage());}
 
         ArrayList[] data = {oteksterTmp, teksterTmp, mteksterTmp, hteksterTmp};
-        p("Data længde: "+ data.length + " | o: "+oteksterTmp.size() + " | i: "+teksterTmp.size() + " | m: "+mteksterTmp.size() + " | h: "+hteksterTmp.size());
+        p("Util.parseXML(): Data længde: "+ data.length + " | o: "+oteksterTmp.size() + " | i: "+teksterTmp.size() + " | m: "+mteksterTmp.size() + " | h: "+hteksterTmp.size());
         return data;
     }
 
-    static int tekstTilTal (String tekst) {
-
-        int l = tekst.length();
-        String udtekst = "";
-        for (int i = 0;i<l; i++) {
-            char a = tekst.charAt(i);
-            int k = Character.getNumericValue(a);
-            udtekst += ""+k;
-
-        }
-        return tryParseInt(udtekst);
-
-    }
 
 	static int lavDato (Date d) {
 		
@@ -204,7 +272,7 @@ public class Util {
             for (int i = 0; i < ind.size() - 1; i++) {
 
                 Tekst b = ind.get(i + 1);
-                if (a.tekstid > b.tekstid) {
+                if (a.id_int > b.id_int) {
                     a = b;
                     ix=i+1;
                 }
@@ -251,8 +319,25 @@ public class Util {
         }
     }
 
+
+    /*
+
+      static int tekstTilTal (String tekst) {
+
+        int l = tekst.length();
+        String udtekst = "";
+        for (int i = 0;i<l; i++) {
+            char a = tekst.charAt(i);
+            int k = Character.getNumericValue(a);
+            udtekst += ""+k;
+
+        }
+        return tryParseInt(udtekst);
+
+    }
+
     public static void gemTekstliste (ArrayList<Tekst> liste, String filename, Context c) {
-        p("gemTekstliste("+filename+")");
+        p("Util.gemTekstliste("+filename+")");
 
 
         File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
@@ -274,7 +359,7 @@ public class Util {
     }
 
     static ArrayList<Tekst> hentTekstliste (String filename, Context c) {
-        p("hentTekstliste("+filename+")");
+        p("Util.hentTekstliste("+filename+")");
         ObjectInputStream input = null;
         ArrayList<Tekst> mitArray = null;
         File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
@@ -346,7 +431,7 @@ public class Util {
 
         return minTekst;
     }
-
+*/
     static ArrayList<Tekst> erstatAfsnit(ArrayList<Tekst>  input){
         ArrayList<Tekst> temp = new ArrayList<Tekst>();
 
@@ -360,9 +445,12 @@ public class Util {
         return temp;
     }
 
+    static void t(Context c, String s){
+        Toast.makeText(c, s, Toast.LENGTH_LONG).show();
+    }
+
     static void p(Object o){
-        String kl = "Util.";
-        kl += o +"   #t:" + Util.tid();
+        String kl = o +"   #t:" + tid();
         System.out.println(kl);
         A.debugmsg += kl +"<br>";
     }

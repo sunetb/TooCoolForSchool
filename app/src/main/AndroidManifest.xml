@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+
+
 
     <application
         android:name=".A"
@@ -24,6 +27,26 @@
 
         <activity android:name=".Forside_akt">
         </activity>
+
+        <receiver
+            android:name=".Alarm_Lytter">
+            <intent-filter>
+                <action android:name="com.example.notitest.START_ALARM" />
+            </intent-filter>
+        </receiver>
+
+
+        <receiver
+            android:name=".Boot_Lytter"
+            android:label="BootModtag"
+            android:enabled="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".SletNotifikation_Lytter" />
 
     </application>
 

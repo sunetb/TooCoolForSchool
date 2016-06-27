@@ -53,9 +53,26 @@ public class Splash extends AppCompatActivity implements Runnable {
 
 
         if (savedInstanceState == null) {
+            p("Starter handler");
             handler.postDelayed(this, (animLængde1+animLængde2)-500);
+            p("kører initialiserData");
+            initialiserData();
+
         }
         splashAktivitet = this;
+
+    }
+
+    private void initialiserData() {
+
+        p("InitialiserData()");
+        p("Splash tjekker A: er oncreate kørt færdig? "+A.tjek);
+        int modenhed = sp.getInt("modenhed", -1);
+        if (modenhed > 1){
+            //// TODO: tjek om tekster skal opdateres 
+            
+        }
+
     }
 
     private void gemKortereVærdier() {
@@ -79,9 +96,7 @@ public class Splash extends AppCompatActivity implements Runnable {
     }
     void p(Object o){
         String kl = "Splash.";
-        kl += o +"   #t:" + Util.tid();
-        System.out.println(kl);
-        A.debugmsg += kl +"<br>";
+        Util.p(kl+o);
     }
 
 

@@ -87,9 +87,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
 	void p(Object o){
 		String kl = "TekstFragment.";
-		kl += o +"   #t:" + Util.tid();
-		System.out.println(kl);
-		A.debugmsg += kl +"<br>";
+		Util.p(kl+o);
 	}
 
 
