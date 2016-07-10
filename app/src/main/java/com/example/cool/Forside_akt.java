@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-public class Forside_akt extends AppCompatActivity implements View.OnClickListener {
+public class Forside_akt extends AppCompatActivity implements View.OnClickListener, Observatør{
 
     PagerAdapter pa;
     ViewPager vp;
@@ -33,6 +33,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         initUI();
+        a.aktivitetenVises = true; //skal den stå tidligere?
     }
 
     @Override
@@ -83,11 +84,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     }
 
 
-
     @Override
     protected void onStart() {
         super.onStart();
-
+        a.lyt(this);
         vp.addOnPageChangeListener(sideLytter);
         int visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
         vp.setCurrentItem(visPosition);
@@ -97,6 +97,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
+        a.afregistrer(this);
         vp.removeOnPageChangeListener(sideLytter);
         prefs.edit().putInt("seneste position", vp.getCurrentItem()).apply();
         a.gemSynligeTekster();
@@ -109,7 +110,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         //TODO husk hTekster
 
-        if (nu == max) {
+        if (nu == max || max == -1) {
             frem.setEnabled(false);
             frem.getBackground().setAlpha(100);
         }
@@ -125,8 +126,13 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             tilbage.setEnabled(true);
             tilbage.getBackground().setAlpha(255);
         }
+    }
 
-
+    @Override
+    public void opdater() {
+        pa.notifyDataSetChanged();
+        knapstatus(a.synligeTekster.size()-1, a.synligeTekster.size()-1);
+        t("Teksterne blev opdateret");
     }
 
     void p(Object o){

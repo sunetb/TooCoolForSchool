@@ -35,13 +35,19 @@ public class A extends Application {
 //////////-------------------------//////////
 	
 
-//////////---------- VISES NU ----------//////////
-	
+//////////---------- UI TILSTAND / Lytterstystem ----------//////////
+	ArrayList<Observatør> observatører = new ArrayList<>();
+    void lyt(Observatør o) {observatører.add(o);}
+    void afregistrer(Observatør o) {observatører.remove(o);}
+    void givBesked () {for (Observatør o: observatører) o.opdater();}
 
-	//todo  scroll, zoom, 
+    boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
+
 //////////-------------------------//////////
+
+
 	
-//////////---------- TILSTAND ----------//////////
+//////////---------- APP TILSTAND ----------//////////
 	
     boolean findesNyTekst = false;
     int modenhed = 0;
@@ -70,23 +76,36 @@ public class A extends Application {
 
     public static String debugmsg = "<!DOCTYPE html ><html><head><meta content=\"text/html; charset=ISO-8859-1\" http-equiv=\"content-type\"><title>o17092016.txt</title></head><body  style=\"color: white; background-color: black;\">";
     public static String hale = "</body></html>";
-    DateTime okt15 = new DateTime(2015, 10, 2, 1,0);
+
 
     static boolean tjek = false;
-    boolean bypassOtekster = false;
+    boolean hurtigModning = true; // til test på enhed
+    DateTime masterDato;
 
 //////////-------------------------//////////
 
     /*-----------------------------noter
+
+    * NeedToHave:
+     * Hvis forbindelsen er langsom, når data ikke at blive hentet før hovedaktiviteten initialiseres.
+    * Kræver:
+    * -opdaterSkærm() -metode i fragment/akt
+    * -lyttersystem
     *
-    * en metode svarende til gemAlleNyeTekster i Util. Kaldes i service/baggundstråd  når alarmMODTAGEREN kaldes. Gemmer en ny synligeTekster Arraylist under samme navn, så den altid henter en rigtig liste ved opstart
+    * ? En Master-dato som sættes med en debug-knap
+	plus re-sync. hmm
+	
+    *
+    * NiceToHave
+    * en metode svarende til gemAlleNyeTekster i Util. Kaldes i service/baggundstråd  når alarmMODTAGEREN kaldes.
+    * Gemmer en ny synligeTekster Arraylist under samme navn, så den altid henter en rigtig liste ved opstart
     * Smart fordi det er det tidligste tidspunkt vi kan vide det.
     * MEn hvvordan gør den hvis appen allerede er åben og der alarmmodtageren kaldes?
     * Kan muligivs løses med lyttersystem..
     *
-    * husk gul skrift til h-tekster
     *
-    * lav om til kun at bruge gemObj og hentObj i Util
+    *
+    *
     *
     *
 
@@ -98,7 +117,7 @@ public class A extends Application {
     public void onCreate() {
         super.onCreate();
         Util.starttid = System.currentTimeMillis();
-        p("A.oncreate() kaldt");
+        p("oncreate() kaldt");
         a= this;
         ctx=this;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -106,40 +125,37 @@ public class A extends Application {
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
 
-        if (bypassOtekster) modenhed = bypassOpstart(); //test
-        else
+        masterDato = new DateTime();
+        if (hurtigModning) masterDato = new DateTime(2015, 10, 1, 0,0);
+
         modenhed = tjekModenhed();
 
         p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
 
-        if (modenhed > MODENHED_HELT_FRISK) {
-            if (bypassOtekster) {
+        if (hurtigModning && modenhed == MODENHED_MODEN){
 
-            }
-            else if (tredjeDagFørsteGang){
-                 p("tredje dag første gang!! ");
+            DateTime glmaster = (DateTime) IO.læsObj("masterdato", this);
+            masterDato = glmaster.plusDays(2);
+            IO.gemObj(masterDato, "masterdato",this);
+            p(masterDato);
+        }
+
+        if (modenhed > MODENHED_HELT_FRISK) {
+
+            if (tredjeDagFørsteGang){
+                p("tredje dag første gang!! ");
                 synligeTekster = (ArrayList<Tekst>) IO.læsObj("tempsynligeTekster", this);
                 p("Synligetekster længde: "+ synligeTekster.size());
-                pref.edit().putInt("seneste position", synligeTekster.size()-1).apply();
-                synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
-
-
+                pref.edit().putInt("seneste position", 0).apply();
                 gemSynligeTekster();
                 tredjeDagFørsteGang = false;
-
             }
             else {
-                synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
-                ArrayList<Tekst> temp = hentsynligeTekster();
-                if (temp != null) {
-                    synligeTekster = temp;
-                    //temp=null;
-                
-                }
-                else p("FEJL gemt synligetekster var null");
+                 synligeTekster = hentsynligeTekster();
             }
-
+			synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
+			
             //-- Tjek om der er opdateringer til tekstene
             new AsyncTask() {
                 @Override
@@ -167,8 +183,8 @@ public class A extends Application {
 
         if (modenhed == MODENHED_MODEN) {
 
-            skalTekstlistenOpdateres();
 
+            skalTekstlistenOpdateres();
 
             new AsyncTask() {
 
@@ -200,7 +216,7 @@ public class A extends Application {
         }
 
         else if (modenhed == MODENHED_FØRSTE_DAG) {
-            p("Dag 1, anden gang");
+            p("Dag 1, ikke første gang");
         }
 
         else if (modenhed == MODENHED_ANDEN_DAG) {
@@ -225,15 +241,13 @@ public class A extends Application {
         IO.gemObj(new ArrayList<Integer>(), "datoliste", this);
         IO.gemObj(new ArrayList<Integer>(), "synligeDatoer", this);
 
+
         new AsyncTask() {
 
 
             @Override
             protected Object doInBackground(Object[] params) {
                 alleTekster = hentTeksterOnline();
-
-
-
                 findesNyTekst = tjekTekstversion(); //køres for at få gemt versionsnummer i prefs første gang
                 return null;
             }
@@ -241,33 +255,27 @@ public class A extends Application {
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
 
-                ArrayList<Tekst> otekster = alleTekster[0];
-                Tekst o1 = otekster.get(0);
-                String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
-                o1.brødtekst = nyBrødtekst;
-                synligeTekster.add(o1);
-                IO.gemObj(o1, "otekst1", ctx);
+                    ArrayList<Tekst> otekster = alleTekster[0];
+                    Tekst o1 = otekster.get(0);
+                    String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
+                    o1.brødtekst = nyBrødtekst;
+                    synligeTekster.add(o1);
+                    p("Så er der O-tekst i array!");
 
+                    if(aktivitetenVises) givBesked();
+                    IO.gemObj(o1, "otekst1", ctx);
 
-                //Gemmer O-tekst nr 2 til næste gang
-                Tekst o2 = otekster.get(1);
-                String nyBrødtekst2 = o2.brødtekst.replaceAll("\n", " ");
+                    //Gemmer O-tekst nr 2 til næste gang
+                    Tekst o2 = otekster.get(1);
+                    String nyBrødtekst2 = o2.brødtekst.replaceAll("\n", " ");
 
-                o1.brødtekst = nyBrødtekst2;
+                    o1.brødtekst = nyBrødtekst2;
 
+                    IO.gemObj(o2, "otekst2", ctx);
 
-                IO.gemObj(o2,"otekst2",ctx);
-
-                fortsæt();
-
+                fortsæt();// async-kæde: ting der også kan gøres i baggrunden, men som er afhængige af værdier fra denne metode
             }
-
-
-
         }.execute();
-
-
-
     }
 
     private void fortsæt() {
@@ -292,7 +300,8 @@ public class A extends Application {
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                gemAlleNyeTekster();
+                gemAlleNyeTekster(); // async-kæde: ting der også kan gøres i baggrunden, men som er afhængige af værdier fra denne metode
+				
             }
         }.execute();
     }
@@ -308,7 +317,7 @@ public class A extends Application {
 
                 //ArrayList<Tekst> itekster;
 
-                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", new DateTime());
+                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", masterDato);
                 dummyITekst.lavId();
                 ArrayList<Integer> datoliste = new ArrayList();
 
@@ -326,10 +335,11 @@ public class A extends Application {
                     int tekstid = itekst.id_int;
                     p("Tjek Itekster: " + tekstid);
                     p("IdTekst: "+itekst.id);
-
+                    datoliste.add(itekst.id_int);
+                    IO.gemObj(itekst, "" + tekstid, ctx);
                     if (tekstid >= dummyITekst.id_int) {
-                        IO.gemObj(itekst, "" + tekstid, ctx);
-                        datoliste.add(itekst.id_int);
+
+
 
                         if (!iFundet && tekstid == dummyITekst.id_int) {
                             p("Itekst eksakt match");
@@ -353,7 +363,7 @@ public class A extends Application {
                     }
                 }
 
-                Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", new DateTime());
+                Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", masterDato);
                 dummyITekst.lavId();
                 p("Tjek dummytekst id: "+dummyITekst.id_int);
 
@@ -368,10 +378,11 @@ public class A extends Application {
                     Tekst mtekst = mtekster.get(i);
                     p("tjek mtekster: " + mtekst.id_int);
                     p("IdTekst: "+mtekst.id);
-
+                    datoliste.add(mtekst.id_int);
+                    IO.gemObj(mtekst, "" + mtekst.id_int, ctx);
                     if (mtekst.id_int >= dummyMTekst.id_int) {
-                        IO.gemObj(mtekst, "" + mtekst.id_int, ctx);
-                        datoliste.add(mtekst.id_int);
+
+
 
                         if (!mFundet) {
 
@@ -397,9 +408,9 @@ public class A extends Application {
                 if(modenhed == MODENHED_MODEN) {
                     synligeTekster.clear();
                     synligeTekster = tempSynlige;
-                    tempSynlige = null;
+                    //tempSynlige = null;
                     p("tjek synligetekster efer init:");
-                    //for (Tekst t : synligeTekster) p(t.toString());
+                    for (Tekst t : synligeTekster) p(t.toString());
                 }
                 p("gemAlleNyeTekster() slut");
 
@@ -412,11 +423,10 @@ public class A extends Application {
 
         new AsyncTask() {
 
-
             @Override
             protected Object doInBackground(Object[] params) {
 				
-                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", new DateTime());
+                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", masterDato);
                 dummyITekst.lavId();
 
                 ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", ctx); //hvis denne gøres global, kan den initalisteres når som helst - dvs igså tidligere.
@@ -424,7 +434,7 @@ public class A extends Application {
 
                 int idag = dummyITekst.id_int;
 				
-				Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", new DateTime());
+				Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", masterDato);
                 dummyITekst.lavId();
 				
 				int mIdag = dummyMTekst.id_int;
@@ -446,7 +456,7 @@ public class A extends Application {
                     int tekstid = datoliste.get(i);
                     p("Tjek datoliste skalTekslistensOpdateres?: " + tekstid);
 
-					if(tekstid < 200000000){
+					if(tekstid < 300000000){
                         if (tekstid >= idag) {
 
 
@@ -471,10 +481,10 @@ public class A extends Application {
                                 }
 
                             }
-                         else slettes.add(tekstid);
+                         //else slettes.add(tekstid);
                         }
 
-					else { //if tekstid > 20000000
+					else { //if tekstid > 30000000
 						if (tekstid >= mIdag) {
 
 
@@ -495,11 +505,11 @@ public class A extends Application {
                         	}
 
                     	}
-						else slettes.add(tekstid);
+						//else slettes.add(tekstid);
 					}
 				}
 
-              	for (Integer i : slettes) datoliste.remove(i);
+              	//for (Integer i : slettes) datoliste.remove(i);
 
                 IO.gemObj( datoliste, "datoliste", ctx);
 
@@ -507,40 +517,55 @@ public class A extends Application {
 
                 return null;
             }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+                boolean ny = false;
+
+
+                if (synligeDatoer.size() != synligeTekster.size()) {
+                    ny = true;
+                    p("Listerne var forskellig længde: SynligeDatoer: "+synligeDatoer.size() + " SynligeTekster: "+synligeTekster.size());
+                }
+                else {
+                    for (int i = 0 ; i < synligeTekster.size(); i++){
+
+                        int a = synligeDatoer.get(i);
+                        int b  = synligeTekster.get(i).id_int;
+                        if (a != b) {
+                            p("Listerne var samme længde: SynligeDatoer: "+synligeDatoer.size() + " SynligeTekster: "+synligeTekster.size());
+                            ny = true;
+                            p("tjekker listerne: ............................................");
+                            for (Integer q : synligeDatoer) p("synligeDatoer: "+q);
+                            for (Tekst t : synligeTekster) p("synligeTekster: "+t.id_int);
+
+                            break;
+                        }
+                    }
+                }
+
+                if (ny) {
+                    synligeTekster.clear();
+                    p("skalTekstlistenOpdateres ny synligetekster");
+
+                    for (Integer i : synligeDatoer) {
+                        p("dato: "+i);
+                        synligeTekster.add( (Tekst) IO.læsObj(""+i,ctx));
+
+                    }
+                    givBesked();
+                    gemSynligeTekster();
+                }
+                else p("skalTekstlistenOpdateres Ingen ny synlige");
+                p("skalTekstlistenOpdateres() slut");
+
+
+
+            }
         }.execute();
 
 
-		boolean ny = false;
-        int p = synligeDatoer.size();
-        int q = synligeTekster.size();
-
-        if (p != q) {
-            ny = true;
-        }
-
-		else {
-            for (int i = 0 ; i < synligeTekster.size(); i++){
-
-                int a = synligeDatoer.get(i);
-                int b  = synligeTekster.get(i).id_int;
-                if (a == b) {
-                    ny = true;
-                    break;
-                }
-            }
-        }
-		
-		if (ny) {
-			synligeTekster.clear();
-			p("skalTekstlistenOpdateres ny synligetekster");
-
-			for (Integer i : synligeDatoer) {
-			p("dato: "+i);
-			synligeTekster.add( (Tekst) IO.læsObj(""+i,ctx));
-			}
-		}
-        else p("skalTekstlistenOpdateres Ingen ny synlige");
-        p("skalTekstlistenOpdateres() slut");
 
     }
 
@@ -586,6 +611,16 @@ public class A extends Application {
 		if (moden == MODENHED_MODEN) return MODENHED_MODEN;
 		
 		int idag = Util.lavDato(new Date());
+
+        if (hurtigModning) { //til test
+            int dag = pref.getInt("fakedato", 1);
+            IO.gemObj(masterDato,"masterdato", this);
+
+            idag = Util.lavDato(new Date(2015,10,dag));
+            pref.edit().putInt("fakedato", dag+1).apply();
+
+
+        }
 		
         if (moden == MODENHED_HELT_FRISK) {
 			pref.edit()
@@ -593,7 +628,7 @@ public class A extends Application {
 				.putInt("installationsdato", idag)
 				.apply();
 			
-            return 0;
+            return MODENHED_HELT_FRISK;
         }
         else if (moden == MODENHED_FØRSTE_DAG){
 			int instDato  = pref.getInt("installationsdato", 0);
@@ -603,7 +638,7 @@ public class A extends Application {
 					.putInt("modenhed", MODENHED_ANDEN_DAG)
 					.putInt("installationsdato2", idag)
 					.apply();
-				return 2;
+				return MODENHED_ANDEN_DAG;
 			}
 		}
         else if (moden == MODENHED_ANDEN_DAG){
@@ -612,10 +647,11 @@ public class A extends Application {
             else {
                 pref.edit().putInt("modenhed", MODENHED_MODEN).apply();
                 tredjeDagFørsteGang = true;
+                p("tjekModenhed() Tredje dag første gang sat til true");
             }
-            return MODENHED_MODEN;
+            //return MODENHED_MODEN;
         }
-
+        p("tjekModenhed() slut ");
         return MODENHED_MODEN;
     }
 
@@ -650,180 +686,14 @@ public class A extends Application {
 
         if (!"".equals(versionStreng) && (versionStreng != null))
             version = Util.tryParseInt(versionStreng);
-        else t("Fejl: Hentet teksteversion null eller tom");
+        else p("Fejl: Hentet teksteversion null eller tom");
 
         pref.edit().putInt("tekstversion", version).apply();
 
         return (gemtTekstversion < version);
     }
 
-    private int bypassOpstart() {
 
-
-
-        new AsyncTask() {
-
-
-            @Override
-            protected Object doInBackground(Object[] params) {
-                alleTekster = hentTeksterOnline();
-
-
-
-                findesNyTekst = tjekTekstversion(); //køres for at få gemt versionsnummer i prefs første gang
-                return null;
-            }
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-
-
-
-
-                new AsyncTask() {
-
-                    @Override
-                    protected Object doInBackground(Object[] params) {
-                        //gemSynligeTekster();
-                        itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
-                        mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
-
-
-                        //gemmer h-tekster
-                        IO.gemObj(Util.erstatAfsnit(alleTekster[3]),"htekster",ctx);
-
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Object o) {
-                        super.onPostExecute(o);
-                        p("gemAlleNyeTekster() start");
-                        new AsyncTask() {
-
-
-
-                            @Override
-                            protected Object doInBackground(Object[] params) {
-
-                                //ArrayList<Tekst> itekster;
-
-                                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", okt15);
-                                dummyITekst.lavId();
-                                p("Tjek dummytekst id: "+dummyITekst.id_int);
-
-                                //itekster = Util.sorterStigende(alleTekster[1]);
-                                p("itekster længde: "+ itekster.size());
-
-                                Set<String> alleteksterSæt = new HashSet<String>();
-
-                                ArrayList<Tekst> tempSynlige = new ArrayList<>();
-
-                                boolean iFundet = false;
-
-                                for (int i = 0; i < itekster.size(); i++) {
-                                    Tekst itekst = itekster.get(i);
-                                    int tekstid = itekst.id_int;
-                                    p("Tjek Itekster: " + tekstid);
-                                    p("IdTekst: "+itekst.id);
-
-                                    if (tekstid >= dummyITekst.id_int) {
-                                        IO.gemObj(itekst, "" + tekstid, ctx);
-                                        alleteksterSæt.add("" + tekstid);
-
-
-
-                                        if (!iFundet && tekstid == dummyITekst.id_int) {
-                                            p("Itekst eksakt match");
-                                            iFundet = true;
-
-                                            if (i>1)tempSynlige.add(itekster.get(i - 2));
-                                            if (i>0) tempSynlige.add(itekster.get(i - 1));
-                                            tempSynlige.add(itekster.get(i));
-
-
-                                        } else if (!iFundet) {
-                                            p("I ineksakt match");
-                                            iFundet = true;
-                                            if (i>2) tempSynlige.add(itekster.get(i - 3));
-                                            if (i>1)tempSynlige.add(itekster.get(i - 2));
-                                            if (i>0) tempSynlige.add(itekster.get(i - 1));
-                                            else tempSynlige.add(itekster.get(i));
-
-                                        }
-
-                                    }
-                                }
-
-                                Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", okt15);
-                                dummyITekst.lavId();
-                                p("Tjek dummytekst id: "+dummyITekst.id_int);
-
-
-                                boolean mFundet = false;
-
-                                //ArrayList<Tekst> mtekster = Util.sorterStigende(alleTekster[2]);
-
-                                p("Mtekster længde: "+mtekster.size());
-
-                                for (int i = 0; i < mtekster.size(); i++) {
-                                    Tekst mtekst = mtekster.get(i);
-                                    p("tjek mtekster: " + mtekst.id_int);
-                                    p("IdTekst: "+mtekst.id);
-
-                                    if (mtekst.id_int >= dummyMTekst.id_int) {
-                                        IO.gemObj(mtekst, "" + mtekst.id_int, ctx);
-                                        alleteksterSæt.add("" + mtekst.id_int);
-
-                                        if (!mFundet) {
-
-                                            if (mtekst.id_int == dummyMTekst.id_int) {
-                                                p("Eksakt match Mtekst");
-                                                tempSynlige.add(mtekst);
-
-
-                                            } else {
-                                                tempSynlige.add(mtekst);
-                                                p("ineksakt match mtekst");
-                                            }
-                                            mFundet = true;
-                                        }
-
-                                    }
-                                }
-
-                                pref.edit().putStringSet("alletekster", alleteksterSæt).apply();
-                                IO.gemObj(tempSynlige,"synligeTekster",ctx );
-
-                                if(modenhed == MODENHED_MODEN) {
-                                    synligeTekster.clear();
-                                    synligeTekster = tempSynlige;
-                                    //tempSynlige = null;
-                                    p("tjek synligetekster efer init:");
-                                    //for (Tekst t : synligeTekster) p(t.toString());
-                                }
-                                p("gemAlleNyeTekster() slut");
-
-                                return null;
-                            }
-                        }.execute();
-
-
-                    }
-                }.execute();
-
-
-
-            }
-
-
-
-        }.execute();
-
-
-
-        return MODENHED_MODEN;
-    }
 
     void t(String s){
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();

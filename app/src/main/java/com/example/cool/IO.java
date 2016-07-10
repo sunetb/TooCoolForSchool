@@ -18,12 +18,11 @@ import java.io.StreamCorruptedException;
 public class IO {
 
     static Object læsObj (String filename, Context c) {
-        // p("læsTekstliste("+filename+")");
+        p("hentet: "+filename);
         ObjectInputStream input = null;
         Object mitObj = null;
-        File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "serlization");
+        File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
 
-        //p("læsTekstliste_Filen eksisterer? "+directory.exists());
         if (directory.exists()){
 
             try {
@@ -46,7 +45,9 @@ public class IO {
     }
 
     static void gemObj (Object mitObj, String filename, Context c) {
-        File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "serlization");
+        p("gemt: "+filename);
+
+        File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
 
         if (!directory.exists()) {
             directory.mkdirs();
@@ -64,6 +65,11 @@ public class IO {
         }
 
 
+    }
+
+    static void p(Object o){
+        String kl = "IO.";
+        Util.p(kl+o);
     }
 
 }
