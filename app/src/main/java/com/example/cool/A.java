@@ -79,7 +79,7 @@ public class A extends Application {
 
 
     static boolean tjek = false;
-    boolean hurtigModning = true; // til test på enhed
+    boolean hurtigModning = false; // til test på enhed
     DateTime masterDato;
 
 //////////-------------------------//////////
@@ -148,7 +148,12 @@ public class A extends Application {
                 synligeTekster = (ArrayList<Tekst>) IO.læsObj("tempsynligeTekster", this);
                 p("Synligetekster længde: "+ synligeTekster.size());
                 pref.edit().putInt("seneste position", 0).apply();
+
+                //evt i async:
+                Util.opdaterKalender(ctx);
                 gemSynligeTekster();
+                //hertil
+
                 tredjeDagFørsteGang = false;
             }
             else {
@@ -184,7 +189,8 @@ public class A extends Application {
         if (modenhed == MODENHED_MODEN) {
 
 
-            skalTekstlistenOpdateres();
+            if (skalTekstlistenOpdateres()) pref.edit().putInt("seneste position", 0).apply();
+
 
             new AsyncTask() {
 
@@ -286,15 +292,17 @@ public class A extends Application {
 
             @Override
             protected Object doInBackground(Object[] params) {
+
                 //gemSynligeTekster();
                 itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
                 mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
 
-
                 //gemmer h-tekster
-               IO.gemObj(Util.erstatAfsnit(alleTekster[3]),"htekster",ctx);
+                IO.gemObj(Util.erstatAfsnit(alleTekster[3]),"htekster",ctx);
 
-                 return null;
+
+
+                return null;
             }
 
             @Override
@@ -305,6 +313,7 @@ public class A extends Application {
             }
         }.execute();
     }
+
 
 
 
@@ -416,10 +425,12 @@ public class A extends Application {
 
                 return null;
             }
+
         }.execute();
     }
 
-    private void skalTekstlistenOpdateres() {
+    private boolean skalTekstlistenOpdateres() {
+
 
         new AsyncTask() {
 
@@ -430,7 +441,6 @@ public class A extends Application {
                 dummyITekst.lavId();
 
                 ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", ctx); //hvis denne gøres global, kan den initalisteres når som helst - dvs igså tidligere.
-                 p("skalTekstlistenOpdateres Tjek dummytekst id: "+dummyITekst.id_int);
 
                 int idag = dummyITekst.id_int;
 				
@@ -438,8 +448,8 @@ public class A extends Application {
                 dummyITekst.lavId();
 				
 				int mIdag = dummyMTekst.id_int;
-                p("Tjek dummytekst id: "+dummyITekst.id_int);
-
+                p("Tjek I dummytekst id: "+dummyITekst.id_int);
+                p("Tjek M dummytekst id: "+dummyMTekst.id_int);
 
                 boolean mFundet = false;
 				boolean iFundet = false;
@@ -454,14 +464,15 @@ public class A extends Application {
 				//TODO: Optimeres senere
                 for (int i = 0; i < datoliste.size(); i++) {
                     int tekstid = datoliste.get(i);
-                    p("Tjek datoliste skalTekslistensOpdateres?: " + tekstid);
 
 					if(tekstid < 300000000){
+                        p("Tjek datoliste skalTOpdateres? I: " + tekstid);
+
                         if (tekstid >= idag) {
 
 
                                 if (!iFundet && tekstid == idag) {
-                                     p("Itekst eksakt match");
+                                     p("Itekst eksakt match: "+tekstid);
                                     iFundet = true;
 
                                     if (i>1)synligeDatoer.add(datoliste.get(i - 2));
@@ -472,7 +483,7 @@ public class A extends Application {
 
                                 }
                                 else if (!iFundet) {
-                                    p("I ineksakt match");
+                                    p("I ineksakt match: dummy: "+dummyITekst.id_int+" | tekst: "+tekstid);
                                     iFundet = true;
                                     if (i>2) synligeDatoer.add(datoliste.get(i - 3));
                                     if (i>1) synligeDatoer.add(datoliste.get(i - 2));
@@ -485,11 +496,13 @@ public class A extends Application {
                         }
 
 					else { //if tekstid > 30000000
-						if (tekstid >= mIdag) {
+                        p("Tjek datoliste skalTOpdateres? M: " + tekstid);
+
+                        if (tekstid >= mIdag) {
 
 
                         	if (!mFundet && tekstid == mIdag) {
-								p("mtekst eksakt match");
+								p("mtekst eksakt match: "+tekstid);
                             	mFundet = true;
 
                             	//if (i>1)synligeDatoer.add(datoliste.get(i - 2));
@@ -499,17 +512,20 @@ public class A extends Application {
 
 
                         	} else if (!mFundet) {
-								p("m ineksakt match");
-								mFundet = true;
-								synligeDatoer.add(datoliste.get(i));///Hvilken finder den?
+                                p("M ineksakt match: dummy: "+dummyMTekst.id_int+" | tekst: "+tekstid);
+                                mFundet = true;
+                                Tekst mtekst = (Tekst) IO.læsObj(""+tekstid, ctx);
+                                DateTime passeretDato = mtekst.dato.plusDays(7);
+                                if (passeretDato.isAfterNow()) slettes.add(tekstid);
+                                else synligeDatoer.add(datoliste.get(i));
                         	}
 
                     	}
-						//else slettes.add(tekstid);
+
 					}
 				}
 
-              	//for (Integer i : slettes) datoliste.remove(i);
+              	for (Integer i : slettes) datoliste.remove(i);
 
                 IO.gemObj( datoliste, "datoliste", ctx);
 
@@ -556,15 +572,17 @@ public class A extends Application {
                     }
                     givBesked();
                     gemSynligeTekster();
+
                 }
                 else p("skalTekstlistenOpdateres Ingen ny synlige");
                 p("skalTekstlistenOpdateres() slut");
 
-
+            //Gider ikke parametrisere
+                pref.edit().putBoolean("nyTekst", ny).apply();
 
             }
         }.execute();
-
+        return pref.getBoolean("nyTekst", false);
 
 
     }

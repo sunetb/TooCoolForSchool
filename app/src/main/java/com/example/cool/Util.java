@@ -95,6 +95,46 @@ public class Util {
         alarmMgr.set(AlarmManager.RTC, t.dato.getMillis(), alarmIntent);
     }
 
+    static void opdaterKalender(Context c){
+        p("opdaterKalender() kaldt");
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(c);
+
+        //Set<String> gamle = pref.getStringSet("gamle", new HashSet<String>());
+        ArrayList<String> gamle = (ArrayList<String>) IO.læsObj("gamle", c);
+
+        System.out.println("opdaterKalender() tjek sættet:");
+        for (String s : gamle) System.out.println(s);
+
+        int iLængde = pref.getInt("teksterLængde", 0);
+        int mLængde = pref.getInt("mteksterLængde", 0);
+
+        //Evt if ilængde == 0...else
+        for (int i = 0; i <iLængde; i++) {
+            String id = pref.getString("i"+i, "fejl");
+            if (id.equals("fejl")) p("Fejl ved indlæsning af itekst nr "+i);
+            else if (!gamle.contains(id)) {
+                Tekst t = (Tekst) IO.læsObj(id, c);
+                p("opdaterKalender() init "+id);
+                Util.startAlarm(c,t);
+            }
+            else p("Noti "+id+" er allerede brugt");
+        }
+
+        //Evt if mlængde == 0... else
+        for (int j = 0; j <mLængde; j++) {
+            String id = pref.getString("m"+j, "fejl");
+
+            if (id.equals("fejl")) p("Fejl ved indlæsning af mtekst nr "+j);
+
+            if (!gamle.contains(id)) {
+                Tekst t = (Tekst) IO.læsObj(id, c);
+                Util.startAlarm(c,t);
+            }
+            else p("Noti "+id+" er allerede brugt");
+        }
+    }
+
+
     static ArrayList[] parseXML (String xml, String kaldtFra) {
         p("Util.parseXML kaldt fra "+kaldtFra);
 
@@ -184,12 +224,12 @@ public class Util {
                                     //p("Dag: "+dag);
 
                                     if (måned > 12) { //Fejl: dag og måned er ombyttet
-                                        if (dag < 13)tempTekst.dato = new DateTime(år,dag,måned,1,0);
+                                        if (dag < 13) tempTekst.dato = new DateTime(år,dag,måned,1,0);
                                         else {
                                             p("Util.parseXML(): FEJL: Ugyldig dato");
                                         }
                                     }
-                                    else tempTekst.dato = new DateTime(år,måned,dag,1,0);
+                                    else tempTekst.dato = new DateTime(år,måned,dag,0,0);
                                     // DateTime()
 									
                                 }
@@ -308,8 +348,20 @@ public class Util {
         in.close();
         return out.toString();
     }
+/*
+    static DateTime idTilDato (int id){
+        int i = -1;
+        if (id > 300000000) i = id/300000000;
+        else i = id/200000000;
+        p("idTilDato(): "+i);
+        String s = ""+i;
+        int å = tryParseInt(s.substring(0,3));
+        int m = tryParseInt(s.substring(4,5));
+        int d = tryParseInt(s.substring(6,7));
 
-
+        return new DateTime(å, m, d, 0, 0);
+    }
+*/
     static Integer tryParseInt (String text) {
         try {
             return new Integer(text);
