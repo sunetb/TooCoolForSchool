@@ -30,11 +30,11 @@ public class Util {
 
         //tjek om første opstart
         boolean førsteOpstart = sp.getBoolean("førstegang", true);
-        ArrayList<String> gamle;
+        ArrayList<Integer> gamle;
 
         //Set<String> brugteNotifikationer = sp.getStringSet("gamle", new HashSet<String>());
         if (førsteOpstart) gamle = new ArrayList<>();
-        else gamle = (ArrayList<String>) IO.læsObj("gamle", c);
+        else gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
 
         sp.edit().putBoolean("førstegang", false).apply();
 
@@ -43,14 +43,14 @@ public class Util {
 
         p("Util.notiBrugt modtog: id: "+id + "id_int: "+id_int);
 
-        boolean føradd = gamle.contains(id);
-        gamle.add(id);
+        boolean føradd = gamle.contains(id_int);
+        gamle.add(id_int);
         //sp.edit().putStringSet("gamle", gamle).apply();
         IO.gemObj(gamle, "gamle", c);
         boolean efteradd = gamle.contains(id);
 
         p("Util.notiBrugt tjek sættet:");
-        for (String s : gamle) System.out.println(s);
+        for (Integer s : gamle) System.out.println(s);
 
         t(c,"notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
         p("Util.notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
@@ -60,11 +60,8 @@ public class Util {
         if (alm == null) alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
         else p("Util.notiBrugt(): alarmManager ekisterer");
         i.cancel();
-
         alm.cancel(i);
-
     }
-
 
     static void startAlarm (Context c, Tekst t) {
         p("Util.startAlarm() modtog "+t.overskrift);
@@ -95,55 +92,97 @@ public class Util {
         alarmMgr.set(AlarmManager.RTC, t.dato.getMillis(), alarmIntent);
     }
 
-    static void opdaterKalender(Context c){
-        p("opdaterKalender() kaldt");
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(c);
-
-        //Set<String> gamle = pref.getStringSet("gamle", new HashSet<String>());
-        ArrayList<String> gamle = (ArrayList<String>) IO.læsObj("gamle", c);
-
+    static void opdaterKalender(Context c, String kaldtfra){
+        p("opdaterKalender() kaldt fra "+kaldtfra);
+        ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
         System.out.println("opdaterKalender() tjek sættet:");
-        for (String s : gamle) System.out.println(s);
+        for (Integer s : gamle) System.out.println(s);
 
-        int iLængde = pref.getInt("teksterLængde", 0);
-        int mLængde = pref.getInt("mteksterLængde", 0);
+        ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", c);
 
-        //Evt if ilængde == 0...else
-        for (int i = 0; i <iLængde; i++) {
-            String id = pref.getString("i"+i, "fejl");
-            if (id.equals("fejl")) p("Fejl ved indlæsning af itekst nr "+i);
-            else if (!gamle.contains(id)) {
-                Tekst t = (Tekst) IO.læsObj(id, c);
-                p("opdaterKalender() init "+id);
-                Util.startAlarm(c,t);
+
+        for (int i = 0 ; i < datoliste.size(); i++){
+
+
+            if (! gamle.contains((datoliste.get(i)))) {
+                Tekst t = (Tekst) IO.læsObj(""+datoliste.get(i), c);
+                if (t.id_int <300000000){  //Hvis I-tekst
+
+                    if (t.dato.isBeforeNow())
+                        gamle.add(t.id_int);
+                    else
+                        Util.startAlarm(c,t);
+                }
+                else{ //-- Hvis m-tekst
+                    if(t.dato.isBeforeNow())
+                        gamle.add(t.id_int);
+                    else {
+                        //-- både notifikation på dagen og syv dage før
+                        Util.startAlarm(c,t);
+
+                        //Et forsøg
+                        Tekst temp = t;
+                        temp.dato = temp.dato.minusDays(7);
+                        Util.startAlarm(c,temp);
+
+                    }
+                }
+
             }
-            else p("Noti "+id+" er allerede brugt");
+            else p("Noti "+datoliste.get(i)+" er allerede brugt");
+
         }
 
-        //Evt if mlængde == 0... else
-        for (int j = 0; j <mLængde; j++) {
-            String id = pref.getString("m"+j, "fejl");
 
-            if (id.equals("fejl")) p("Fejl ved indlæsning af mtekst nr "+j);
-
-            if (!gamle.contains(id)) {
-                Tekst t = (Tekst) IO.læsObj(id, c);
-                Util.startAlarm(c,t);
-            }
-            else p("Noti "+id+" er allerede brugt");
-        }
+        IO.gemObj(gamle, "gamle", c);
     }
 
+    static boolean visMtekst(DateTime mTid){
+        //-- Eks: 11 september     ///Vises                    5, 6, 7, 8, 9, 10, 11
+                                   ///Vises ikke: 1, 2, 3. 4.                         12, 13, 14, sept
+
+
+
+        //-- Tjek om  m-dato er idag NB: tekstens klokkeslæt er altid kl 00:00 dvs FØR evt samme dato /// dvs 11/09 kl 13:41 er EFTER 11/09 kl 00:00
+        if (erSammeDato(mTid)) return true;
+
+
+        //-- Tjek om idag er 12 sept eller efter.
+        if (mTid.isBeforeNow()) return false;
+
+        //-- Tjek om idag er 4. sept eller tidligere
+        DateTime syvFør = mTid.minusDays(7);
+
+        if (syvFør.isAfterNow()) return false;
+
+        return true;
+    }
+
+     static boolean erSammeDato(DateTime tid){
+        //-- Sammenligner en DateTime med dags dato men ignorerer klokkelæt (og årstal)
+         int dag = tid.getDayOfMonth();
+        DateTime nu = new DateTime();
+        int idagD = nu.getDayOfMonth();
+
+        if (dag != idagD) return false;
+
+        int mrd = tid.getMonthOfYear();
+        int idagMrd = nu.getMonthOfYear();
+
+        if (mrd == idagMrd ) return true;
+
+        return false;
+
+    }
 
     static ArrayList[] parseXML (String xml, String kaldtFra) {
         p("Util.parseXML kaldt fra "+kaldtFra);
-
 
         ArrayList<Tekst> oteksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> teksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> mteksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> hteksterTmp = new ArrayList<Tekst>();
-
+        DateTime idag = new DateTime();
         try {
 
             XmlPullParser parser;
@@ -212,32 +251,36 @@ public class Util {
                                 if (txt.length() > 1) {
                                     String dato = txt.substring(1);
                                     int længde = dato.length();
-
-                                    String tmpÅr = dato.substring(længde - 4, længde);
-                                    int år = tryParseInt(tmpÅr);
-                                   // p("År: "+år);
-                                    String tmpMåned = dato.substring(længde-6, længde-4);
+                                    String tmpMåned = dato.substring(længde-2, længde);
                                     int måned = tryParseInt(tmpMåned);
-                                    //p("Måned: "+måned);
-                                    String tmpDag = dato.substring(0, længde-6);
+                                    String tmpDag = dato.substring(0, længde-2);
                                     int dag = tryParseInt(tmpDag);
-                                    //p("Dag: "+dag);
 
-                                    if (måned > 12) { //Fejl: dag og måned er ombyttet
-                                        if (dag < 13) tempTekst.dato = new DateTime(år,dag,måned,1,0);
+                                    if (måned > 12) { //Fejl: dag og måned er måske ombyttet
+                                        if (dag < 13) {
+                                            int tmpTmpMåned = dag;
+                                            dag = måned;
+                                            måned = tmpTmpMåned;
+                                        }
                                         else {
                                             p("Util.parseXML(): FEJL: Ugyldig dato");
                                         }
                                     }
-                                    else tempTekst.dato = new DateTime(år,måned,dag,0,0);
-                                    // DateTime()
+
+                                    //vi regner selv ud hvilket år vi skal skrive, så vi kan spare opdatering af datafilen
+                                    int år = idag.getYear();
+                                    if (måned < 7) år++; //Vi har passeret årsskiftet
+
+
+                                    tempTekst.dato = new DateTime(år,måned,dag,0,0);
+
 									
                                 }
                             }
                         }
                         else if (celletæller == 2){
 
-                            tempTekst.overskrift = put; //Hmmm else her?
+                            tempTekst.overskrift = put;
                         }
                         else if (celletæller == 3) {
 
@@ -255,18 +298,8 @@ public class Util {
                             if      (tempTekst.kategori.equalsIgnoreCase("o")) oteksterTmp.add(tempTekst);
                             else if (tempTekst.kategori.equalsIgnoreCase("i")) teksterTmp.add(tempTekst);
                             else if (tempTekst.kategori.equalsIgnoreCase("m")) mteksterTmp.add(tempTekst);
-                            else if (tempTekst.kategori.equalsIgnoreCase("h")) {
+                            else if (tempTekst.kategori.equalsIgnoreCase("h")) hteksterTmp.add(tempTekst);
 
-                               /* //MEGET ad hoc
-                                String nybrød = "<html><head><meta content=\"text/html; charset=ISO-8859-1\"http-equiv=\"content-type\"></head><body style=\"color: white; background-color: black;\">"+
-                                        tempTekst.brødtekst+
-                                        "</body></html>";
-                                 tempTekst.brødtekst = nybrød;
-                                //hertil
-                                */
-
-                                hteksterTmp.add(tempTekst);
-                            }
                             
                         }
 
@@ -301,7 +334,16 @@ public class Util {
 		dato += m+""+d.getYear();
 		return tryParseInt(dato);
 	}
-	
+
+    /*
+    static DateTime idTilDateTime (int id){
+        int udenKategori = 0;
+        if (id >300000000) udenKategori = id/300000000;
+        else udenKategori = id/200000000;
+
+
+    }
+	*/
     static ArrayList<Tekst> sorterStigende (ArrayList<Tekst> ind){
         ArrayList<Tekst> tempListe = new ArrayList<Tekst>();
 
@@ -321,15 +363,6 @@ public class Util {
 
             ind.remove(ix);
         }
-
-        /*
-        p("sorterStigende() tjekker lister:");
-         p("ind:");
-         for (Tekst t: ind) p(t.datokode());
-         p("Ud: ");
-       for  (Tekst t: tempListe) p(t.datokode());
-        */
-
         return tempListe;
     }
 
@@ -348,20 +381,6 @@ public class Util {
         in.close();
         return out.toString();
     }
-/*
-    static DateTime idTilDato (int id){
-        int i = -1;
-        if (id > 300000000) i = id/300000000;
-        else i = id/200000000;
-        p("idTilDato(): "+i);
-        String s = ""+i;
-        int å = tryParseInt(s.substring(0,3));
-        int m = tryParseInt(s.substring(4,5));
-        int d = tryParseInt(s.substring(6,7));
-
-        return new DateTime(å, m, d, 0, 0);
-    }
-*/
     static Integer tryParseInt (String text) {
         try {
             return new Integer(text);
@@ -372,118 +391,6 @@ public class Util {
     }
 
 
-    /*
-
-      static int tekstTilTal (String tekst) {
-
-        int l = tekst.length();
-        String udtekst = "";
-        for (int i = 0;i<l; i++) {
-            char a = tekst.charAt(i);
-            int k = Character.getNumericValue(a);
-            udtekst += ""+k;
-
-        }
-        return tryParseInt(udtekst);
-
-    }
-
-    public static void gemTekstliste (ArrayList<Tekst> liste, String filename, Context c) {
-        p("Util.gemTekstliste("+filename+")");
-
-
-        File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
-
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-        ObjectOutput out = null;
-
-        try {
-            out = new ObjectOutputStream(new FileOutputStream(directory+ File.separator + filename));
-            out.writeObject(liste);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();p(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();p(e.getMessage());
-        }
-    }
-
-    static ArrayList<Tekst> hentTekstliste (String filename, Context c) {
-        p("Util.hentTekstliste("+filename+")");
-        ObjectInputStream input = null;
-        ArrayList<Tekst> mitArray = null;
-        File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
-
-        if (directory.exists()){
-
-            try {
-                input = new ObjectInputStream(new FileInputStream(directory+ File.separator + filename));
-                mitArray = (ArrayList<Tekst>) input.readObject();
-                input.close();
-            } catch (StreamCorruptedException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        if (mitArray != null)  p("læsTekstliste_længde: "+mitArray.size());
-
-        return mitArray;
-    }
-
-    public static void gemTekst (Tekst t, String filename, Context c) {
-        p("gemTekst("+filename+")");
-        File directory = new File(c.getFilesDir().getAbsolutePath() + File.separator + "filer");
-
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-        ObjectOutput out = null;
-
-        try {
-            out = new ObjectOutputStream(new FileOutputStream(directory+ File.separator + filename));
-            out.writeObject(t);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();p(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();p(e.getMessage());
-        }
-    }
-
-    static Tekst hentTekst (String filename, Context c) {
-        p("hentTekst("+filename+")");
-        ObjectInputStream input = null;
-        Tekst minTekst = null;
-        File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
-
-        if (directory.exists()){
-
-            try {
-                input = new ObjectInputStream(new FileInputStream(directory+ File.separator + filename));
-                minTekst = (Tekst) input.readObject();
-                input.close();
-            } catch (StreamCorruptedException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        if (minTekst != null)  p("hentTekst(): Teksten var null)");
-
-        return minTekst;
-    }
-*/
     static ArrayList<Tekst> erstatAfsnit(ArrayList<Tekst>  input){
         ArrayList<Tekst> temp = new ArrayList<Tekst>();
 

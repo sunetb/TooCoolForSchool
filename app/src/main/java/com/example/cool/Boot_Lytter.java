@@ -28,16 +28,14 @@ public class Boot_Lytter extends BroadcastReceiver  {
 
 
                 Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
-				//TODO: find og sæt tidligere alarmer
-				//context.startActivity(new Intent(context, MainActivity.class));
-				//Notifikation.bygNotifikation(context,"fra boot","fra boot", "fra boot");
-                new AsyncTask() {
+				new AsyncTask() {
 
                     ;
                     @Override
                     protected Object doInBackground(Object[] params) {
-                        Util.opdaterKalender(c);
+                        int modenhed = pref.getInt("modenhed", -1);
 
+                        if (modenhed == 3) Util.opdaterKalender(c, "boot-lytter");
 
                         return null;
                     }

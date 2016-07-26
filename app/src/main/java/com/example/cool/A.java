@@ -29,7 +29,7 @@ public class A extends Application {
     ArrayList<Integer> synligeDatoer;
 	
 
-    public String henteurl = "http://www.lightspeople.net/sune/skole/teksterny.xml";
+    public String henteurl = "http://www.lightspeople.net/sune/skole/tekster.xml";
     public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
 
 //////////-------------------------//////////
@@ -150,14 +150,15 @@ public class A extends Application {
                 pref.edit().putInt("seneste position", 0).apply();
 
                 //evt i async:
-                Util.opdaterKalender(ctx);
+
+                Util.opdaterKalender(ctx, "Application singleton");
                 gemSynligeTekster();
                 //hertil
 
                 tredjeDagFørsteGang = false;
             }
             else {
-                 synligeTekster = hentsynligeTekster();
+                synligeTekster = hentsynligeTekster();
             }
 			synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
 			
@@ -243,7 +244,7 @@ public class A extends Application {
 
     private void initAllerFørsteGang(){
 
-        IO.gemObj(new ArrayList<String>(), "gamle", this);
+        IO.gemObj(new ArrayList<Integer>(), "gamle", this);
         IO.gemObj(new ArrayList<Integer>(), "datoliste", this);
         IO.gemObj(new ArrayList<Integer>(), "synligeDatoer", this);
 
@@ -365,7 +366,7 @@ public class A extends Application {
                             if (i>2) tempSynlige.add(itekster.get(i - 3));
                             if (i>1)tempSynlige.add(itekster.get(i - 2));
                             if (i>0) tempSynlige.add(itekster.get(i - 1));
-                            else tempSynlige.add(itekster.get(i));
+
 
                         }
 
@@ -374,7 +375,7 @@ public class A extends Application {
 
                 Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", masterDato);
                 dummyITekst.lavId();
-                p("Tjek dummytekst id: "+dummyITekst.id_int);
+                p("Tjek M dummytekst id: "+dummyMTekst.id_int);
 
 
                 boolean mFundet = false;
@@ -400,7 +401,7 @@ public class A extends Application {
                                 tempSynlige.add(mtekst);
 
 
-                            } else {
+                            } else if (Util.visMtekst(mtekst.dato) ){
                                 tempSynlige.add(mtekst);
                                 p("ineksakt match mtekst");
                             }
@@ -418,7 +419,7 @@ public class A extends Application {
                     synligeTekster.clear();
                     synligeTekster = tempSynlige;
                     //tempSynlige = null;
-                    p("tjek synligetekster efer init:");
+                    p("tjek synligetekster efter init:");
                     for (Tekst t : synligeTekster) p(t.toString());
                 }
                 p("gemAlleNyeTekster() slut");
@@ -430,8 +431,6 @@ public class A extends Application {
     }
 
     private boolean skalTekstlistenOpdateres() {
-
-
         new AsyncTask() {
 
             @Override
@@ -459,9 +458,7 @@ public class A extends Application {
                 ArrayList<Integer> slettes = new ArrayList<>();
 
                 
-                //int huskI = 0;
-				//TODO: Husk at m-noti skal også vises på dagen, dvs 7 dage senere
-				//TODO: Optimeres senere
+               //TODO: Optimeres senere
                 for (int i = 0; i < datoliste.size(); i++) {
                     int tekstid = datoliste.get(i);
 
@@ -474,13 +471,9 @@ public class A extends Application {
                                 if (!iFundet && tekstid == idag) {
                                      p("Itekst eksakt match: "+tekstid);
                                     iFundet = true;
-
                                     if (i>1)synligeDatoer.add(datoliste.get(i - 2));
                                     if (i>0) synligeDatoer.add(datoliste.get(i - 1));
                                     synligeDatoer.add(datoliste.get(i));
-
-
-
                                 }
                                 else if (!iFundet) {
                                     p("I ineksakt match: dummy: "+dummyITekst.id_int+" | tekst: "+tekstid);
@@ -495,32 +488,18 @@ public class A extends Application {
                          //else slettes.add(tekstid);
                         }
 
-					else { //if tekstid > 30000000
+					else { //if tekstid > 300000000
                         p("Tjek datoliste skalTOpdateres? M: " + tekstid);
 
-                        if (tekstid >= mIdag) {
+                        //Todo: bør skrives om til at bruge tekst id i stedet for at hente alle tekster
+                        Tekst t = (Tekst) IO.læsObj(""+datoliste.get(i), ctx);
 
-
-                        	if (!mFundet && tekstid == mIdag) {
-								p("mtekst eksakt match: "+tekstid);
-                            	mFundet = true;
-
-                            	//if (i>1)synligeDatoer.add(datoliste.get(i - 2));
-                            	//if (i>0) synligeDatoer.add(datoliste.get(i - 1));
-                           	 	synligeDatoer.add(datoliste.get(i));
-
-
-
-                        	} else if (!mFundet) {
-                                p("M ineksakt match: dummy: "+dummyMTekst.id_int+" | tekst: "+tekstid);
-                                mFundet = true;
-                                Tekst mtekst = (Tekst) IO.læsObj(""+tekstid, ctx);
-                                DateTime passeretDato = mtekst.dato.plusDays(7);
-                                if (passeretDato.isAfterNow()) slettes.add(tekstid);
-                                else synligeDatoer.add(datoliste.get(i));
-                        	}
-
+                        if (Util.visMtekst(t.dato)) {
+                            synligeDatoer.add(datoliste.get(i));
+                            break; //Tillader ikke to m-tekster. KAN konflikte med notifikationer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     	}
+                        else if (t.dato.isBeforeNow())
+                            slettes.add(datoliste.get(i));
 
 					}
 				}
