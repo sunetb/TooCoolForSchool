@@ -103,8 +103,7 @@ public class Util {
 
         for (int i = 0 ; i < datoliste.size(); i++){
 
-
-            if (! gamle.contains((datoliste.get(i)))) {
+            if (!gamle.contains((datoliste.get(i)))) {
                 Tekst t = (Tekst) IO.læsObj(""+datoliste.get(i), c);
                 if (t.id_int <300000000){  //Hvis I-tekst
 

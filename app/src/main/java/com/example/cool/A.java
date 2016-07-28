@@ -366,7 +366,7 @@ public class A extends Application {
                             if (i>2) tempSynlige.add(itekster.get(i - 3));
                             if (i>1)tempSynlige.add(itekster.get(i - 2));
                             if (i>0) tempSynlige.add(itekster.get(i - 1));
-
+                            else tempSynlige.add(itekster.get(i));
 
                         }
 
@@ -374,7 +374,7 @@ public class A extends Application {
                 }
 
                 Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", masterDato);
-                dummyITekst.lavId();
+                dummyMTekst.lavId();
                 p("Tjek M dummytekst id: "+dummyMTekst.id_int);
 
 
@@ -403,7 +403,7 @@ public class A extends Application {
 
                             } else if (Util.visMtekst(mtekst.dato) ){
                                 tempSynlige.add(mtekst);
-                                p("ineksakt match mtekst");
+                                p("Mtekst ineksakt match --");
                             }
                             mFundet = true;
                         }
@@ -444,7 +444,7 @@ public class A extends Application {
                 int idag = dummyITekst.id_int;
 				
 				Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", masterDato);
-                dummyITekst.lavId();
+                dummyMTekst.lavId();
 				
 				int mIdag = dummyMTekst.id_int;
                 p("Tjek I dummytekst id: "+dummyITekst.id_int);
@@ -566,12 +566,21 @@ public class A extends Application {
 
     }
 
+    private void opdaterSynligeTekster(){
+
+
+
+
+    }
+
     private ArrayList<Tekst> hentsynligeTekster(){
 		//new Asynctask
 		return (ArrayList<Tekst>) IO.læsObj("synligeTekster",this);
 		
 	}
-	
+
+
+
 	public void gemSynligeTekster(){
 		//new async ?
 		IO.gemObj(synligeTekster, "synligeTekster", this);
