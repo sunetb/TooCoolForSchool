@@ -22,17 +22,18 @@ public class Alarm_Lytter extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        ArrayList<String> gamle = (ArrayList<String>) IO.læsObj("gamle", context);
+        ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", context);
         Bundle b = intent.getExtras();
 
         String overskrift = b.getString("overskrift");
         String id = b.getString("tekstId");
         int id_int = b.getInt("id_int");
 
-        p("onRecieve() modtog "+overskrift);
+        p("cool.onRecieve() modtog "+overskrift);
 		Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
 
-        if (!gamle.contains(id)) bygNotifikation(context, overskrift, id, id_int);
+        if (!gamle.contains(id))
+        bygNotifikation(context, overskrift, id, id_int);
 
     }
 
@@ -47,7 +48,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("Notitest "+id)
+                        .setContentTitle("Too Cool for School")
                         .setContentText(overskrift)
                         .setAutoCancel(true)
                         .setCategory(Notification.CATEGORY_ALARM)
@@ -59,6 +60,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         resultIntent.putExtra("overskrift", overskrift);
         resultIntent.putExtra("tekstId", id);
         resultIntent.putExtra("id_int", id_int);
+        resultIntent.putExtra("fraAlarm", true);
         resultIntent.setAction(id); //lille hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         //stackBuilder.addParentStack(Forside.class);
@@ -66,7 +68,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(
                         0,
-                        PendingIntent.FLAG_UPDATE_CURRENT //FLAG_ONE_SHOT//
+                        PendingIntent.FLAG_CANCEL_CURRENT //FLAG_ONE_SHOT//
                 );
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =

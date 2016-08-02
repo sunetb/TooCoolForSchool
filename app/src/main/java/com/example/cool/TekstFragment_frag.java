@@ -17,7 +17,7 @@ import android.graphics.*;
 public class TekstFragment_frag extends Fragment implements View.OnClickListener {
 
 	WebView w;
-
+	View divi;
     int position = -1;
     A a;
 	private Tekst tekst;
@@ -60,13 +60,15 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
 			}
 		}
-		if (tekst.kategori.equals("m")) t.setTextColor(Color.YELLOW);
+		//-- Hvis teksten er M eller H: gul overskrift
+		if (tekst.kategori.equals("h") || tekst.kategori.equals("m")) t.setTextColor(Color.YELLOW);
 		else t.setTextColor(Color.WHITE);
 
+		//-- Hvis teksten er H: Gul divider
+		divi = v.findViewById(R.id.adskiller);
+		if (tekst.kategori.equals("h")) divi.setBackgroundColor(Color.YELLOW);
+		else divi.setBackgroundColor(Color.WHITE);
 
-
-
-		
         return  v;
     }
 

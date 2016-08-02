@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.*;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -17,7 +18,6 @@ import org.xmlpull.v1.*;
  */
 public class Util {
 
-
     static long starttid = 0;
 
     static double tid (){
@@ -25,7 +25,7 @@ public class Util {
     }
 
     static void notiBrugt(Context c, Intent intent){
-
+        p("Util.notiBrugt kaldt");
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 
         //tjek om første opstart
@@ -36,9 +36,13 @@ public class Util {
         if (førsteOpstart) gamle = new ArrayList<>();
         else gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
 
-        sp.edit().putBoolean("førstegang", false).apply();
-
-        String id = intent.getExtras().getString("tekstId", "");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+            sp.edit().putBoolean("førstegang", false).apply();
+        else sp.edit().putBoolean("førstegang", false).commit();
+        String id = "";
+        if (Build.VERSION.SDK_INT >= 12)
+            id = intent.getExtras().getString("tekstId", "");
+        else   id = intent.getExtras().getString("tekstId");
         int id_int = intent.getExtras().getInt("id_int", 0);
 
         p("Util.notiBrugt modtog: id: "+id + "id_int: "+id_int);
@@ -81,13 +85,13 @@ public class Util {
         intent.putExtra("id_int", t.id_int);
         intent.putExtra("tekstId", t.id);
         intent.putExtra("overskrift", t.overskrift);
-        //intent.setAction("com.example.notitest.START_ALARM"); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
-//com.example.notitest.START_ALARM
-        //int id_int = Util.tekstTilTal(id);
+        String action = ""+t.id_int;
+        if (t.kategori.equals("mgentag")) action+="gentag"; //--M-tekster har TO notifikationer: en syv dage før og en på dagen
+        intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+        alarmIntent = PendingIntent.getBroadcast(c, t.id_int, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
-        alarmIntent = PendingIntent.getBroadcast(c, t.id_int, intent,  PendingIntent.FLAG_UPDATE_CURRENT);
-
-        p("Util.startAlarm() Dato: "+t.dato.toString());
+        p("Util.startAlarm()      Dato: "+t.dato.toString());
+        p("Util.startAlarm() Dags Dato: "+new DateTime());
 
         alarmMgr.set(AlarmManager.RTC, t.dato.getMillis(), alarmIntent);
     }
@@ -116,12 +120,13 @@ public class Util {
                     if(t.dato.isBeforeNow())
                         gamle.add(t.id_int);
                     else {
-                        //-- både notifikation på dagen og syv dage før
+                        //-- M-tekster har både notifikation på dagen ...
                         Util.startAlarm(c,t);
 
-                        //Et forsøg
+                        //-- ...og syv dage før
                         Tekst temp = t;
                         temp.dato = temp.dato.minusDays(7);
+                        temp.kategori="mgentag";
                         Util.startAlarm(c,temp);
 
                     }
@@ -157,7 +162,7 @@ public class Util {
         return true;
     }
 
-     static boolean erSammeDato(DateTime tid){
+    static boolean erSammeDato(DateTime tid){
         //-- Sammenligner en DateTime med dags dato men ignorerer klokkelæt (og årstal)
          int dag = tid.getDayOfMonth();
         DateTime nu = new DateTime();
@@ -324,7 +329,6 @@ public class Util {
         return data;
     }
 
-
 	static int lavDato (Date d) {
 		
 		String dato = ""+d.getDay();
@@ -334,15 +338,6 @@ public class Util {
 		return tryParseInt(dato);
 	}
 
-    /*
-    static DateTime idTilDateTime (int id){
-        int udenKategori = 0;
-        if (id >300000000) udenKategori = id/300000000;
-        else udenKategori = id/200000000;
-
-
-    }
-	*/
     static ArrayList<Tekst> sorterStigende (ArrayList<Tekst> ind){
         ArrayList<Tekst> tempListe = new ArrayList<Tekst>();
 
@@ -365,7 +360,6 @@ public class Util {
         return tempListe;
     }
 
-
     static String inputStreamSomStreng(InputStream is) throws IOException {
         char[] buffer = new char[1024];
         StringBuilder out = new StringBuilder();
@@ -380,6 +374,7 @@ public class Util {
         in.close();
         return out.toString();
     }
+
     static Integer tryParseInt (String text) {
         try {
             return new Integer(text);
@@ -388,7 +383,6 @@ public class Util {
             return null;
         }
     }
-
 
     static ArrayList<Tekst> erstatAfsnit(ArrayList<Tekst>  input){
         ArrayList<Tekst> temp = new ArrayList<Tekst>();
@@ -409,7 +403,7 @@ public class Util {
 
     static void p(Object o){
         String kl = o +"   #t:" + tid();
-        System.out.println(kl);
+        System.out.println("_____"+kl);
         A.debugmsg += kl +"<br>";
     }
 

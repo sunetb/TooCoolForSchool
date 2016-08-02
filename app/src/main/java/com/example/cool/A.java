@@ -21,16 +21,19 @@ public class A extends Application {
     Context ctx;
     static AlarmManager alm;
 
-//////////---------- TEKSTFRAGMENT DATA ----------//////////
+//////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
 
     ArrayList<Tekst> synligeTekster = new ArrayList();  //brugeas af pageradapteren
     ArrayList<Tekst> htekster = new ArrayList();
     ArrayList<Integer> synligeDatoer;
-	
+    ArrayList<String> hteksterOverskrifter = new ArrayList();
+
 
     public String henteurl = "http://www.lightspeople.net/sune/skole/tekster.xml";
     public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
+
+    int sidstKendteVindueshøjde = 0;
 
 //////////-------------------------//////////
 	
@@ -42,6 +45,12 @@ public class A extends Application {
     void givBesked () {for (Observatør o: observatører) o.opdater();}
 
     boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
+
+
+
+
+
+
 
 //////////-------------------------//////////
 
@@ -82,18 +91,19 @@ public class A extends Application {
     boolean hurtigModning = false; // til test på enhed
     DateTime masterDato;
 
+    static boolean debugging = true; //ændrer omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
+
 //////////-------------------------//////////
 
     /*-----------------------------noter
 
     * NeedToHave:
-     * Hvis forbindelsen er langsom, når data ikke at blive hentet før hovedaktiviteten initialiseres.
-    * Kræver:
-    * -opdaterSkærm() -metode i fragment/akt
-    * -lyttersystem
+     * tjek i aktiviteten om den er åbnet nra noti. vis tilvvarende tekst på skærmen
     *
-    * ? En Master-dato som sættes med en debug-knap
-	plus re-sync. hmm
+    * 
+    * 
+    *
+    * 
 	
     *
     * NiceToHave
@@ -109,7 +119,11 @@ public class A extends Application {
     *
     *
 
-    *
+    *    int modenhed = 0;
+    final int MODENHED_HELT_FRISK = 0;
+    final int MODENHED_FØRSTE_DAG = 1;
+    final int MODENHED_ANDEN_DAG = 2;
+    final int MODENHED_MODEN = 3;
     * */
 	
 
@@ -129,11 +143,16 @@ public class A extends Application {
         if (hurtigModning) masterDato = new DateTime(2015, 10, 1, 0,0);
 
         modenhed = tjekModenhed();
-
+        tjekOpstart();
         p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
 
-        if (hurtigModning && modenhed == MODENHED_MODEN){
+    }//Oncreate færdig
+
+    private void tjekOpstart() {
+
+
+        if (hurtigModning && modenhed == MODENHED_MODEN){ //-- kun til debugging
 
             DateTime glmaster = (DateTime) IO.læsObj("masterdato", this);
             masterDato = glmaster.plusDays(2);
@@ -146,11 +165,19 @@ public class A extends Application {
             if (tredjeDagFørsteGang){
                 p("tredje dag første gang!! ");
                 synligeTekster = (ArrayList<Tekst>) IO.læsObj("tempsynligeTekster", this);
+
+
+                //--hvis nu nogle h-tekster skulle være gemt
+                //    for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
+
                 p("Synligetekster længde: "+ synligeTekster.size());
-                pref.edit().putInt("seneste position", 0).apply();
-
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+                    pref.edit().putInt("seneste position", -1).apply();
+                else pref.edit().putInt("seneste position", -1).commit();
+                //test
+                //Tekst testtt = new Tekst("test", "test", "i", new DateTime().plusSeconds(60));
+                //Util.startAlarm(this,testtt);
                 //evt i async:
-
                 Util.opdaterKalender(ctx, "Application singleton");
                 gemSynligeTekster();
                 //hertil
@@ -159,14 +186,23 @@ public class A extends Application {
             }
             else {
                 synligeTekster = hentsynligeTekster();
+
             }
-			synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
-			
+
+            //--hvis nu nogle h-tekster skulle være gemt
+            int før = synligeTekster.size();
+            for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
+            int efter = synligeTekster.size();
+            if (før != efter) pref.edit().putInt("seneste position", -1).commit();
+
+            synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
+
             //-- Tjek om der er opdateringer til tekstene
             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] params) {
                     htekster = (ArrayList<Tekst>) IO.læsObj("htekster", ctx);
+                    for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift);
                     findesNyTekst = tjekTekstversion();
                     p("Ny tekstversion? : " + findesNyTekst);
                     return null;
@@ -190,7 +226,12 @@ public class A extends Application {
         if (modenhed == MODENHED_MODEN) {
 
 
-            if (skalTekstlistenOpdateres()) pref.edit().putInt("seneste position", 0).apply();
+            if (skalTekstlistenOpdateres())  {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+                    pref.edit().putInt("seneste position", -1).apply();
+                else pref.edit().putInt("seneste position", -1).commit();
+            }
+
 
 
             new AsyncTask() {
@@ -218,7 +259,7 @@ public class A extends Application {
         }
 
         else if (modenhed == MODENHED_HELT_FRISK) {
-			p("oncreate() Modenhed: Helt frisk");
+            p("oncreate() Modenhed: Helt frisk");
             initAllerFørsteGang();
         }
 
@@ -233,14 +274,19 @@ public class A extends Application {
                 Tekst t = (Tekst) IO.læsObj("otekst2", ctx);
                 synligeTekster.add(t);
                 gemSynligeTekster();
-                pref.edit().putBoolean("andenDagFørsteGang", false).apply();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+
+                    pref.edit().putBoolean("andenDagFørsteGang", false).apply();
+
+                else pref.edit().putBoolean("andenDagFørsteGang", false).commit();
             }
         }
         p("onCreate færdig");
         tjek = true;
 
-    }//Oncreate færdig
 
+
+    }
 
     private void initAllerFørsteGang(){
 
@@ -297,6 +343,14 @@ public class A extends Application {
                 //gemSynligeTekster();
                 itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
                 mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
+                htekster = alleTekster[3];
+
+
+
+
+
+
+                for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift);
 
                 //gemmer h-tekster
                 IO.gemObj(Util.erstatAfsnit(alleTekster[3]),"htekster",ctx);
@@ -314,9 +368,6 @@ public class A extends Application {
             }
         }.execute();
     }
-
-
-
 
     private void gemAlleNyeTekster() {
         p("gemAlleNyeTekster() start");
@@ -421,7 +472,9 @@ public class A extends Application {
                     //tempSynlige = null;
                     p("tjek synligetekster efter init:");
                     for (Tekst t : synligeTekster) p(t.toString());
+
                 }
+                else gemSynligeTekster();
                 p("gemAlleNyeTekster() slut");
 
                 return null;
@@ -430,7 +483,7 @@ public class A extends Application {
         }.execute();
     }
 
-    private boolean skalTekstlistenOpdateres() {
+    boolean skalTekstlistenOpdateres() {
         new AsyncTask() {
 
             @Override
@@ -542,7 +595,7 @@ public class A extends Application {
 
                 if (ny) {
                     synligeTekster.clear();
-                    p("skalTekstlistenOpdateres ny synligetekster");
+                    p("skalTekstlistenOpdateres synligetekster er NY");
 
                     for (Integer i : synligeDatoer) {
                         p("dato: "+i);
@@ -557,20 +610,11 @@ public class A extends Application {
                 p("skalTekstlistenOpdateres() slut");
 
             //Gider ikke parametrisere
-                pref.edit().putBoolean("nyTekst", ny).apply();
+                pref.edit().putBoolean("nyTekst", ny).commit();
 
             }
         }.execute();
         return pref.getBoolean("nyTekst", false);
-
-
-    }
-
-    private void opdaterSynligeTekster(){
-
-
-
-
     }
 
     private ArrayList<Tekst> hentsynligeTekster(){
@@ -579,11 +623,9 @@ public class A extends Application {
 		
 	}
 
-
-
 	public void gemSynligeTekster(){
 		//new async ?
-		IO.gemObj(synligeTekster, "synligeTekster", this);
+        IO.gemObj(synligeTekster, "synligeTekster", this);
 	}
 	
 	//kaldes kun fra baggrundstråd
@@ -623,27 +665,42 @@ public class A extends Application {
             IO.gemObj(masterDato,"masterdato", this);
 
             idag = Util.lavDato(new Date(2015,10,dag));
-            pref.edit().putInt("fakedato", dag+1).apply();
-
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+                pref.edit().putInt("fakedato", dag+1).apply();
+            else pref.edit().putInt("fakedato", dag+1).commit();
 
         }
 		
         if (moden == MODENHED_HELT_FRISK) {
-			pref.edit()
-				.putInt("modenhed", MODENHED_FØRSTE_DAG)
-				.putInt("installationsdato", idag)
-				.apply();
-			
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+                pref.edit()
+                    .putInt("modenhed", MODENHED_FØRSTE_DAG)
+                    .putInt("installationsdato", idag)
+                    .apply();
+            }
+            else {
+                pref.edit()
+                        .putInt("modenhed", MODENHED_FØRSTE_DAG)
+                        .putInt("installationsdato", idag)
+                        .commit();
+            }
+
             return MODENHED_HELT_FRISK;
         }
         else if (moden == MODENHED_FØRSTE_DAG){
 			int instDato  = pref.getInt("installationsdato", 0);
 			if (idag == instDato) return MODENHED_FØRSTE_DAG;
 			else {
-				pref.edit()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+                    pref.edit()
 					.putInt("modenhed", MODENHED_ANDEN_DAG)
 					.putInt("installationsdato2", idag)
 					.apply();
+
+                else  pref.edit()
+                        .putInt("modenhed", MODENHED_ANDEN_DAG)
+                        .putInt("installationsdato2", idag)
+                        .commit();
 				return MODENHED_ANDEN_DAG;
 			}
 		}
@@ -651,7 +708,9 @@ public class A extends Application {
             int instDatoPlusEn = pref.getInt("installationsdato2", 0);
             if (idag == instDatoPlusEn) return MODENHED_ANDEN_DAG;
             else {
-                pref.edit().putInt("modenhed", MODENHED_MODEN).apply();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+                    pref.edit().putInt("modenhed", MODENHED_MODEN).apply();
+                else pref.edit().putInt("modenhed", MODENHED_MODEN).commit();
                 tredjeDagFørsteGang = true;
                 p("tjekModenhed() Tredje dag første gang sat til true");
             }
@@ -660,8 +719,6 @@ public class A extends Application {
         p("tjekModenhed() slut ");
         return MODENHED_MODEN;
     }
-
-
 
     private boolean tjekTekstversion() {
 
@@ -694,12 +751,37 @@ public class A extends Application {
             version = Util.tryParseInt(versionStreng);
         else p("Fejl: Hentet teksteversion null eller tom");
 
-        pref.edit().putInt("tekstversion", version).apply();
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+            pref.edit().putInt("tekstversion", version).apply();
+        else pref.edit().putInt("tekstversion", version).commit();
         return (gemtTekstversion < version);
     }
 
+    void nulstil () {
 
+       tredjeDagFørsteGang = false;
+
+        synligeTekster = new ArrayList();  //brugeas af pageradapteren
+        htekster = new ArrayList();
+
+        hteksterOverskrifter = new ArrayList();
+
+        tjek = false;
+
+        masterDato = new DateTime();
+        modenhed = tjekModenhed();
+        tjekOpstart();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                givBesked();
+            }
+        }, 100);
+
+
+
+    }
 
     void t(String s){
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();

@@ -31,7 +31,7 @@
         <receiver
             android:name=".Alarm_Lytter">
             <intent-filter>
-                <action android:name="com.example.notitest.START_ALARM" />
+                <action android:name="com.example.cool.START_ALARM" />
             </intent-filter>
         </receiver>
 

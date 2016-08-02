@@ -66,7 +66,7 @@ public class Splash extends AppCompatActivity implements Runnable {
         sp.edit()
                 .putInt("animLængde1", 2100)
                 .putInt("animLængde1", 1500)
-                .apply();
+                .commit();
     }
 
     @Override
