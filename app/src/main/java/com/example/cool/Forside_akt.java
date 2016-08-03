@@ -36,9 +36,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     ViewPager.OnPageChangeListener sideLytter;
     int visPosition = 0;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +73,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
                 del.setEnabled(false);
                 del.getBackground().setAlpha(100);
-
             }
             else {
                 //todo
@@ -88,8 +84,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 a.nulstil();
                 startActivity(new Intent(this, Forside_akt.class));
                 finish();
-
-
             }
             else {
                 //todo
@@ -100,7 +94,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
 
     }
-
 
     private void initUI() {
         vp = (ViewPager) findViewById(R.id.pager);
