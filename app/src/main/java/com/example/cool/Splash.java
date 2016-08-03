@@ -25,6 +25,8 @@ public class Splash extends AppCompatActivity implements Runnable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.drawable.cool_nobkgr_50x50_rund);
 
         sp = PreferenceManager.getDefaultSharedPreferences(this);
 

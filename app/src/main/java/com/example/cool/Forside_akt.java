@@ -43,6 +43,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forside);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.cool_nobkgr_50x50_rund);
 
         p("oncreate() kaldt");
@@ -53,19 +54,18 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         initUI();
         a.aktivitetenVises = true; //skal den stå tidligere?
         tjekOpstartstype(savedInstanceState);
-
+        if (a.debugging && prefs.getBoolean("vistestdialog", true)) testDialog();
 
     }
 
     @Override
     public void onClick(View v) {
         int positionNu = vp.getCurrentItem();
-        int maxPosition = a.synligeTekster.size()-1;
 
         if (v==tilbage && positionNu > 0) {
             vp.setCurrentItem(--positionNu);
         }
-        else if (v == frem && positionNu != maxPosition){
+        else if (v == frem && positionNu != a.synligeTekster.size()-1){
             vp.setCurrentItem(++positionNu);
         }
         else if (v == extras)
@@ -87,7 +87,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                 a.nulstil();
                 startActivity(new Intent(this, Forside_akt.class));
-                knapstatus (vp.getCurrentItem(), maxPosition);
                 finish();
 
 
@@ -96,7 +95,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 //todo
             }
         }
-        knapstatus (vp.getCurrentItem(), maxPosition);
+        knapstatus (vp.getCurrentItem(), "onClick()");
 
 
 
@@ -125,14 +124,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
             @Override
             public void onPageSelected(int position) {
-                knapstatus(position, a.synligeTekster.size()-1);
+                knapstatus(position, "sidelytter.onPageSelected()");
             }
-
             @Override
             public void onPageScrollStateChanged(int state) {}
         };
     }
-
 
     @Override
     protected void onStart() {
@@ -142,7 +139,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
         if (visPosition == -1) visPosition = a.synligeTekster.size()-1;
         vp.setCurrentItem(visPosition);
-		knapstatus(visPosition, a.synligeTekster.size()-1);
+		knapstatus(visPosition, "onStart()");
     }
 
     @Override
@@ -153,8 +150,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         prefs.edit().putInt("seneste position", vp.getCurrentItem()).commit();
     }
 
-    public void knapstatus (int nu, int max) {
-		p("knapstatus: nu="+nu+" max="+max);
+    public void knapstatus (int nu, String kaldtFra) {
+        int max = a.synligeTekster.size()-1;
+		p("knapstatus: nu="+nu+" max="+max + "Kaldt fra "+kaldtFra);
 
         //TODO husk hTekster
 
@@ -178,26 +176,18 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }
         if (a.debugging){
 
-
         }
     }
-    public void knapstatus () {
-        p("knapstatus()");
-            frem.setEnabled(false);
-            frem.getBackground().setAlpha(100);
 
-            tilbage.setEnabled(false);
-            tilbage.getBackground().setAlpha(100);
 
-    }
     @Override
     public void opdater() {
         pa.notifyDataSetChanged();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                //knapstatus(a.synligeTekster.size()-1, a.synligeTekster.size()-1);
+                vp.setCurrentItem(a.synligeTekster.size()-1);
+                knapstatus(a.synligeTekster.size()-1, " opdater()");
 
             }
         }, 50);
@@ -213,10 +203,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         Util.t(this,s);
     }
 
-    //todo: husk tjek for skærmvending
-    //----Bygger en AlertDialog med listen over Ekstra-tekster
+     //----Bygger en AlertDialog med listen over Ekstra-tekster
     @Override
     protected Dialog onCreateDialog(int id){
+
         p("Dialog: htekster længde: "+a.htekster.size());
         AlertDialog.Builder extraliste = new AlertDialog.Builder(this);
 
@@ -227,16 +217,16 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int valgt) {
-                        Tekst valgHTekst = a.htekster.get(valgt);
+                        Tekst valgtHTekst = a.htekster.get(valgt);
 
-                        if (!a.synligeTekster.contains(valgHTekst)) {
-                            a.synligeTekster.add(valgHTekst);
+                        if (!a.synligeTekster.contains(valgtHTekst)) {
+                            a.synligeTekster.add(valgtHTekst);
                             a.givBesked();
                             vp.setCurrentItem(a.synligeTekster.size()-1);
                         }
-                        else t("Teksten: \n\n"+valgHTekst.overskrift+" \n\ner allerede valgt");
-
-
+                        else {
+                            vp.setCurrentItem(a.findTekstnr(valgtHTekst.id_int));
+                        }
                     }
                 }); // ArrayAdapter slut
 
@@ -282,20 +272,63 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         break;
                     }
                 }
+                p("tjekOpstartstype: husk="+husk);
                 if (husk != -1) {
                     vp.setCurrentItem(husk);
-                    knapstatus(husk,a.synligeTekster.size()-1);
+                    knapstatus(husk,"tjekOpstartstype()");
+                    prefs.edit().putInt("seneste position", vp.getCurrentItem()).commit();
+
                 }
                 else {
                     p("FEJL: Teksten fre notifikationen fandtes ikke i synligeTekster!");
                     Tekst t = (Tekst) IO.læsObj(""+idstr, this);
                     a.synligeTekster.add(t);
-                    vp.setCurrentItem(husk);
-                    knapstatus();
+                    pa.notifyDataSetChanged();
+                    prefs.edit().putInt("seneste position", vp.getCurrentItem()).commit();
+                   // vp.setCurrentItem(husk);
+                    //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
 
                 }
             }
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        p("onDestroy() blev kaldt");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    private void testDialog () {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+
+        // set titleis
+        alertDialogBuilder.setTitle("Test-tilstand aktiveret");
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("Knapperne 'Del' (tre prikker forbundet med streger) og 'Send' (papirfly) har en anden funktion end normalt:\n\n" +
+                        "'Del' aktiverer en ny side hvor du kan indstille telefonens dato. Dette skal du gøre først. Fjern fluebenet i 'Automatisk dato og klokkeslæt'. Tryk 'Indstil dato'. Tryk på Tilbage-knappen for at komme tilbage til appen\n\n" +
+                        "'Send' opdaterer data, så du kan se hvordan det ville se ud hvis appen blev genstartet. Den skal du trykke på for at se appen på en bestemt dato.\n\n" +
+                        "Husk at stille datoen på din telefon tilbage når du er færdig med at teste")
+                .setCancelable(false)
+                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        prefs.edit().putBoolean("vistestdialog", false).commit();
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
 }

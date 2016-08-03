@@ -85,8 +85,9 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 	@Override
 	public void onSaveInstanceState(Bundle outState)
 	{
-
-		w.saveState(outState);
+		//http://stackoverflow.com/questions/23153084/view-of-a-fragment-becoming-null-at-the-time-of-onsaveinstancestate-callback
+		p("onSaveInstanceState(): er webview null? "+ ( w==null ));
+		if (w!=null) w.saveState(outState);
 		super.onSaveInstanceState(outState);
 
 	}

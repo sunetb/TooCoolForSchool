@@ -46,12 +46,6 @@ public class A extends Application {
 
     boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
 
-
-
-
-
-
-
 //////////-------------------------//////////
 
 
@@ -146,6 +140,7 @@ public class A extends Application {
         tjekOpstart();
         p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
+        if (debugging) pref.edit().putBoolean("vistestdialog", true).commit();
 
     }//Oncreate færdig
 
@@ -171,9 +166,7 @@ public class A extends Application {
                 //    for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
 
                 p("Synligetekster længde: "+ synligeTekster.size());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-                    pref.edit().putInt("seneste position", -1).apply();
-                else pref.edit().putInt("seneste position", -1).commit();
+                pref.edit().putInt("seneste position", -1).commit();
                 //test
                 //Tekst testtt = new Tekst("test", "test", "i", new DateTime().plusSeconds(60));
                 //Util.startAlarm(this,testtt);
@@ -227,9 +220,7 @@ public class A extends Application {
 
 
             if (skalTekstlistenOpdateres())  {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-                    pref.edit().putInt("seneste position", -1).apply();
-                else pref.edit().putInt("seneste position", -1).commit();
+                pref.edit().putInt("seneste position", -1).commit();
             }
 
 
@@ -274,11 +265,8 @@ public class A extends Application {
                 Tekst t = (Tekst) IO.læsObj("otekst2", ctx);
                 synligeTekster.add(t);
                 gemSynligeTekster();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-
-                    pref.edit().putBoolean("andenDagFørsteGang", false).apply();
-
-                else pref.edit().putBoolean("andenDagFørsteGang", false).commit();
+                pref.edit().putInt("seneste position", -1).commit();
+                pref.edit().putBoolean("andenDagFørsteGang", false).commit();
             }
         }
         p("onCreate færdig");
@@ -344,11 +332,6 @@ public class A extends Application {
                 itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
                 mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
                 htekster = alleTekster[3];
-
-
-
-
-
 
                 for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift);
 
@@ -759,12 +742,20 @@ public class A extends Application {
 
     void nulstil () {
 
-       tredjeDagFørsteGang = false;
-
         synligeTekster = new ArrayList();  //brugeas af pageradapteren
         htekster = new ArrayList();
-
+        synligeDatoer = null;
         hteksterOverskrifter = new ArrayList();
+        sidstKendteVindueshøjde = 0;
+
+        aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
+
+        findesNyTekst = false;
+        modenhed = 0;
+        tredjeDagFørsteGang = false;
+
+        if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        else p("alarmManager eksisterer");
 
         tjek = false;
 
@@ -781,6 +772,14 @@ public class A extends Application {
 
 
 
+    }
+
+    int findTekstnr (int id) {
+
+        for (int i = 0; i < synligeTekster.size(); i++)
+            if (id == synligeTekster.get(i).id_int) return i;
+
+        return -1;
     }
 
     void t(String s){
