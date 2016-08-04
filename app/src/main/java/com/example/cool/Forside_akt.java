@@ -12,8 +12,6 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
@@ -35,6 +33,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     ImageButton frem, tilbage, del, kontakt, extras;
     ViewPager.OnPageChangeListener sideLytter;
     int visPosition = 0;
+    boolean datoÆndret = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +46,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         a = A.a;
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         initUI();
         a.aktivitetenVises = true; //skal den stå tidligere?
         tjekOpstartstype(savedInstanceState);
@@ -67,27 +65,25 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }
         else if (v == extras)
             showDialog(1);
-        //TODO Lav de andrre knapper
         else if (v == del){
             if (a.debugging) {
                 startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
-                del.setEnabled(false);
-                del.getBackground().setAlpha(100);
+                datoÆndret = true;
             }
             else {
-                //todo
+                p("klikket på Anbefal");
+//Todo: Ny aktivitet med forklaring af pointsystem mm
+                Intent i = new Intent();
+                i.setAction(Intent.ACTION_SEND);
+                i.putExtra(Intent.EXTRA_TEXT, "Hey check out this app at: https://play.google.com/store/apps/details?id=com.google.android.apps.plus");
+                i.setType("text/plain");
+                startActivity(i);
             }
 
         } else if (v == kontakt) {
-            if (a.debugging) {
-
-                a.nulstil();
-                startActivity(new Intent(this, Forside_akt.class));
-                finish();
-            }
-            else {
-                //todo
-            }
+            p("klikket på Kontakt");
+            Intent i = new Intent(this,Kontakt.class );
+            startActivity(i);
         }
         knapstatus (vp.getCurrentItem(), "onClick()");
 
@@ -106,6 +102,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         frem.setOnClickListener(this);
         del = (ImageButton) findViewById(R.id.anbefal);
         del.setOnClickListener(this);
+        if (a.debugging) del.setImageResource(R.mipmap.ic_launcher);
         kontakt = (ImageButton) findViewById(R.id.redigerFeedback);
         kontakt.setOnClickListener(this);
         extras = (ImageButton) findViewById(R.id.extras);
@@ -127,13 +124,25 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onStart() {
         super.onStart();
-        a.lyt(this);
-        vp.addOnPageChangeListener(sideLytter);
-        visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
-        if (visPosition == -1) visPosition = a.synligeTekster.size()-1;
-        vp.setCurrentItem(visPosition);
-		knapstatus(visPosition, "onStart()");
+        if (datoÆndret){
+            p("onStart: Dato ændret");
+            datoÆndret = false;
+            a.nulstil();
+            startActivity(new Intent(this, Forside_akt.class));
+            finish();
+        }
+        else {
+            a.lyt(this);
+            vp.addOnPageChangeListener(sideLytter);
+
+            visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
+            if (visPosition == -1) visPosition = a.synligeTekster.size() - 1;
+            vp.setCurrentItem(visPosition);
+            knapstatus(visPosition, "onStart()");
+        }
     }
+
+
 
     @Override
     protected void onStop() {
@@ -141,6 +150,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         a.afregistrer(this);
         vp.removeOnPageChangeListener(sideLytter);
         prefs.edit().putInt("seneste position", vp.getCurrentItem()).commit();
+
     }
 
     public void knapstatus (int nu, String kaldtFra) {
@@ -306,10 +316,17 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         // set dialog message
         alertDialogBuilder
-                .setMessage("Knapperne 'Del' (tre prikker forbundet med streger) og 'Send' (papirfly) har en anden funktion end normalt:\n\n" +
-                        "'Del' aktiverer en ny side hvor du kan indstille telefonens dato. Dette skal du gøre først. Fjern fluebenet i 'Automatisk dato og klokkeslæt'. Tryk 'Indstil dato'. Tryk på Tilbage-knappen for at komme tilbage til appen\n\n" +
-                        "'Send' opdaterer data, så du kan se hvordan det ville se ud hvis appen blev genstartet. Den skal du trykke på for at se appen på en bestemt dato.\n\n" +
-                        "Husk at stille datoen på din telefon tilbage når du er færdig med at teste")
+                .setMessage("Knappen 'Del' er erstattet af et android-ikon. Nu aktiverer den en ny side hvor du kan indstille telefonens dato. \n\n" +
+                        "   1: Fjern fluebenet i 'Automatisk\n" +
+                        "       dato og klokkeslæt'. \n" +
+                        "       Kun nødvendigt første gang.\n\n" +
+                        "   2: Tryk 'Indstil dato'. \n\n" +
+                        "   3: Vælg en dato. \n\n" +
+                        "   4: Tryk på Tilbage-knappen for\n" +
+                        "       at komme tilbage til appen\n\n" +
+                        "\n\n" +
+                        "Tip: Start gerne med at vælge 1 sept, dernæst 2. sept..\n\n"+
+                        "Husk at stille datoen på din telefon tilbage når du er færdig med at teste!")
                 .setCancelable(false)
                 .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
@@ -323,5 +340,57 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         // show it
         alertDialog.show();
+    }
+
+    ///kun til test
+    void bygNotifikation (Context context, String overskrift, String id, int id_int) {
+
+        p("bygnotifokation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
+
+
+
+
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.cool_nobkgr_71x71)
+                        .setContentTitle("Too Cool for School")
+                        .setContentText(overskrift)
+                        .setAutoCancel(true)
+                        .setCategory(Notification.CATEGORY_ALARM)
+                        .setOnlyAlertOnce(true);
+        //ingen effekt.setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
+        ;
+
+        Intent resultIntent = new Intent(context, Forside_akt.class);
+        resultIntent.putExtra("overskrift", overskrift);
+        resultIntent.putExtra("tekstId", id);
+        resultIntent.putExtra("id_int", id_int);
+        resultIntent.putExtra("fraAlarm", true);
+        resultIntent.setAction(id); //lille hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        //stackBuilder.addParentStack(Forside.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_CANCEL_CURRENT //FLAG_ONE_SHOT//
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification n = mBuilder
+                .build();
+
+        //Hvis brugeren sletter notifikationen ved swipe eller tømmer alle notifikationer
+        Intent sletteIntent = new Intent(context, SletNotifikation_Lytter.class);
+        sletteIntent.putExtra("tekstId", id);
+        sletteIntent.setAction(id);
+
+        n.deleteIntent = PendingIntent.getBroadcast(context, 0, sletteIntent, 0);
+        mNotificationManager.notify(id_int, n);
+
+
     }
 }

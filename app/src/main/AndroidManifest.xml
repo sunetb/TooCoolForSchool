@@ -5,18 +5,15 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
-
-
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
     <application
         android:name=".A"
         android:allowBackup="true"
+        android:icon="@drawable/cool_nobkgr_71x71"
         android:label="Too Cool For School. BETA V.0.91"
         android:supportsRtl="true"
-        android:theme="@style/SortBaggrund"
-		android:icon="@drawable/cool_nobkgr_71x71">
-
+        android:theme="@style/SortBaggrund">
         <activity android:name=".Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,30 +21,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Forside_akt"></activity>
 
-        <activity android:name=".Forside_akt">
-        </activity>
-
-        <receiver
-            android:name=".Alarm_Lytter">
+        <receiver android:name=".Alarm_Lytter">
             <intent-filter>
                 <action android:name="com.example.cool.START_ALARM" />
             </intent-filter>
         </receiver>
-
-
         <receiver
             android:name=".Boot_Lytter"
-            android:label="BootModtag"
-            android:enabled="true">
-
+            android:enabled="true"
+            android:label="BootModtag">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".SletNotifikation_Lytter" />
 
+        <activity android:name=".Kontakt"></activity>
     </application>
 
 </manifest>

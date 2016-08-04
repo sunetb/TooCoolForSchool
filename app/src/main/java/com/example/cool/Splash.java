@@ -20,6 +20,7 @@ public class Splash extends AppCompatActivity implements Runnable {
     SharedPreferences sp;
     int animLængde1;
     int animLængde2;
+    A a ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,13 @@ public class Splash extends AppCompatActivity implements Runnable {
         setContentView(R.layout.activity_splash);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.cool_nobkgr_50x50_rund);
+        a = A.a;
+        animer(savedInstanceState);
 
+
+    }
+
+    private void animer (Bundle savedInstanceState){
         sp = PreferenceManager.getDefaultSharedPreferences(this);
 
         animLængde1 = sp.getInt("animLængde1", 3400);

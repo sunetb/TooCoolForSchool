@@ -60,6 +60,8 @@ public class A extends Application {
     final int MODENHED_MODEN = 3;
 
     boolean tredjeDagFørsteGang = false;
+
+    static boolean singletonKlar = false;
 //////////-------------------------//////////
 	
 	
@@ -81,11 +83,11 @@ public class A extends Application {
     public static String hale = "</body></html>";
 
 
-    static boolean tjek = false;
-    boolean hurtigModning = false; // til test på enhed
+
+  //  boolean hurtigModning = false; // til test på enhed
     DateTime masterDato;
 
-    static boolean debugging = true; //ændrer omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
+    static boolean debugging = true; //-- omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
 
 //////////-------------------------//////////
 
@@ -134,7 +136,7 @@ public class A extends Application {
         else p("alarmManager eksisterer");
 
         masterDato = new DateTime();
-        if (hurtigModning) masterDato = new DateTime(2015, 10, 1, 0,0);
+        //if (hurtigModning) masterDato = new DateTime(2015, 10, 1, 0,0);
 
         modenhed = tjekModenhed();
         tjekOpstart();
@@ -146,14 +148,6 @@ public class A extends Application {
 
     private void tjekOpstart() {
 
-
-        if (hurtigModning && modenhed == MODENHED_MODEN){ //-- kun til debugging
-
-            DateTime glmaster = (DateTime) IO.læsObj("masterdato", this);
-            masterDato = glmaster.plusDays(2);
-            IO.gemObj(masterDato, "masterdato",this);
-            p(masterDato);
-        }
 
         if (modenhed > MODENHED_HELT_FRISK) {
 
@@ -270,7 +264,7 @@ public class A extends Application {
             }
         }
         p("onCreate færdig");
-        tjek = true;
+        singletonKlar = true;
 
 
 
@@ -643,17 +637,6 @@ public class A extends Application {
 		
 		int idag = Util.lavDato(new Date());
 
-        if (hurtigModning) { //til test
-            int dag = pref.getInt("fakedato", 1);
-            IO.gemObj(masterDato,"masterdato", this);
-
-            idag = Util.lavDato(new Date(2015,10,dag));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-                pref.edit().putInt("fakedato", dag+1).apply();
-            else pref.edit().putInt("fakedato", dag+1).commit();
-
-        }
-		
         if (moden == MODENHED_HELT_FRISK) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
                 pref.edit()
@@ -757,7 +740,7 @@ public class A extends Application {
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
 
-        tjek = false;
+        singletonKlar = false;
 
         masterDato = new DateTime();
         modenhed = tjekModenhed();

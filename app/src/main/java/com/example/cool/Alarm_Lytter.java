@@ -47,7 +47,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+						.setSmallIcon(R.drawable.cool_nobkgr_71x71)
                         .setContentTitle("Too Cool for School")
                         .setContentText(overskrift)
                         .setAutoCancel(true)
