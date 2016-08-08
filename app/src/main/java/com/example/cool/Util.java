@@ -2,16 +2,27 @@ package com.example.cool;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import java.io.*;
-import java.util.*;
-import org.joda.time.*;
-import org.xmlpull.v1.*;
+import org.joda.time.DateTime;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by sune on 6/3/16.
@@ -51,12 +62,12 @@ public class Util {
         gamle.add(id_int);
         //sp.edit().putStringSet("gamle", gamle).apply();
         IO.gemObj(gamle, "gamle", c);
-        boolean efteradd = gamle.contains(id);
+        boolean efteradd = gamle.contains(id_int);
 
         p("Util.notiBrugt tjek sættet:");
         for (Integer s : gamle) System.out.println(s);
 
-        t(c,"notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
+        if (A.debugging) t(c,"notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
         p("Util.notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
 
         PendingIntent i = PendingIntent.getBroadcast(c, id_int, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -157,9 +168,8 @@ public class Util {
         //-- Tjek om idag er 4. sept eller tidligere
         DateTime syvFør = mTid.minusDays(7);
 
-        if (syvFør.isAfterNow()) return false;
+        return !syvFør.isAfterNow();
 
-        return true;
     }
 
     static boolean erSammeDato(DateTime tid){
@@ -173,9 +183,7 @@ public class Util {
         int mrd = tid.getMonthOfYear();
         int idagMrd = nu.getMonthOfYear();
 
-        if (mrd == idagMrd ) return true;
-
-        return false;
+        return mrd == idagMrd;
 
     }
 
@@ -205,8 +213,8 @@ public class Util {
 
             Tekst tempTekst = new Tekst();
 
-            while (eventType != parser.END_DOCUMENT) {
-                if (eventType == parser.START_TAG) {
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_TAG) {
                     tag = parser.getName();
                     if ("ss:Worksheet".equals(tag) ) startnu=true;
                     if(startnu) {
@@ -222,13 +230,13 @@ public class Util {
                     }
                 }//END IF START_TAG
 
-                else if (startnu && parser.getEventType() == parser.TEXT) {
+                else if (startnu && parser.getEventType() == XmlPullParser.TEXT) {
                     txt = parser.getText();
                     put+=txt;
 
                 }//END IF TEXT
 
-                else if (startnu && eventType == parser.END_TAG){
+                else if (startnu && eventType == XmlPullParser.END_TAG){
                     tag = parser.getName();
                    if ("Cell".equals(tag)){
                         if (celletæller == 1){
@@ -255,6 +263,12 @@ public class Util {
                                 if (txt.length() > 1) {
                                     String dato = txt.substring(1);
                                     int længde = dato.length();
+                                    if (længde >4) {
+                                        dato = dato.substring(0,længde-4);
+                                        længde = dato.length();
+                                        p("ParseXML lang dato læst: "+dato);
+
+                                    }
                                     String tmpMåned = dato.substring(længde-2, længde);
                                     int måned = tryParseInt(tmpMåned);
                                     String tmpDag = dato.substring(0, længde-2);
@@ -267,7 +281,7 @@ public class Util {
                                             måned = tmpTmpMåned;
                                         }
                                         else {
-                                            p("Util.parseXML(): FEJL: Ugyldig dato");
+                                            p("Util.parseXML(): FEJL: Ugyldig dato: "+txt);
                                         }
                                     }
 
@@ -407,6 +421,9 @@ public class Util {
         A.debugmsg += kl +"<br>";
     }
 
+    public static void kørIBaggrund(Runnable r) {
+        new Thread(r).start();
+    }
 
 
 }

@@ -1,15 +1,28 @@
 package com.example.cool;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.preference.*;
-import android.widget.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import android.app.AlarmManager;
+import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by sune on 5/31/16.
@@ -29,7 +42,6 @@ public class A extends Application {
     ArrayList<Integer> synligeDatoer;
     ArrayList<String> hteksterOverskrifter = new ArrayList();
 
-
     public String henteurl = "http://www.lightspeople.net/sune/skole/tekster.xml";
     public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
 
@@ -38,13 +50,28 @@ public class A extends Application {
 //////////-------------------------//////////
 	
 
-//////////---------- UI TILSTAND / Lytterstystem ----------//////////
+//////////---------- UI TILSTAND / Lytterstystem ----------////////// Todo: lav ny klasse
 	ArrayList<Observatør> observatører = new ArrayList<>();
     void lyt(Observatør o) {observatører.add(o);}
     void afregistrer(Observatør o) {observatører.remove(o);}
-    void givBesked () {for (Observatør o: observatører) o.opdater();}
+    int senesteEvent = 0;
+    void givBesked (int event) {
+        senesteEvent =event;
 
-    boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
+        if (event == HTEKSTER_OPDATERET) hteksterKlar= true;
+        new Handler(Looper.getMainLooper()).post(new Runnable() { //-- for at sikre at den køres i hovedtråden
+            @Override
+            public void run() {
+                for (Observatør o: observatører) o.opdater(senesteEvent);
+            }
+        });
+    }
+
+    final int SYNLIGETEKSTER_OPDATERET = 1;
+    final int HTEKSTER_OPDATERET = 2;
+    boolean hteksterKlar = false;
+
+
 
 //////////-------------------------//////////
 
@@ -62,6 +89,8 @@ public class A extends Application {
     boolean tredjeDagFørsteGang = false;
 
     static boolean singletonKlar = false;
+    boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
+
 //////////-------------------------//////////
 	
 	
@@ -93,9 +122,13 @@ public class A extends Application {
 
     /*-----------------------------noter
 
+Think about modules in your application, don't just write linear code.
+
     * NeedToHave:
-     * tjek i aktiviteten om den er åbnet nra noti. vis tilvvarende tekst på skærmen
-    *
+     * ved første opstart, tjek om der er internet. Start et loop hvis ikke
+     *
+     * Hvis der går lang tid mellem at appen er åben, når appen forbi de noti som er 'bestilt'
+    * Lazy loading måske?
     * 
     * 
     *
@@ -110,16 +143,6 @@ public class A extends Application {
     * Kan muligivs løses med lyttersystem..
     *
     *
-    *
-    *
-    *
-    *
-
-    *    int modenhed = 0;
-    final int MODENHED_HELT_FRISK = 0;
-    final int MODENHED_FØRSTE_DAG = 1;
-    final int MODENHED_ANDEN_DAG = 2;
-    final int MODENHED_MODEN = 3;
     * */
 	
 
@@ -136,7 +159,13 @@ public class A extends Application {
         else p("alarmManager eksisterer");
 
         masterDato = new DateTime();
-        //if (hurtigModning) masterDato = new DateTime(2015, 10, 1, 0,0);
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
 
         modenhed = tjekModenhed();
         tjekOpstart();
@@ -145,6 +174,11 @@ public class A extends Application {
         if (debugging) pref.edit().putBoolean("vistestdialog", true).commit();
 
     }//Oncreate færdig
+
+    private void sletGamleNotifikationer(){
+
+
+    }
 
     private void tjekOpstart() {
 
@@ -155,18 +189,23 @@ public class A extends Application {
                 p("tredje dag første gang!! ");
                 synligeTekster = (ArrayList<Tekst>) IO.læsObj("tempsynligeTekster", this);
 
+                //-- sørger for at der ikke vises notifikationer for helt nye tekster
+                ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", ctx);
+                for (Tekst t : synligeTekster)
+                    gamle.add(t.id_int);
+
+                IO.gemObj(gamle, "gamle", ctx);
 
                 //--hvis nu nogle h-tekster skulle være gemt
                 //    for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
 
+
                 p("Synligetekster længde: "+ synligeTekster.size());
                 pref.edit().putInt("seneste position", -1).commit();
-                //test
-                //Tekst testtt = new Tekst("test", "test", "i", new DateTime().plusSeconds(60));
-                //Util.startAlarm(this,testtt);
+
                 //evt i async:
-                Util.opdaterKalender(ctx, "Application singleton");
-                gemSynligeTekster();
+                    Util.opdaterKalender(ctx, "Application singleton");
+                    gemSynligeTekster();
                 //hertil
 
                 tredjeDagFørsteGang = false;
@@ -184,12 +223,20 @@ public class A extends Application {
 
             synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
 
-            //-- Tjek om der er opdateringer til tekstene
-            new AsyncTask() {
+             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] params) {
+
+                    //--  Init h-tekster
+
                     htekster = (ArrayList<Tekst>) IO.læsObj("htekster", ctx);
                     for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift);
+                    hteksterKlar = true;
+                    givBesked(HTEKSTER_OPDATERET);
+
+
+                    //-- Tjek om der er opdateringer til tekstene
+
                     findesNyTekst = tjekTekstversion();
                     p("Ny tekstversion? : " + findesNyTekst);
                     return null;
@@ -263,11 +310,9 @@ public class A extends Application {
                 pref.edit().putBoolean("andenDagFørsteGang", false).commit();
             }
         }
-        p("onCreate færdig");
+        p("tjekOpstart() færdig");
+
         singletonKlar = true;
-
-
-
     }
 
     private void initAllerFørsteGang(){
@@ -290,27 +335,48 @@ public class A extends Application {
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
 
-                    ArrayList<Tekst> otekster = alleTekster[0];
-                    Tekst o1 = otekster.get(0);
-                    String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
-                    o1.brødtekst = nyBrødtekst;
-                    synligeTekster.add(o1);
-                    p("Så er der O-tekst i array!");
+                if (alleTekster[0].size() == 0) prøvIgen();
+                else {
 
-                    if(aktivitetenVises) givBesked();
-                    IO.gemObj(o1, "otekst1", ctx);
+                    //-- denne kode burde egentlig stå i tjekModenhed() men er flyttet hertil så appen kun kan modnes hvis den får data første gang.
+                        int idag = Util.lavDato(new Date());
 
-                    //Gemmer O-tekst nr 2 til næste gang
-                    Tekst o2 = otekster.get(1);
-                    String nyBrødtekst2 = o2.brødtekst.replaceAll("\n", " ");
+                        pref.edit()
+                                .putInt("modenhed", MODENHED_FØRSTE_DAG)
+                                .putInt("installationsdato", idag)
+                                .commit();
+                    //-- hertil
 
-                    o1.brødtekst = nyBrødtekst2;
+                        ArrayList<Tekst> otekster = alleTekster[0];
+                        Tekst o1 = otekster.get(0);
+                        p("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" + o1.brødtekst);
+                        String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
+                        o1.brødtekst = nyBrødtekst;
+                        synligeTekster.add(o1);
+                        p("Så er der O-tekst i array!");
 
-                    IO.gemObj(o2, "otekst2", ctx);
+                        if (aktivitetenVises) givBesked(SYNLIGETEKSTER_OPDATERET);
+                        IO.gemObj(o1, "otekst1", ctx);
 
-                fortsæt();// async-kæde: ting der også kan gøres i baggrunden, men som er afhængige af værdier fra denne metode
+                        fortsæt();// async-kæde: ting der også kan gøres i baggrunden, men som er afhængige af værdier fra denne metode
+                    }
             }
         }.execute();
+    }
+
+    private void prøvIgen(){
+
+        t("Fejl ved hentning af data. Prøver igen...\nTjek evt. om der er netforbindelse");
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                initAllerFørsteGang();
+
+            }
+        }, 5000);
+
     }
 
     private void fortsæt() {
@@ -322,15 +388,30 @@ public class A extends Application {
             @Override
             protected Object doInBackground(Object[] params) {
 
-                //gemSynligeTekster();
+                //-- gemmer h-tekster
+
+                htekster = Util.erstatAfsnit(alleTekster[3]);
+
+                for (Tekst t : htekster)
+                    hteksterOverskrifter.add(t.overskrift);
+
+                givBesked(HTEKSTER_OPDATERET);
+
+                IO.gemObj(htekster,"htekster",ctx);
+
+                //-- Gemmer O-tekst nr 2 til næste gang
+
+                ArrayList<Tekst> otekster = alleTekster[0];
+                Tekst o2 = otekster.get(1);
+                String nyBrødtekst2 = o2.brødtekst.replaceAll("\n", " ");
+
+                o2.brødtekst = nyBrødtekst2;
+
+                IO.gemObj(o2, "otekst2", ctx);
+
+                //-- Gemmer resten
                 itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
                 mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
-                htekster = alleTekster[3];
-
-                for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift);
-
-                //gemmer h-tekster
-                IO.gemObj(Util.erstatAfsnit(alleTekster[3]),"htekster",ctx);
 
 
 
@@ -443,7 +524,7 @@ public class A extends Application {
 
                 IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
-                if(modenhed == MODENHED_MODEN) {
+                if(modenhed == MODENHED_MODEN) {  ///
                     synligeTekster.clear();
                     synligeTekster = tempSynlige;
                     //tempSynlige = null;
@@ -480,7 +561,6 @@ public class A extends Application {
                 p("Tjek I dummytekst id: "+dummyITekst.id_int);
                 p("Tjek M dummytekst id: "+dummyMTekst.id_int);
 
-                boolean mFundet = false;
 				boolean iFundet = false;
 				
                // ArrayList<Integer> tempSynlige = new ArrayList<>();
@@ -534,6 +614,24 @@ public class A extends Application {
 					}
 				}
 
+                //-- Renser ud i gamle tekster
+                int ældsteI = synligeDatoer.get(0);
+                for (Integer i : datoliste) if (i<ældsteI) slettes.add(i);
+
+                ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", ctx);
+                gamle.addAll(slettes);
+/* Igang: slet intents for gamle notifikationer)
+                if (alm == null) alm = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+
+                for (int i = 0 ; i < gamle.size() ; i++){
+                    PendingIntent pi = PendingIntent.getBroadcast(ctx, gamle.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    pi.cancel();
+                    alm.cancel(pi);
+                }
+*/
+                IO.gemObj(gamle, "gamle", ctx);
+
               	for (Integer i : slettes) datoliste.remove(i);
 
                 IO.gemObj( datoliste, "datoliste", ctx);
@@ -579,7 +677,7 @@ public class A extends Application {
                         synligeTekster.add( (Tekst) IO.læsObj(""+i,ctx));
 
                     }
-                    givBesked();
+                    givBesked(SYNLIGETEKSTER_OPDATERET);
                     gemSynligeTekster();
 
                 }
@@ -638,18 +736,7 @@ public class A extends Application {
 		int idag = Util.lavDato(new Date());
 
         if (moden == MODENHED_HELT_FRISK) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                pref.edit()
-                    .putInt("modenhed", MODENHED_FØRSTE_DAG)
-                    .putInt("installationsdato", idag)
-                    .apply();
-            }
-            else {
-                pref.edit()
-                        .putInt("modenhed", MODENHED_FØRSTE_DAG)
-                        .putInt("installationsdato", idag)
-                        .commit();
-            }
+           //koden herfra er flyttet til initAllerFørsteGang() for at den ikke bliver kørt med mindre appen får hentet sine data
 
             return MODENHED_HELT_FRISK;
         }
@@ -749,7 +836,7 @@ public class A extends Application {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                givBesked();
+                givBesked(SYNLIGETEKSTER_OPDATERET);
             }
         }, 100);
 

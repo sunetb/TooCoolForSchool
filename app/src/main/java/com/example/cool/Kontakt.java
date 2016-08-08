@@ -1,5 +1,5 @@
 package com.example.cool;
-import android.app.Activity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +25,6 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
     CheckBox sendlog;
 
     EditText et_navn, et_emne, et_besked;
-    boolean logMig = true;
 
 
     //-> ress
@@ -108,7 +107,7 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         p("endMail()");
 
         String afstedtekst = besked +"\n\n"+"Med venlig hilsen\n"+ navn;
-        if (sendlog.isChecked()) afstedtekst+= "\n\n\n\n"+ instans.debugmsg;
+        if (sendlog.isChecked()) afstedtekst+= "\n\n\n\n"+ A.debugmsg;
 
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("message/rfc822");

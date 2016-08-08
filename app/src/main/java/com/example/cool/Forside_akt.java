@@ -9,7 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
@@ -17,12 +17,9 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 public class Forside_akt extends AppCompatActivity implements View.OnClickListener, Observatør{
 
@@ -49,7 +46,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         initUI();
         a.aktivitetenVises = true; //skal den stå tidligere?
         tjekOpstartstype(savedInstanceState);
-        if (a.debugging && prefs.getBoolean("vistestdialog", true)) testDialog();
+        if (A.debugging && prefs.getBoolean("vistestdialog", true)) testDialog();
 
     }
 
@@ -66,7 +63,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else if (v == extras)
             showDialog(1);
         else if (v == del){
-            if (a.debugging) {
+            if (A.debugging) {
                 startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
                 datoÆndret = true;
             }
@@ -75,7 +72,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 //Todo: Ny aktivitet med forklaring af pointsystem mm
                 Intent i = new Intent();
                 i.setAction(Intent.ACTION_SEND);
-                i.putExtra(Intent.EXTRA_TEXT, "Hey check out this app at: https://play.google.com/store/apps/details?id=com.google.android.apps.plus");
+                i.putExtra(Intent.EXTRA_TEXT, "Hej tjek denne app ud: ");
                 i.setType("text/plain");
                 startActivity(i);
             }
@@ -102,12 +99,15 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         frem.setOnClickListener(this);
         del = (ImageButton) findViewById(R.id.anbefal);
         del.setOnClickListener(this);
-        if (a.debugging) del.setImageResource(R.mipmap.ic_launcher);
+        if (A.debugging) del.setImageResource(R.mipmap.ic_launcher);
         kontakt = (ImageButton) findViewById(R.id.redigerFeedback);
         kontakt.setOnClickListener(this);
         extras = (ImageButton) findViewById(R.id.extras);
         extras.setOnClickListener(this);
-
+        if (!a.hteksterKlar) {
+            extras.setEnabled(false);
+            extras.getBackground().setAlpha(100);
+        }
         sideLytter = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
@@ -157,8 +157,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         int max = a.synligeTekster.size()-1;
 		p("knapstatus: nu="+nu+" max="+max + "Kaldt fra "+kaldtFra);
 
-        //TODO husk hTekster
-
         if (max == 0) nu =0;
 
         if (nu == max || max == -1 ) {
@@ -177,25 +175,32 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             tilbage.setEnabled(true);
             tilbage.getBackground().setAlpha(255);
         }
-        if (a.debugging){
+        if (A.debugging){
 
         }
     }
 
 
     @Override
-    public void opdater() {
-        pa.notifyDataSetChanged();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                vp.setCurrentItem(a.synligeTekster.size()-1);
-                knapstatus(a.synligeTekster.size()-1, " opdater()");
+    public void opdater(int event) {
+        if (event == a.SYNLIGETEKSTER_OPDATERET){
+            pa.notifyDataSetChanged();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    vp.setCurrentItem(a.synligeTekster.size()-1);
+                    knapstatus(a.synligeTekster.size()-1, " opdater()");
 
-            }
-        }, 50);
+                }
+            }, 50);
 
-        t("Teksterne blev opdateret");
+            t("Teksterne blev opdateret");
+        }
+        else if (event == a.HTEKSTER_OPDATERET){
+            extras.setEnabled(true);
+            extras.getBackground().setAlpha(255);
+
+        }
     }
 
     void p(Object o){
@@ -224,7 +229,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                         if (!a.synligeTekster.contains(valgtHTekst)) {
                             a.synligeTekster.add(valgtHTekst);
-                            a.givBesked();
+                            a.givBesked(a.SYNLIGETEKSTER_OPDATERET);
+                            pa.notifyDataSetChanged();
                             vp.setCurrentItem(a.synligeTekster.size()-1);
                         }
                         else {
@@ -266,11 +272,15 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 else p(opstart+"Genstartet af systemet eller brugeren");
             }
             else {
-                p(opstart+" NOTIFIKATION: "+ startBundle.getString("overskrift"));
-                int idstr = startBundle.getInt("id_int");
+                int id = startBundle.getInt("id_int");
+
+                p(opstart+" NOTIFIKATION: "+ startBundle.getString("overskrift") + "id_int: "+id);
+
                 int husk = -1;
                 for (int i = 0; i < a.synligeTekster.size(); i++) {
-                    if (a.synligeTekster.get(i).id_int == idstr) {
+                    p("søger synligetkster igennem: "+ a.synligeTekster.get(i).id_int);
+
+                    if (a.synligeTekster.get(i).id_int == id) {
                         husk = i;
                         break;
                     }
@@ -283,11 +293,11 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                 }
                 else {
-                    p("FEJL: Teksten fre notifikationen fandtes ikke i synligeTekster!");
-                    Tekst t = (Tekst) IO.læsObj(""+idstr, this);
+                    p("FEJL: Teksten fra notifikationen fandtes ikke i synligeTekster!");
+                    Tekst t = (Tekst) IO.læsObj(""+id, this);
                     a.synligeTekster.add(t);
                     pa.notifyDataSetChanged();
-                    prefs.edit().putInt("seneste position", vp.getCurrentItem()).commit();
+                    prefs.edit().putInt("seneste position", a.synligeTekster.size()-1).commit();
                    // vp.setCurrentItem(husk);
                     //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
 
@@ -316,17 +326,20 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         // set dialog message
         alertDialogBuilder
-                .setMessage("Knappen 'Del' er erstattet af et android-ikon. Nu aktiverer den en ny side hvor du kan indstille telefonens dato. \n\n" +
-                        "   1: Fjern fluebenet i 'Automatisk\n" +
-                        "       dato og klokkeslæt'. \n" +
-                        "       Kun nødvendigt første gang.\n\n" +
-                        "   2: Tryk 'Indstil dato'. \n\n" +
-                        "   3: Vælg en dato. \n\n" +
-                        "   4: Tryk på Tilbage-knappen for\n" +
-                        "       at komme tilbage til appen\n\n" +
-                        "\n\n" +
-                        "Tip: Start gerne med at vælge 1 sept, dernæst 2. sept..\n\n"+
-                        "Husk at stille datoen på din telefon tilbage når du er færdig med at teste!")
+                .setMessage("Sådan skifter du dato:\n\n"+
+
+                        "   1: Tryk på Android-ikonet.\n"+
+                        "   2: Fjern fluebenet i 'Automatisk\n"+
+                        "       dato og klokkeslæt'.\n"+
+                        "       (Kun nødvendigt første gang)\n"+
+                        "   3: Tryk 'Indstil dato'. \n"+
+                        "   4: Vælg en dato. \n"+
+                        "   5: Tryk på telefonens Tilbage-\n"+
+                        "       knap.\n\n"+
+
+                        "Tip: Start gerne med at vælge 2 sept, dernæst 3. sept. 4. sept. Og derefter ca en uge frem ad gangen...\n\n"+
+
+                        "Husk at sætte hak i 'Automatisk dato' når du er færdig med at teste!")
                 .setCancelable(false)
                 .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
@@ -360,7 +373,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         .setCategory(Notification.CATEGORY_ALARM)
                         .setOnlyAlertOnce(true);
         //ingen effekt.setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
-        ;
 
         Intent resultIntent = new Intent(context, Forside_akt.class);
         resultIntent.putExtra("overskrift", overskrift);

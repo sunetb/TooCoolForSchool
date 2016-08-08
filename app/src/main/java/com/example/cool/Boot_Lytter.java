@@ -8,10 +8,9 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 /**
  * Created by sune on 6/6/16.
+ * Opdaterer alarmer. Alarmer slettes når telefonen slukkes. Derfor skal de sættes igen ved opstart
  */
 public class Boot_Lytter extends BroadcastReceiver  {
         Context c;
@@ -27,27 +26,29 @@ public class Boot_Lytter extends BroadcastReceiver  {
             {
 
 
-                Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
-				new AsyncTask() {
+                if (A.debugging) Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
 
-                    ;
-                    @Override
-                    protected Object doInBackground(Object[] params) {
-                        int modenhed = pref.getInt("modenhed", -1);
+                int modenhed = pref.getInt("modenhed", -1);
 
-                        if (modenhed == 3) Util.opdaterKalender(c, "boot-lytter");
-
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Object o) {
-
-                        super.onPostExecute(o);
-                    }
-                }.execute();
+                if (modenhed == 3) {
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Util.opdaterKalender(c, "boot-lytter");
+                        }
+                    });
+/*
+                    new AsyncTask() {
+                        @Override
+                        protected Object doInBackground(Object[] params) {
 
 
+
+                            return null;
+                        }
+                    }.execute();
+*/
+                }
 
             }
         }

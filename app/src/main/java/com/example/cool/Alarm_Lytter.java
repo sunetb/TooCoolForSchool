@@ -18,7 +18,6 @@ import java.util.ArrayList;
  */
 public class Alarm_Lytter extends BroadcastReceiver {
 
-
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -30,7 +29,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         int id_int = b.getInt("id_int");
 
         p("cool.onRecieve() modtog "+overskrift);
-		Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
+        if (A.debugging) Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
 
         if (!gamle.contains(id))
         bygNotifikation(context, overskrift, id, id_int);
@@ -39,11 +38,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
     void bygNotifikation (Context context, String overskrift, String id, int id_int) {
 
-        p("bygnotifokation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
-
-
-
-
+        p("bygnotifikation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
@@ -54,7 +49,6 @@ public class Alarm_Lytter extends BroadcastReceiver {
                         .setCategory(Notification.CATEGORY_ALARM)
                         .setOnlyAlertOnce(true);
         //ingen effekt.setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
-        ;
 
         Intent resultIntent = new Intent(context, Forside_akt.class);
         resultIntent.putExtra("overskrift", overskrift);
@@ -79,7 +73,8 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
         //Hvis brugeren sletter notifikationen ved swipe eller tømmer alle notifikationer
         Intent sletteIntent = new Intent(context, SletNotifikation_Lytter.class);
-        sletteIntent.putExtra("tekstId", id);
+        sletteIntent.putExtra("tekstId", id)
+                .putExtra("id_int", id_int);
         sletteIntent.setAction(id);
 
         n.deleteIntent = PendingIntent.getBroadcast(context, 0, sletteIntent, 0);
