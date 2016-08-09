@@ -11,7 +11,7 @@
         android:name=".A"
         android:allowBackup="true"
         android:icon="@drawable/cool_nobkgr_71x71"
-        android:label="Too Cool For School. BETA V.0.91"
+        android:label="Too Cool For School. BETA 0.8"
         android:supportsRtl="true"
         android:theme="@style/SortBaggrund">
         <activity android:name=".Splash">
@@ -39,6 +39,9 @@
         <receiver android:name=".SletNotifikation_Lytter" />
 
         <activity android:name=".Kontakt"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="a473bb17c446dada4b78b47051b2b561970908f7" />
     </application>
 
 </manifest>

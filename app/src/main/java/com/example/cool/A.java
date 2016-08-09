@@ -11,6 +11,8 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.joda.time.DateTime;
 
 import java.io.BufferedInputStream;
@@ -23,6 +25,8 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by sune on 5/31/16.
@@ -149,6 +153,7 @@ Think about modules in your application, don't just write linear code.
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         Util.starttid = System.currentTimeMillis();
         p("oncreate() kaldt");
         a= this;

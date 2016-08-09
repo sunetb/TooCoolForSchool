@@ -184,10 +184,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     public void opdater(int event) {
         if (event == a.SYNLIGETEKSTER_OPDATERET){
-            pa.notifyDataSetChanged();
-            new Handler().postDelayed(new Runnable() {
+             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    pa.notifyDataSetChanged();
                     vp.setCurrentItem(a.synligeTekster.size()-1);
                     knapstatus(a.synligeTekster.size()-1, " opdater()");
 
