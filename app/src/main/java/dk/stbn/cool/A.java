@@ -127,7 +127,7 @@ public class A extends Application {
   //  boolean hurtigModning = false; // til test på enhed
     DateTime masterDato;
 
-    static boolean debugging = true; //-- omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
+    static boolean debugging = false; //-- omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
 
 //////////-------------------------//////////
 

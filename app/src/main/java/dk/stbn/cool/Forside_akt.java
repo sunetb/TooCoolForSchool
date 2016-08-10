@@ -319,11 +319,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     private void testDialog () {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
-
-        // set titleis
         alertDialogBuilder.setTitle("Test-tilstand aktiveret");
-
-        // set dialog message
         alertDialogBuilder
                 .setMessage("Sådan skifter du dato:\n\n"+
 
@@ -347,10 +343,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     }
                 });
 
-        // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
 
-        // show it
         alertDialog.show();
     }
 
