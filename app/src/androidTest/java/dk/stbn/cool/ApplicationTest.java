@@ -1,4 +1,4 @@
-package com.example.cool;
+package dk.stbn.cool;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

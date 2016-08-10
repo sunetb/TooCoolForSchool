@@ -1,4 +1,4 @@
-package com.example.cool;
+package dk.stbn.cool;
 
 import android.app.AlarmManager;
 import android.app.Application;
@@ -59,14 +59,21 @@ public class A extends Application {
     void lyt(Observatør o) {observatører.add(o);}
     void afregistrer(Observatør o) {observatører.remove(o);}
     int senesteEvent = 0;
+    int tæller= 0;
     void givBesked (int event) {
         senesteEvent =event;
+        p("givbesked blev kaldt med "+event);
 
         if (event == HTEKSTER_OPDATERET) hteksterKlar= true;
         new Handler(Looper.getMainLooper()).post(new Runnable() { //-- for at sikre at den køres i hovedtråden
             @Override
             public void run() {
-                for (Observatør o: observatører) o.opdater(senesteEvent);
+                tæller = 0;
+                for (Observatør o: observatører) {
+                    o.opdater(senesteEvent);
+                    tæller++;
+                }
+                p("Lyttersystem.opdater() kaldt "+tæller+ " gange");
             }
         });
     }

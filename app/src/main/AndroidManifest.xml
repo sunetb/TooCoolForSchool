@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.cool">
+    package="dk.stbn.cool">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -8,37 +8,37 @@
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
     <application
-        android:name=".A"
+        android:name="dk.stbn.cool.A"
         android:allowBackup="true"
         android:icon="@drawable/cool_nobkgr_71x71"
-        android:label="Too Cool For School. BETA 0.8"
+        android:label="Too Cool For School. BETA 0.9"
         android:supportsRtl="true"
         android:theme="@style/SortBaggrund">
-        <activity android:name=".Splash">
+        <activity android:name="dk.stbn.cool.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Forside_akt"></activity>
+        <activity android:name="dk.stbn.cool.Forside_akt"></activity>
 
-        <receiver android:name=".Alarm_Lytter">
+        <receiver android:name="dk.stbn.cool.Alarm_Lytter">
             <intent-filter>
-                <action android:name="com.example.cool.START_ALARM" />
+                <action android:name="dk.stbn.cool.START_ALARM" />
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".Boot_Lytter"
+            android:name="dk.stbn.cool.Boot_Lytter"
             android:enabled="true"
             android:label="BootModtag">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".SletNotifikation_Lytter" />
+        <receiver android:name="dk.stbn.cool.SletNotifikation_Lytter" />
 
-        <activity android:name=".Kontakt"></activity>
+        <activity android:name="dk.stbn.cool.Kontakt"></activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a473bb17c446dada4b78b47051b2b561970908f7" />

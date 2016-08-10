@@ -1,4 +1,4 @@
-package com.example.cool;
+package dk.stbn.cool;
 
 import android.content.Context;
 
@@ -27,7 +27,7 @@ public class IO {
 
             try {
                 input = new ObjectInputStream(new FileInputStream(directory+ File.separator + filename));
-                mitObj = (Object) input.readObject();
+                mitObj = input.readObject();
                 input.close();
             } catch (StreamCorruptedException e) {
                 e.printStackTrace();

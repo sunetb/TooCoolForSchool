@@ -1,4 +1,4 @@
-package com.example.cool;
+package dk.stbn.cool;
 
 /**
  * Created by sune on 6/28/16.

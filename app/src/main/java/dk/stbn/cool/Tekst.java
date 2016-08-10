@@ -1,4 +1,4 @@
-package com.example.cool;
+package dk.stbn.cool;
 
 import org.joda.time.DateTime;
 

@@ -1,4 +1,4 @@
-package com.example.cool;
+package dk.stbn.cool;
 
 import android.app.Dialog;
 import android.app.Notification;
@@ -134,15 +134,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else {
             a.lyt(this);
             vp.addOnPageChangeListener(sideLytter);
-
+            if (A.debugging) pa.notifyDataSetChanged(); //lidt groft
             visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
             if (visPosition == -1) visPosition = a.synligeTekster.size() - 1;
             vp.setCurrentItem(visPosition);
             knapstatus(visPosition, "onStart()");
         }
+
     }
-
-
 
     @Override
     protected void onStop() {
@@ -337,7 +336,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         "   5: Tryk på telefonens Tilbage-\n"+
                         "       knap.\n\n"+
 
-                        "Tip: Start gerne med at vælge 2 sept, dernæst 3. sept. 4. sept. Og derefter ca en uge frem ad gangen...\n\n"+
+                        "Tip: Start gerne med at gå en dag frem ad gangen. Når der ikke sker så meget ved det mere,  hop ca en uge frem ad gangen...\n\n"+
 
                         "Husk at sætte hak i 'Automatisk dato' når du er færdig med at teste!")
                 .setCancelable(false)

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
 	android:background="#00000000"
-    tools:context="com.example.cool.TekstFragment_frag">
+    tools:context="dk.stbn.cool.TekstFragment_frag">
 
 
 

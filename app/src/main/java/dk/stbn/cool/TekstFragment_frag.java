@@ -1,6 +1,7 @@
-package com.example.cool;
+package dk.stbn.cool;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.TextView;
-import android.graphics.*;
 
 
 
@@ -113,7 +113,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 		kliktæller++;
 		if (kliktæller  == 7 )
 		{
-			w.loadData(a.debugmsg+a.hale, "text/html; charset=utf-8", "UTF-8");
+			w.loadData(A.debugmsg + A.hale, "text/html; charset=utf-8", "UTF-8");
 			kliktæller =0;
 		}
 	}
