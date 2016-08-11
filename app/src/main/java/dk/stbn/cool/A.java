@@ -127,7 +127,7 @@ public class A extends Application {
   //  boolean hurtigModning = false; // til test på enhed
     DateTime masterDato;
 
-    static boolean debugging = false; //-- omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
+    static boolean debugging = true; //-- omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
 
 //////////-------------------------//////////
 
@@ -141,7 +141,7 @@ Think about modules in your application, don't just write linear code.
      * Hvis der går lang tid mellem at appen er åben, når appen forbi de noti som er 'bestilt'
     * Lazy loading måske?
     * 
-    * 
+    * Hvis der er ny tekstfil: hemt og nulstil
     *
     * 
 	
@@ -187,10 +187,7 @@ Think about modules in your application, don't just write linear code.
 
     }//Oncreate færdig
 
-    private void sletGamleNotifikationer(){
 
-
-    }
 
     private void tjekOpstart() {
 
@@ -258,12 +255,7 @@ Think about modules in your application, don't just write linear code.
                 protected void onPostExecute(Object o) {
                     super.onPostExecute(o);
 
-                    //TODO: if (findesNyTekst) {
-                    // hentonline
-                    // gemallenye
-                    // opdater adapter (lyttersystem)
-                    // }
-                    ///for (Tekst t : htekster) p("Tjekker Htekster: " + t.toString(1));
+
                 }
             }.execute();
 
@@ -286,7 +278,7 @@ Think about modules in your application, don't just write linear code.
                     p("Findes ny tekstversion? "+findesNyTekst);
                     if (findesNyTekst) {
                         alleTekster = hentTeksterOnline();
-                        //TODO: erstat synlige. giv adapter besked. gem synlige.
+                        gemAlleNyeTekster();
                         //nyt versionsnr gemmes i tjektekstversion
 
                     }
@@ -470,8 +462,6 @@ Think about modules in your application, don't just write linear code.
                     IO.gemObj(itekst, "" + tekstid, ctx);
                     if (tekstid >= dummyITekst.id_int) {
 
-
-
                         if (!iFundet && tekstid == dummyITekst.id_int) {
                             p("Itekst eksakt match");
                             iFundet = true;
@@ -537,14 +527,32 @@ Think about modules in your application, don't just write linear code.
                 IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
                 if(modenhed == MODENHED_MODEN) {  ///
+
+                    ArrayList<Tekst> tempHTekster = Util.erstatAfsnit(alleTekster[3]);
+                    ArrayList<String> TempHOverskfrifter = new ArrayList<String>();
+                    for (Tekst t : htekster)
+                        TempHOverskfrifter.add(t.overskrift);
+
+
+                    htekster.clear();
+                    htekster = tempHTekster;
+                    hteksterOverskrifter.clear();
+                    hteksterOverskrifter = TempHOverskfrifter;
+
+                    givBesked(HTEKSTER_OPDATERET);
+
                     synligeTekster.clear();
                     synligeTekster = tempSynlige;
-                    //tempSynlige = null;
+                    givBesked(SYNLIGETEKSTER_OPDATERET);
+
                     p("tjek synligetekster efter init:");
                     for (Tekst t : synligeTekster) p(t.toString());
-
+                    gemSynligeTekster();
+                    skalTekstlistenOpdateres();
                 }
-                else gemSynligeTekster();
+                else IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
+
+                gemSynligeTekster();
                 p("gemAlleNyeTekster() slut");
 
                 return null;

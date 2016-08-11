@@ -31,6 +31,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     ViewPager.OnPageChangeListener sideLytter;
     int visPosition = 0;
     boolean datoÆndret = false;
+    ArrayAdapter hListeadapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,9 +194,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 }
             }, 50);
 
-            t("Teksterne blev opdateret");
+
         }
         else if (event == a.HTEKSTER_OPDATERET){
+            if (hListeadapter != null) hListeadapter.notifyDataSetChanged();
             extras.setEnabled(true);
             extras.getBackground().setAlpha(255);
 
@@ -218,9 +220,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         AlertDialog.Builder extraliste = new AlertDialog.Builder(this);
 
         extraliste.setTitle("Extras");
+        ArrayAdapter aad =
+        new ArrayAdapter(this, android.R.layout.simple_list_item_1, a.hteksterOverskrifter); // ArrayAdapter slut
 
-        extraliste.setAdapter(new ArrayAdapter(this,
-                        android.R.layout.simple_list_item_1, a.hteksterOverskrifter),
+        extraliste.setAdapter(aad,
                 new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int valgt) {
@@ -235,9 +238,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         else {
                             vp.setCurrentItem(a.findTekstnr(valgtHTekst.id_int));
                         }
+                        hListeadapter = null;
                     }
-                }); // ArrayAdapter slut
-
+                } );
+        hListeadapter = aad;
         return extraliste.create();
 
 
