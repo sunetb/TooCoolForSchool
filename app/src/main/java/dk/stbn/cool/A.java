@@ -125,7 +125,7 @@ public class A extends Application {
 
 
   //  boolean hurtigModning = false; // til test på enhed
-    DateTime masterDato;
+    public static DateTime masterDato;
 
     static boolean debugging = true; //-- omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
 
@@ -170,7 +170,7 @@ Think about modules in your application, don't just write linear code.
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
 
-        masterDato = new DateTime();
+
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -183,8 +183,11 @@ Think about modules in your application, don't just write linear code.
         tjekOpstart();
         p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
-        if (debugging) pref.edit().putBoolean("vistestdialog", true).commit();
-
+        if (debugging) {
+            pref.edit().putBoolean("vistestdialog", true).commit();
+            masterDato = (DateTime) IO.læsObj("masterdato", this);
+        }
+        else  masterDato = new DateTime();
     }//Oncreate færdig
 
 
@@ -193,7 +196,10 @@ Think about modules in your application, don't just write linear code.
 
 
         if (modenhed > MODENHED_HELT_FRISK) {
-
+            if (debugging) {
+                masterDato = masterDato.plusDays(1);
+                IO.gemObj(masterDato, "masterdato", this);
+            }
             if (tredjeDagFørsteGang){
                 p("tredje dag første gang!! ");
                 synligeTekster = (ArrayList<Tekst>) IO.læsObj("tempsynligeTekster", this);
@@ -297,6 +303,7 @@ Think about modules in your application, don't just write linear code.
         else if (modenhed == MODENHED_HELT_FRISK) {
             p("oncreate() Modenhed: Helt frisk");
             initAllerFørsteGang();
+            if (debugging) IO.gemObj(new DateTime(), "masterdato", this);
         }
 
         else if (modenhed == MODENHED_FØRSTE_DAG) {
@@ -830,7 +837,8 @@ Think about modules in your application, don't just write linear code.
         return (gemtTekstversion < version);
     }
 
-    void nulstil () {
+    // - - Til test
+    void rul () {
 
         synligeTekster = new ArrayList();  //brugeas af pageradapteren
         htekster = new ArrayList();
@@ -849,7 +857,6 @@ Think about modules in your application, don't just write linear code.
 
         singletonKlar = false;
 
-        masterDato = new DateTime();
         modenhed = tjekModenhed();
         tjekOpstart();
 

@@ -17,6 +17,8 @@ import java.io.StreamCorruptedException;
  */
 public class IO {
 
+    //TODO Lav typetjek
+
     static Object læsObj (String filename, Context c) {
         p("hentet: "+filename);
         ObjectInputStream input = null;
@@ -40,7 +42,6 @@ public class IO {
             }
         }
 
-
         return mitObj;
     }
 
@@ -63,8 +64,6 @@ public class IO {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     static void p(Object o){

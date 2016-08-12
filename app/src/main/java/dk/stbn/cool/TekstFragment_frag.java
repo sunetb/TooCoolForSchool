@@ -31,7 +31,9 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
         super.onCreate(savedInstanceState);
         a = A.a;
 		position = getArguments().getInt("pos", 0);
+		if (position >= a.synligeTekster.size()) position = a.synligeTekster.size()-1;
 		tekst= a.synligeTekster.get(position);
+
 		
         p("Fragment oncreate "+position);
     }

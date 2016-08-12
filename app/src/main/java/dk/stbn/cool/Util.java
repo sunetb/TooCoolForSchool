@@ -102,7 +102,7 @@ public class Util {
         alarmIntent = PendingIntent.getBroadcast(c, t.id_int, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
         p("Util.startAlarm()      Dato: "+t.dato.toString());
-        p("Util.startAlarm() Dags Dato: "+new DateTime());
+        p("Util.startAlarm() Dags Dato: "+A.masterDato);
 
         alarmMgr.set(AlarmManager.RTC, t.dato.getMillis(), alarmIntent);
     }
@@ -175,7 +175,7 @@ public class Util {
     static boolean erSammeDato(DateTime tid){
         //-- Sammenligner en DateTime med dags dato men ignorerer klokkelæt (og årstal)
          int dag = tid.getDayOfMonth();
-        DateTime nu = new DateTime();
+        DateTime nu = A.masterDato;
         int idagD = nu.getDayOfMonth();
 
         if (dag != idagD) return false;
@@ -194,7 +194,7 @@ public class Util {
         ArrayList<Tekst> teksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> mteksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> hteksterTmp = new ArrayList<Tekst>();
-        DateTime idag = new DateTime();
+        DateTime idag = A.masterDato;
         try {
 
             XmlPullParser parser;
