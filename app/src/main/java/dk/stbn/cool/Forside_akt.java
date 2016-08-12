@@ -128,7 +128,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         if (datoÆndret){
             p("onStart: Dato ændret");
             datoÆndret = false;
-            a.nulstil();
+            her
+            a.rul();
+
             startActivity(new Intent(this, Forside_akt.class));
             finish();
         }
