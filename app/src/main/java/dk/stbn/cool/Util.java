@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by sune on 6/3/16.
@@ -343,10 +342,10 @@ public class Util {
         return data;
     }
 
-	static int lavDato (Date d) {
+	static int lavDato (DateTime d) {
 		
-		String dato = ""+d.getDay();
-		int m = d.getMonth()+1;
+		String dato = ""+d.getDayOfMonth();
+		int m = d.getMonthOfYear();
 		if (m<10) dato +="0";
 		dato += m+""+d.getYear();
 		return tryParseInt(dato);

@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 
@@ -47,7 +48,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         initUI();
         a.aktivitetenVises = true; //skal den stå tidligere?
         tjekOpstartstype(savedInstanceState);
-        if (A.debugging && prefs.getBoolean("vistestdialog", true)) testDialog();
+        if (A.testtilstand){
+            t("Idag er "+ A.masterDato.getDayOfMonth() + " / " + A.masterDato.getMonthOfYear() + " - " + A.masterDato.getYear());
+            if (prefs.getBoolean("vistestdialog", true)) testDialog();
+        }
 
     }
 
@@ -64,9 +68,13 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else if (v == extras)
             showDialog(1);
         else if (v == del){
-            if (A.debugging) {
-                startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
-                datoÆndret = true;
+            if (A.testtilstand) {
+                //startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
+                //datoÆndret = true;
+                a.rul();
+
+                startActivity(new Intent(this, Forside_akt.class));
+                finish();
             }
             else {
                 p("klikket på Anbefal");
@@ -100,7 +108,16 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         frem.setOnClickListener(this);
         del = (ImageButton) findViewById(R.id.anbefal);
         del.setOnClickListener(this);
-        if (A.debugging) del.setImageResource(R.mipmap.ic_launcher);
+        if (A.debugging) {
+            del.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    A.testtilstand =  (A.testtilstand) ? false : true;
+                    return false;
+                }
+            });
+        }
+        //if (A.debugging) del.setImageResource(R.mipmap.ic_launcher);
         kontakt = (ImageButton) findViewById(R.id.redigerFeedback);
         kontakt.setOnClickListener(this);
         extras = (ImageButton) findViewById(R.id.extras);
@@ -128,11 +145,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         if (datoÆndret){
             p("onStart: Dato ændret");
             datoÆndret = false;
-            her
-            a.rul();
+            //her
 
-            startActivity(new Intent(this, Forside_akt.class));
-            finish();
         }
         else {
             a.lyt(this);
@@ -206,48 +220,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    void p(Object o){
-        String kl = "Forside.";
-        Util.p(kl+o);
-    }
-    void t(String s){
-        Util.t(this,s);
-    }
-
-     //----Bygger en AlertDialog med listen over Ekstra-tekster
-    @Override
-    protected Dialog onCreateDialog(int id){
-
-        p("Dialog: htekster længde: "+a.htekster.size());
-        AlertDialog.Builder extraliste = new AlertDialog.Builder(this);
-
-        extraliste.setTitle("Extras");
-        ArrayAdapter aad =
-        new ArrayAdapter(this, android.R.layout.simple_list_item_1, a.hteksterOverskrifter); // ArrayAdapter slut
-
-        extraliste.setAdapter(aad,
-                new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int valgt) {
-                        Tekst valgtHTekst = a.htekster.get(valgt);
-
-                        if (!a.synligeTekster.contains(valgtHTekst)) {
-                            a.synligeTekster.add(valgtHTekst);
-                            a.givBesked(a.SYNLIGETEKSTER_OPDATERET);
-                            pa.notifyDataSetChanged();
-                            vp.setCurrentItem(a.synligeTekster.size()-1);
-                        }
-                        else {
-                            vp.setCurrentItem(a.findTekstnr(valgtHTekst.id_int));
-                        }
-                        hListeadapter = null;
-                    }
-                } );
-        hListeadapter = aad;
-        return extraliste.create();
-
-
-    }// end onCreateDialog
 
     private boolean skærmvending () {
 
@@ -404,4 +376,60 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
 
     }
+
+    void p(Object o){
+        String kl = "Forside.";
+        Util.p(kl+o);
+    }
+    void t(String s){
+        Util.t(this,s);
+    }
+
+    //----Bygger en AlertDialog med listen over Ekstra-tekster
+    @Override
+    protected Dialog onCreateDialog(int id){
+
+        p("Dialog: htekster længde: "+a.htekster.size());
+        final AlertDialog.Builder extraliste = new AlertDialog.Builder(this);
+
+        extraliste.setTitle("Extras");
+        ArrayAdapter aad =
+                new ArrayAdapter(this, android.R.layout.simple_list_item_1, a.hteksterOverskrifter); // ArrayAdapter slut
+
+        extraliste.setAdapter(aad,
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int valgt) {
+                        Tekst valgtHTekst = a.htekster.get(valgt);
+
+                        if (!a.synligeTekster.contains(valgtHTekst)) {
+                            a.synligeTekster.add(valgtHTekst);
+                            a.givBesked(a.SYNLIGETEKSTER_OPDATERET);
+                            pa.notifyDataSetChanged();
+                            vp.setCurrentItem(a.synligeTekster.size()-1);
+                        }
+                        else {
+                            vp.setCurrentItem(a.findTekstnr(valgtHTekst.id_int));
+                        }
+                        hListeadapter = null;
+
+                    }
+                } );
+        hListeadapter = aad;
+        doKeepDialog(extraliste);
+        return extraliste.create();
+
+
+    }// end onCreateDialog
+
+    //Bevarer dialog ved skærmvending tilpasset fra http://stackoverflow.com/questions/8537518/the-method-getwindow-is-undefined-for-the-type-alertdialog-builder
+    private static void doKeepDialog(AlertDialog.Builder dialog){
+        AlertDialog dlg = dialog.show();
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dlg.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        dlg.getWindow().setAttributes(lp);
+    }
+
 }

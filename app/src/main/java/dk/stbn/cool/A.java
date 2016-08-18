@@ -24,7 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -127,7 +126,9 @@ public class A extends Application {
   //  boolean hurtigModning = false; // til test på enhed
     public static DateTime masterDato;
 
-    static boolean debugging = true; //-- omdefiner knapperne "Del" og "Kontakt" i hovedaktiviteteten
+    static boolean debugging = true;
+    static boolean testtilstand = false;
+
 
 //////////-------------------------//////////
 
@@ -136,15 +137,20 @@ public class A extends Application {
 Think about modules in your application, don't just write linear code.
 
     * NeedToHave:
-     * ved første opstart, tjek om der er internet. Start et loop hvis ikke
+     * Ny, hemmelig test-tilstand bseret på masterdato
      *
      * Hvis der går lang tid mellem at appen er åben, når appen forbi de noti som er 'bestilt'
     * Lazy loading måske?
     * 
-    * Hvis der er ny tekstfil: hemt og nulstil
+    * Hvis der er ny tekstfil: hemt og nulstil. Er skrevet men ikke testet
+    *
+    * Tekst-rul ser ikke ud til at virke sopm det skal. Og notifikationer lader til kun at blive oprettet npr appen startes, Dvs ikke af AlarmManageren når appen ikke er levende
     *
     * 
-	
+
+	VERY NICE to have
+	undgå async-kæde: brug evt onprogressupdate i stedet. Evt udvide lyttersystem eller også kald med handler?
+
     *
     * NiceToHave
     * en metode svarende til gemAlleNyeTekster i Util. Kaldes i service/baggundstråd  når alarmMODTAGEREN kaldes.
@@ -171,7 +177,7 @@ Think about modules in your application, don't just write linear code.
         else p("alarmManager eksisterer");
 
 
-
+        masterDato = new DateTime();
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -183,11 +189,7 @@ Think about modules in your application, don't just write linear code.
         tjekOpstart();
         p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
-        if (debugging) {
-            pref.edit().putBoolean("vistestdialog", true).commit();
-            masterDato = (DateTime) IO.læsObj("masterdato", this);
-        }
-        else  masterDato = new DateTime();
+
     }//Oncreate færdig
 
 
@@ -350,7 +352,7 @@ Think about modules in your application, don't just write linear code.
                 else {
 
                     //-- denne kode burde egentlig stå i tjekModenhed() men er flyttet hertil så appen kun kan modnes hvis den får data første gang.
-                        int idag = Util.lavDato(new Date());
+                        int idag = Util.lavDato(masterDato);
 
                         pref.edit()
                                 .putInt("modenhed", MODENHED_FØRSTE_DAG)
@@ -760,7 +762,7 @@ Think about modules in your application, don't just write linear code.
 
 		if (moden == MODENHED_MODEN) return MODENHED_MODEN;
 		
-		int idag = Util.lavDato(new Date());
+		int idag = Util.lavDato(masterDato);
 
         if (moden == MODENHED_HELT_FRISK) {
            //koden herfra er flyttet til initAllerFørsteGang() for at den ikke bliver kørt med mindre appen får hentet sine data
@@ -839,6 +841,8 @@ Think about modules in your application, don't just write linear code.
 
     // - - Til test
     void rul () {
+
+        masterDato = masterDato.plusDays(1);
 
         synligeTekster = new ArrayList();  //brugeas af pageradapteren
         htekster = new ArrayList();
