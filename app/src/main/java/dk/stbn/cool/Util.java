@@ -152,6 +152,8 @@ public class Util {
     }
 
     static boolean visMtekst(DateTime mTid){
+
+        p("Util.visMtekst() "+ mTid.dayOfMonth()+ "/"+mTid.monthOfYear());
         //-- Eks: 11 september     ///Vises                    5, 6, 7, 8, 9, 10, 11
                                    ///Vises ikke: 1, 2, 3. 4.                         12, 13, 14, sept
 
@@ -162,12 +164,13 @@ public class Util {
 
 
         //-- Tjek om idag er 12 sept eller efter.
-        if (mTid.isBeforeNow()) return false;
+        if (mTid.isBefore(A.masterDato)) return false;
 
         //-- Tjek om idag er 4. sept eller tidligere
         DateTime syvFør = mTid.minusDays(7);
+        p("Util.visMtekst() dato var IKKE SAMME og IKKE FØR. Skal den vises? "+!syvFør.isAfter(A.masterDato));
 
-        return !syvFør.isAfterNow();
+        return !syvFør.isAfter(A.masterDato);
 
     }
 

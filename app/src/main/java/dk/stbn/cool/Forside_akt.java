@@ -41,7 +41,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.cool_nobkgr_50x50_rund);
 
-        p("oncreate() kaldt");
+        p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
+        p(" idag er: "+ A.masterDato.getDayOfMonth() + ": " + A.masterDato.getMonthOfYear() + " - "+ A.masterDato.getYear());
         a = A.a;
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -49,7 +50,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         a.aktivitetenVises = true; //skal den stå tidligere?
         tjekOpstartstype(savedInstanceState);
         if (A.testtilstand){
-            t("Idag er "+ A.masterDato.getDayOfMonth() + " / " + A.masterDato.getMonthOfYear() + " - " + A.masterDato.getYear());
             if (prefs.getBoolean("vistestdialog", true)) testDialog();
         }
 
@@ -71,9 +71,13 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             if (A.testtilstand) {
                 //startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
                 //datoÆndret = true;
-                a.rul();
-
-                startActivity(new Intent(this, Forside_akt.class));
+                t("Spoler 1 dag frem...");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        a.rul(1);
+                    }
+                }, 110);
                 finish();
             }
             else {
@@ -81,15 +85,27 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 //Todo: Ny aktivitet med forklaring af pointsystem mm
                 Intent i = new Intent();
                 i.setAction(Intent.ACTION_SEND);
-                i.putExtra(Intent.EXTRA_TEXT, "Hej tjek denne app ud: ");
+                i.putExtra(Intent.EXTRA_TEXT, "Hej tjek denne app ud: https://play.google.com/store/apps/details?id=dk.stbn.cool");
                 i.setType("text/plain");
                 startActivity(i);
             }
 
         } else if (v == kontakt) {
-            p("klikket på Kontakt");
-            Intent i = new Intent(this,Kontakt.class );
-            startActivity(i);
+            if (A.testtilstand) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        a.rul(6);
+                    }
+                }, 110);
+                t("Spoler 6 dage frem...");
+                finish();
+            }
+            else {
+                p("klikket på Kontakt");
+                Intent i = new Intent(this, Kontakt.class);
+                startActivity(i);
+            }
         }
         knapstatus (vp.getCurrentItem(), "onClick()");
 
@@ -108,21 +124,33 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         frem.setOnClickListener(this);
         del = (ImageButton) findViewById(R.id.anbefal);
         del.setOnClickListener(this);
+        kontakt = (ImageButton) findViewById(R.id.redigerFeedback);
+        kontakt.setOnClickListener(this);
+
+
         if (A.debugging) {
             del.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
+
                     A.testtilstand =  (A.testtilstand) ? false : true;
-                    return false;
+                    if (prefs.getBoolean("vistestdialog", true)) testDialog();
+                    if (A.testtilstand) {
+                        del.setImageResource(R.drawable.en);
+                        kontakt.setImageResource(R.drawable.seks);
+                    }
+                    else {
+                        del.setImageResource(R.drawable.ic_share_black_24dp);
+                        kontakt.setImageResource(R.drawable.ic_send_black_24dp);
+                    }
+                    return true;
                 }
             });
         }
         //if (A.debugging) del.setImageResource(R.mipmap.ic_launcher);
-        kontakt = (ImageButton) findViewById(R.id.redigerFeedback);
-        kontakt.setOnClickListener(this);
         extras = (ImageButton) findViewById(R.id.extras);
         extras.setOnClickListener(this);
-        if (!a.hteksterKlar) {
+        if (!A.hteksterKlar) {
             extras.setEnabled(false);
             extras.getBackground().setAlpha(100);
         }
@@ -149,9 +177,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         }
         else {
-            a.lyt(this);
+            Lyttersystem.lyt(this);
             vp.addOnPageChangeListener(sideLytter);
-            if (A.debugging) pa.notifyDataSetChanged(); //lidt groft
+            if (A.debugging) pa.notifyDataSetChanged(); //lidt groft ?
             visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
             if (visPosition == -1) visPosition = a.synligeTekster.size() - 1;
             vp.setCurrentItem(visPosition);
@@ -163,8 +191,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-        a.afregistrer(this);
+        Lyttersystem.afregistrer(this);
         vp.removeOnPageChangeListener(sideLytter);
+        a.aktivitetenVises = false;
         prefs.edit().putInt("seneste position", vp.getCurrentItem()).commit();
 
     }
@@ -173,7 +202,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         int max = a.synligeTekster.size()-1;
 		p("knapstatus: nu="+nu+" max="+max + "Kaldt fra "+kaldtFra);
 
-        if (max == 0) nu =0;
+        if (max == 0) nu = 0;
 
         if (nu == max || max == -1 ) {
             frem.setEnabled(false);
@@ -192,27 +221,28 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             tilbage.getBackground().setAlpha(255);
         }
         if (A.debugging){
-
+            if (A.testtilstand){
+                del.setImageResource(R.drawable.en);
+                kontakt.setImageResource(R.drawable.seks);
+            }
         }
     }
 
 
     @Override
     public void opdater(int event) {
-        if (event == a.SYNLIGETEKSTER_OPDATERET){
+        if (event == Lyttersystem.SYNLIGETEKSTER_OPDATERET){
              new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     pa.notifyDataSetChanged();
                     vp.setCurrentItem(a.synligeTekster.size()-1);
                     knapstatus(a.synligeTekster.size()-1, " opdater()");
-
                 }
             }, 50);
 
-
         }
-        else if (event == a.HTEKSTER_OPDATERET){
+        else if (event == Lyttersystem.HTEKSTER_OPDATERET){
             if (hListeadapter != null) hListeadapter.notifyDataSetChanged();
             extras.setEnabled(true);
             extras.getBackground().setAlpha(255);
@@ -220,10 +250,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-
     private boolean skærmvending () {
 
         int vindueshøjdetmp = Resources.getSystem().getDisplayMetrics().heightPixels;
+
         if (a.sidstKendteVindueshøjde==0) {
             a.sidstKendteVindueshøjde = vindueshøjdetmp;
             return false;
@@ -294,25 +324,20 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         super.onSaveInstanceState(outState);
     }
 
+    //kun til test
     private void testDialog () {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
         alertDialogBuilder.setTitle("Test-tilstand aktiveret");
         alertDialogBuilder
-                .setMessage("Sådan skifter du dato:\n\n"+
+                .setMessage("Nu er 'DEL' og 'KONTAKT'-knapperne omdefineret:\n\n"+
 
-                        "   1: Tryk på Android-ikonet.\n"+
-                        "   2: Fjern fluebenet i 'Automatisk\n"+
-                        "       dato og klokkeslæt'.\n"+
-                        "       (Kun nødvendigt første gang)\n"+
-                        "   3: Tryk 'Indstil dato'. \n"+
-                        "   4: Vælg en dato. \n"+
-                        "   5: Tryk på telefonens Tilbage-\n"+
-                        "       knap.\n\n"+
+                        "-Knappen '1' ruller appens interne dato 1 dag frem\n\n"+
+                        "-Knappen '6' ruller appens interne dato 6 dage frem\n\n" +
+                        "\n"+
+                        "Du kan deaktivere test-tilstand igen ved at holde knappen '1' nede i et par sekunder"
 
-                        "Tip: Start gerne med at gå en dag frem ad gangen. Når der ikke sker så meget ved det mere,  hop ca en uge frem ad gangen...\n\n"+
-
-                        "Husk at sætte hak i 'Automatisk dato' når du er færdig med at teste!")
+                )
                 .setCancelable(false)
                 .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
@@ -386,6 +411,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     }
 
     //----Bygger en AlertDialog med listen over Ekstra-tekster
+    boolean klikket = false; //Holder KUN dialogen i live hvis skærmen bliver vendt.
     @Override
     protected Dialog onCreateDialog(int id){
 
@@ -404,7 +430,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                         if (!a.synligeTekster.contains(valgtHTekst)) {
                             a.synligeTekster.add(valgtHTekst);
-                            a.givBesked(a.SYNLIGETEKSTER_OPDATERET);
+                            Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
                             pa.notifyDataSetChanged();
                             vp.setCurrentItem(a.synligeTekster.size()-1);
                         }
@@ -412,15 +438,20 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                             vp.setCurrentItem(a.findTekstnr(valgtHTekst.id_int));
                         }
                         hListeadapter = null;
-
+                        klikket = true;
                     }
                 } );
         hListeadapter = aad;
-        doKeepDialog(extraliste);
+        if (klikket) {
+            doKeepDialog(extraliste);
+            klikket= false;
+        }
         return extraliste.create();
 
 
     }// end onCreateDialog
+
+
 
     //Bevarer dialog ved skærmvending tilpasset fra http://stackoverflow.com/questions/8537518/the-method-getwindow-is-undefined-for-the-type-alertdialog-builder
     private static void doKeepDialog(AlertDialog.Builder dialog){

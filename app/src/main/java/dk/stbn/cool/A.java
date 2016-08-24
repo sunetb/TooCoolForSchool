@@ -3,11 +3,11 @@ package dk.stbn.cool;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -30,7 +30,7 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by sune on 5/31/16.
  */
-public class A extends Application {
+public class A extends Application implements Observatør{
 
     static A a;
 	SharedPreferences pref;
@@ -53,33 +53,8 @@ public class A extends Application {
 //////////-------------------------//////////
 	
 
-//////////---------- UI TILSTAND / Lytterstystem ----------////////// Todo: lav ny klasse
-	ArrayList<Observatør> observatører = new ArrayList<>();
-    void lyt(Observatør o) {observatører.add(o);}
-    void afregistrer(Observatør o) {observatører.remove(o);}
-    int senesteEvent = 0;
-    int tæller= 0;
-    void givBesked (int event) {
-        senesteEvent =event;
-        p("givbesked blev kaldt med "+event);
-
-        if (event == HTEKSTER_OPDATERET) hteksterKlar= true;
-        new Handler(Looper.getMainLooper()).post(new Runnable() { //-- for at sikre at den køres i hovedtråden
-            @Override
-            public void run() {
-                tæller = 0;
-                for (Observatør o: observatører) {
-                    o.opdater(senesteEvent);
-                    tæller++;
-                }
-                p("Lyttersystem.opdater() kaldt "+tæller+ " gange");
-            }
-        });
-    }
-
-    final int SYNLIGETEKSTER_OPDATERET = 1;
-    final int HTEKSTER_OPDATERET = 2;
-    boolean hteksterKlar = false;
+//////////---------- UI TILSTAND / Lytterstystem ----------//////////
+    static boolean hteksterKlar = false;
 
 
 
@@ -137,7 +112,7 @@ public class A extends Application {
 Think about modules in your application, don't just write linear code.
 
     * NeedToHave:
-     * Ny, hemmelig test-tilstand bseret på masterdato
+     * V: Ny, hemmelig test-tilstand bseret på masterdato
      *
      * Hvis der går lang tid mellem at appen er åben, når appen forbi de noti som er 'bestilt'
     * Lazy loading måske?
@@ -146,7 +121,8 @@ Think about modules in your application, don't just write linear code.
     *
     * Tekst-rul ser ikke ud til at virke sopm det skal. Og notifikationer lader til kun at blive oprettet npr appen startes, Dvs ikke af AlarmManageren når appen ikke er levende
     *
-    * 
+    * SkalTekstlistenopdateres() skal rettes til:
+    * I ineksakt match: dummy: 220160827 | tekst: 220160907   #t:31.667
 
 	VERY NICE to have
 	undgå async-kæde: brug evt onprogressupdate i stedet. Evt udvide lyttersystem eller også kald med handler?
@@ -160,6 +136,15 @@ Think about modules in your application, don't just write linear code.
     * Kan muligivs løses med lyttersystem..
     *
     *
+    *
+    *
+    * Let anync
+    AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
     * */
 	
 
@@ -167,23 +152,17 @@ Think about modules in your application, don't just write linear code.
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
+
         Util.starttid = System.currentTimeMillis();
         p("oncreate() kaldt");
         a= this;
         ctx=this;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-
+        Lyttersystem.lyt(this);
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
 
-
         masterDato = new DateTime();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
 
         modenhed = tjekModenhed();
         tjekOpstart();
@@ -198,10 +177,7 @@ Think about modules in your application, don't just write linear code.
 
 
         if (modenhed > MODENHED_HELT_FRISK) {
-            if (debugging) {
-                masterDato = masterDato.plusDays(1);
-                IO.gemObj(masterDato, "masterdato", this);
-            }
+
             if (tredjeDagFørsteGang){
                 p("tredje dag første gang!! ");
                 synligeTekster = (ArrayList<Tekst>) IO.læsObj("tempsynligeTekster", this);
@@ -213,11 +189,7 @@ Think about modules in your application, don't just write linear code.
 
                 IO.gemObj(gamle, "gamle", ctx);
 
-                //--hvis nu nogle h-tekster skulle være gemt
-                //    for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
-
-
-                p("Synligetekster længde: "+ synligeTekster.size());
+                //-- Viewpageren nulstiles (og viser sidste element i listen når det starter)
                 pref.edit().putInt("seneste position", -1).commit();
 
                 //evt i async:
@@ -248,9 +220,6 @@ Think about modules in your application, don't just write linear code.
 
                     htekster = (ArrayList<Tekst>) IO.læsObj("htekster", ctx);
                     for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift);
-                    hteksterKlar = true;
-                    givBesked(HTEKSTER_OPDATERET);
-
 
                     //-- Tjek om der er opdateringer til tekstene
 
@@ -262,6 +231,8 @@ Think about modules in your application, don't just write linear code.
                 @Override
                 protected void onPostExecute(Object o) {
                     super.onPostExecute(o);
+
+                    Lyttersystem.givBesked(Lyttersystem.HTEKSTER_OPDATERET);
 
 
                 }
@@ -286,7 +257,7 @@ Think about modules in your application, don't just write linear code.
                     p("Findes ny tekstversion? "+findesNyTekst);
                     if (findesNyTekst) {
                         alleTekster = hentTeksterOnline();
-                        gemAlleNyeTekster();
+
                         //nyt versionsnr gemmes i tjektekstversion
 
                     }
@@ -297,6 +268,7 @@ Think about modules in your application, don't just write linear code.
                 protected void onPostExecute(Object o) {
                     super.onPostExecute(o);
                     p("Ny tekstversion? : "+findesNyTekst);
+                    if (findesNyTekst) gemAlleNyeTekster(); //Kæde: metoden gemAlle..() kører i baggrunden
                 }
             }.execute();
 
@@ -362,13 +334,13 @@ Think about modules in your application, don't just write linear code.
 
                         ArrayList<Tekst> otekster = alleTekster[0];
                         Tekst o1 = otekster.get(0);
-                        p("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" + o1.brødtekst);
+                        //p("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" + o1.brødtekst);
                         String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
                         o1.brødtekst = nyBrødtekst;
                         synligeTekster.add(o1);
                         p("Så er der O-tekst i array!");
 
-                        if (aktivitetenVises) givBesked(SYNLIGETEKSTER_OPDATERET);
+                        if (aktivitetenVises) Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
                         IO.gemObj(o1, "otekst1", ctx);
 
                         fortsæt();// async-kæde: ting der også kan gøres i baggrunden, men som er afhængige af værdier fra denne metode
@@ -408,7 +380,7 @@ Think about modules in your application, don't just write linear code.
                 for (Tekst t : htekster)
                     hteksterOverskrifter.add(t.overskrift);
 
-                givBesked(HTEKSTER_OPDATERET);
+                Lyttersystem.givBesked(Lyttersystem.HTEKSTER_OPDATERET);
 
                 IO.gemObj(htekster,"htekster",ctx);
 
@@ -487,9 +459,7 @@ Think about modules in your application, don't just write linear code.
                             if (i>1)tempSynlige.add(itekster.get(i - 2));
                             if (i>0) tempSynlige.add(itekster.get(i - 1));
                             else tempSynlige.add(itekster.get(i));
-
                         }
-
                     }
                 }
 
@@ -512,14 +482,11 @@ Think about modules in your application, don't just write linear code.
                     IO.gemObj(mtekst, "" + mtekst.id_int, ctx);
                     if (mtekst.id_int >= dummyMTekst.id_int) {
 
-
-
                         if (!mFundet) {
 
                             if (mtekst.id_int == dummyMTekst.id_int) {
                                 p("Eksakt match Mtekst");
                                 tempSynlige.add(mtekst);
-
 
                             } else if (Util.visMtekst(mtekst.dato) ){
                                 tempSynlige.add(mtekst);
@@ -527,7 +494,6 @@ Think about modules in your application, don't just write linear code.
                             }
                             mFundet = true;
                         }
-
                     }
                 }
 
@@ -548,16 +514,16 @@ Think about modules in your application, don't just write linear code.
                     hteksterOverskrifter.clear();
                     hteksterOverskrifter = TempHOverskfrifter;
 
-                    givBesked(HTEKSTER_OPDATERET);
+                    Lyttersystem.givBesked(Lyttersystem.HTEKSTER_OPDATERET);
 
                     synligeTekster.clear();
                     synligeTekster = tempSynlige;
-                    givBesked(SYNLIGETEKSTER_OPDATERET);
+                    Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
 
                     p("tjek synligetekster efter init:");
                     for (Tekst t : synligeTekster) p(t.toString());
                     gemSynligeTekster();
-                    skalTekstlistenOpdateres();
+
                 }
                 else IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
@@ -567,6 +533,12 @@ Think about modules in your application, don't just write linear code.
                 return null;
             }
 
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+                if (modenhed == MODENHED_MODEN)
+                    skalTekstlistenOpdateres(); ///KÆDE
+            }
         }.execute();
     }
 
@@ -681,17 +653,14 @@ Think about modules in your application, don't just write linear code.
                     p("Listerne var forskellig længde: SynligeDatoer: "+synligeDatoer.size() + " SynligeTekster: "+synligeTekster.size());
                 }
                 else {
+                    p("Listerne var samme længde: SynligeDatoer: "+synligeDatoer.size() + " SynligeTekster: "+synligeTekster.size());
+
                     for (int i = 0 ; i < synligeTekster.size(); i++){
 
                         int a = synligeDatoer.get(i);
                         int b  = synligeTekster.get(i).id_int;
                         if (a != b) {
-                            p("Listerne var samme længde: SynligeDatoer: "+synligeDatoer.size() + " SynligeTekster: "+synligeTekster.size());
                             ny = true;
-                            p("tjekker listerne: ............................................");
-                            for (Integer q : synligeDatoer) p("synligeDatoer: "+q);
-                            for (Tekst t : synligeTekster) p("synligeTekster: "+t.id_int);
-
                             break;
                         }
                     }
@@ -706,7 +675,7 @@ Think about modules in your application, don't just write linear code.
                         synligeTekster.add( (Tekst) IO.læsObj(""+i,ctx));
 
                     }
-                    givBesked(SYNLIGETEKSTER_OPDATERET);
+                    Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
                     gemSynligeTekster();
 
                 }
@@ -716,8 +685,11 @@ Think about modules in your application, don't just write linear code.
             //Gider ikke parametrisere
                 pref.edit().putBoolean("nyTekst", ny).commit();
 
+
             }
+
         }.execute();
+
         return pref.getBoolean("nyTekst", false);
     }
 
@@ -839,18 +811,18 @@ Think about modules in your application, don't just write linear code.
         return (gemtTekstversion < version);
     }
 
-    // - - Til test
-    void rul () {
 
-        masterDato = masterDato.plusDays(1);
+    // - - Til test
+    void rul (int antaldage) {
+        p("rul() kaldt");
+        masterDato = masterDato.plusDays(antaldage);
+        t("Idag er "+ masterDato.getDayOfMonth() + " / " + masterDato.getMonthOfYear() + " - " + masterDato.getYear());
 
         synligeTekster = new ArrayList();  //brugeas af pageradapteren
         htekster = new ArrayList();
         synligeDatoer = null;
         hteksterOverskrifter = new ArrayList();
         sidstKendteVindueshøjde = 0;
-
-        aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
 
         findesNyTekst = false;
         modenhed = 0;
@@ -863,16 +835,25 @@ Think about modules in your application, don't just write linear code.
 
         modenhed = tjekModenhed();
         tjekOpstart();
+        p("rul() sover 1½ sek");
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        p("rul() starter ny aktivitet");
+
+        Intent i = new Intent(this, Forside_akt.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                givBesked(SYNLIGETEKSTER_OPDATERET);
+                Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
             }
-        }, 100);
-
-
-
+        }, 10);
     }
 
     int findTekstnr (int id) {
@@ -891,4 +872,8 @@ Think about modules in your application, don't just write linear code.
         Util.p(kl+o);
     }
 
+    @Override
+    public void opdater(int event) {
+
+    }
 }
