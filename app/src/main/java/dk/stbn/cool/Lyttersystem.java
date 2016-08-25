@@ -1,8 +1,5 @@
 package dk.stbn.cool;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import java.util.ArrayList;
 
 /**
@@ -11,7 +8,9 @@ import java.util.ArrayList;
 public class Lyttersystem {
 
     static ArrayList<Observatør> observatører = new ArrayList<>();
-    static int senesteEvent = 0;
+
+    static int senesteHændelse = 0;
+
     static int tæller= 0;
 
     static final int SYNLIGETEKSTER_OPDATERET = 1;
@@ -20,53 +19,72 @@ public class Lyttersystem {
     static final int HTEKSTER_OPDATERET = 2;
     static final String TO = "HTEKSTER_OPDATERET";
 
+    static final int NYE_TEKSTER_ONLINE = 3;
+    static final String TRE = "NYE_TEKSTER_ONLINE";
+
+
+
     //static final int  = ;
 
 
 
     static void lyt(Observatør o) {
-        observatører.add(o);
+        if (!observatører.contains(o)) observatører.add(o);
     }
 
     static void afregistrer(Observatør o) {
         observatører.remove(o);
     }
 
-    static void givBesked (int event) {
-        senesteEvent =event;
-
-        p("givbesked() blev kaldt med "+event + ": "+eventTekst(event));
-
-        if (event == HTEKSTER_OPDATERET) A.hteksterKlar= true;
-
-        new Handler(Looper.getMainLooper()).post(new Runnable() { //-- Sikrer at den køres i hovedtråden
-            @Override
-            public void run() {
-                tæller = 0;
-                for (Observatør o: observatører) {
-                    o.opdater(senesteEvent);
-                    tæller++;
-                }
-                p("opdater() kaldt "+tæller+ " gange. ");
-            }
-        });
+    static void nulstil(){
+        observatører.clear();
     }
 
-    static String eventTekst (int event){
+    static int getSenesteHændelse(){
+        return senesteHændelse;
+    }
+    static void setSenesteHændelse (int hændelse) {
+        senesteHændelse = hændelse;
+    }
 
-        String eventTekst = "FEJL: Ukendt eventtype";
+    // -- Må KUN kaldes fra hovedtråden
+    static void givBesked (int hændelse, String besked, int id) {
+        p("1: givebesked MODTOG: : "+besked+ " hændelse: "+hændelsestekst(hændelse)+ " id: "+id);
+        //senesteHændelse =hændelse;
+        setSenesteHændelse(hændelse);
 
-        switch (event){
+        if (hændelse == HTEKSTER_OPDATERET) A.hteksterKlar= true;
+
+     //   new Handler(Looper.getMainLooper()).postDelayed(new Runnable() { //-- Sikrer at den køres i hovedtråden
+       //     @Override
+         //   public void run() {
+           //     tæller = 0;
+                for (Observatør o: observatører) {
+                    o.opdater(hændelse);
+             //       tæller++;
+                }
+                p("2: givBesked() SENDTE "+getSenesteHændelse() + ": "+ hændelsestekst(getSenesteHændelse())+" " + " tråd: "+Thread.currentThread().getName());
+                //senesteHændelse= 0;
+         //   }
+       // },0);
+        p("3: Hændelse: "+hændelse + " VS. senesteHændelse: "+getSenesteHændelse()+ " id: "+id);
+    }
+
+    static String hændelsestekst(int hændelse){
+
+        String tekst = "FEJL: Ukendt eventtype";
+
+        switch (hændelse){
             case 1 : return ET;
             case 2 : return TO;
+            case 3 : return TRE;
         }
 
-        return eventTekst;
+        return tekst;
 
     }
 
     static void p(Object o){
-        String kl = "Lyttersystem.";
-        Util.p(kl+o);
+        Util.p("Lyttersystem."+o);
     }
 }

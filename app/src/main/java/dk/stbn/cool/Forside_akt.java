@@ -430,7 +430,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                         if (!a.synligeTekster.contains(valgtHTekst)) {
                             a.synligeTekster.add(valgtHTekst);
-                            Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
+                            Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog", a.hændelsesId++);
                             pa.notifyDataSetChanged();
                             vp.setCurrentItem(a.synligeTekster.size()-1);
                         }

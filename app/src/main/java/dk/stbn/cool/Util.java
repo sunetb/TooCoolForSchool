@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -46,13 +45,9 @@ public class Util {
         if (førsteOpstart) gamle = new ArrayList<>();
         else gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-            sp.edit().putBoolean("førstegang", false).apply();
-        else sp.edit().putBoolean("førstegang", false).commit();
+        sp.edit().putBoolean("førstegang", false).commit();
         String id = "";
-        if (Build.VERSION.SDK_INT >= 12)
-            id = intent.getExtras().getString("tekstId", "");
-        else   id = intent.getExtras().getString("tekstId");
+        id = intent.getExtras().getString("tekstId");
         int id_int = intent.getExtras().getInt("id_int", 0);
 
         p("Util.notiBrugt modtog: id: "+id + "id_int: "+id_int);
@@ -114,7 +109,6 @@ public class Util {
 
         ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", c);
 
-
         for (int i = 0 ; i < datoliste.size(); i++){
 
             if (!gamle.contains((datoliste.get(i)))) {
@@ -147,19 +141,15 @@ public class Util {
 
         }
 
-
         IO.gemObj(gamle, "gamle", c);
     }
 
     static boolean visMtekst(DateTime mTid){
-
-        p("Util.visMtekst() "+ mTid.dayOfMonth()+ "/"+mTid.monthOfYear());
+        String logbesked = "Util.visMtekst() "+ mTid.getDayOfMonth()+ "/"+mTid.getMonthOfYear();
         //-- Eks: 11 september     ///Vises                    5, 6, 7, 8, 9, 10, 11
                                    ///Vises ikke: 1, 2, 3. 4.                         12, 13, 14, sept
 
-
-
-        //-- Tjek om  m-dato er idag NB: tekstens klokkeslæt er altid kl 00:00 dvs FØR evt samme dato /// dvs 11/09 kl 13:41 er EFTER 11/09 kl 00:00
+        //-- Tjek om  m-dato er idag
         if (erSammeDato(mTid)) return true;
 
 
@@ -168,15 +158,14 @@ public class Util {
 
         //-- Tjek om idag er 4. sept eller tidligere
         DateTime syvFør = mTid.minusDays(7);
-        p("Util.visMtekst() dato var IKKE SAMME og IKKE FØR. Skal den vises? "+!syvFør.isAfter(A.masterDato));
+        p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!syvFør.isAfter(A.masterDato));
 
         return !syvFør.isAfter(A.masterDato);
-
     }
 
     static boolean erSammeDato(DateTime tid){
         //-- Sammenligner en DateTime med dags dato men ignorerer klokkelæt (og årstal)
-         int dag = tid.getDayOfMonth();
+        int dag = tid.getDayOfMonth();
         DateTime nu = A.masterDato;
         int idagD = nu.getDayOfMonth();
 
@@ -186,7 +175,6 @@ public class Util {
         int idagMrd = nu.getMonthOfYear();
 
         return mrd == idagMrd;
-
     }
 
     static ArrayList[] parseXML (String xml, String kaldtFra) {

@@ -18,12 +18,12 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
 	WebView w;
 	View divi;
+
     int position = -1;
     A a;
 	private Tekst tekst;
 
     public TekstFragment_frag() {
-        // Required empty public constructor
     }
 
     @Override
@@ -33,9 +33,8 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 		position = getArguments().getInt("pos", 0);
 		if (position >= a.synligeTekster.size()) position = a.synligeTekster.size()-1;
 		tekst= a.synligeTekster.get(position);
-
 		
-        p("Fragment oncreate "+position);
+        p("Fragment oncreate. Pos: "+position);
     }
 
     @Override
@@ -52,13 +51,13 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 		if (a.synligeTekster.size() == 0 || tekst == null){
 			p("onCreatView() ingen data");
 			t.setText(Html.fromHtml("Vent et øjeblik"));
-			w.loadData("Netforbindelsen er vist langsom. Hvis der ikke sker noget meget snart, så prøv at genstarte appen..", "text/html; charset=utf-8", "UTF-8"); //"UTF-8");
+			w.loadData(A.hoved +"Netforbindelsen er vist langsom. Hvis der ikke sker noget meget snart, så prøv at genstarte appen.."+ A.hale, "text/html; charset=utf-8", "UTF-8");
 		}
         else {
 			t.setText(Html.fromHtml(tekst.overskrift));
 			if (savedInstanceState == null) {
 
-				w.loadData(tekst.brødtekst, "text/html; charset=utf-8", "UTF-8"); //"UTF-8");
+				w.loadData(tekst.brødtekst, "text/html; charset=utf-8", "UTF-8");
 
 			}
 		}
@@ -73,16 +72,6 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
         return  v;
     }
-
-	@Override
-	public void onPause()
-	{
-
-		super.onPause();
-		
-	}
-
-	
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState)
@@ -97,26 +86,27 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
-
 		super.onActivityCreated(savedInstanceState);
 		w.restoreState(savedInstanceState);
-		
 	}
 
-	void p(Object o){
-		String kl = "TekstFragment.";
-		Util.p(kl+o);
-	}
+
 
 
 	int kliktæller = 0;
 	@Override
 	public void onClick(View v) {
 		kliktæller++;
-		if (kliktæller  == 7 )
+		if (kliktæller  == 7)
 		{
 			w.loadData(A.debugmsg + A.hale, "text/html; charset=utf-8", "UTF-8");
 			kliktæller =0;
+			//todo: skift henteurl og aktiver testtilstand
+
 		}
+	}
+
+	void p(Object o){
+		Util.p("TekstFragment."+o);
 	}
 }
