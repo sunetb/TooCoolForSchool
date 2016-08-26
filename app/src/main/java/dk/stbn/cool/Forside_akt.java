@@ -133,9 +133,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public boolean onLongClick(View v) {
 
-                    A.testtilstand =  (A.testtilstand) ? false : true;
-                    if (prefs.getBoolean("vistestdialog", true)) testDialog();
+                    A.testtilstand =  !A.testtilstand;
                     if (A.testtilstand) {
+                        testDialog();
+
                         del.setImageResource(R.drawable.en);
                         kontakt.setImageResource(R.drawable.seks);
                     }

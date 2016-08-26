@@ -159,7 +159,7 @@ Think about modules in your application, don't just write linear code.
         ctx=this;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
        //til test
-        pref.edit().putInt("tekstversion",1).commit();
+        //pref.edit().putInt("tekstversion",1).commit();
         //hertil
         Lyttersystem.nulstil();
         Lyttersystem.lyt(this);
@@ -173,13 +173,6 @@ Think about modules in your application, don't just write linear code.
         p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
 
-        //test
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET, "fake rul, synlige, UI-tråd? : "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
-            }
-        }, 10);
 
 
     }//Oncreate færdig
@@ -615,6 +608,8 @@ Think about modules in your application, don't just write linear code.
             @Override
             protected Object doInBackground(Object... o) {
 
+                //-- datoliste er listen med alle teksters  id'er
+
                 ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", ctx); //hvis denne gøres global, kan den initalisteres når som helst - dvs igså tidligere.
 
                 //-- Hvis datolisten er tom, er det fordi vi er nået til slutningen af skoleåret og der er ikke flere nye tekster
@@ -640,7 +635,8 @@ Think about modules in your application, don't just write linear code.
 
                 
                //TODO: Optimeres senere
-                //Plus: tjek for om datoliste er tom
+
+                synligeDatoer.clear(); //todo: ikke nødvendigt at gemme den på disk. Ryd op i det
                 for (int i = 0; i < datoliste.size(); i++) {
                     int tekstid = datoliste.get(i);
 
@@ -748,6 +744,7 @@ Think about modules in your application, don't just write linear code.
                     }
                     Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET, "skaltekstlistenopdaetere() synlige UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
                     gemSynligeTekster();
+                    IO.gemObj(synligeDatoer, "synligeDatoer", ctx);
 
                 }
                 else p("skalTekstlistenOpdateres Ingen ny synlige");
