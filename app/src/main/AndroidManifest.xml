@@ -11,7 +11,7 @@
         android:name="dk.stbn.cool.A"
         android:allowBackup="true"
         android:icon="@drawable/cool_nobkgr_71x71"
-        android:label="Too Cool For School. BETA 0.9"
+        android:label="Too Cool For School"
         android:supportsRtl="true"
         android:theme="@style/SortBaggrund">
         <activity android:name="dk.stbn.cool.Splash">
