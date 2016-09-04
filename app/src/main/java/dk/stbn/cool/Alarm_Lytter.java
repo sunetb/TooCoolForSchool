@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -29,11 +28,12 @@ public class Alarm_Lytter extends BroadcastReceiver {
         int id_int = b.getInt("id_int");
 
         p("cool.onRecieve() modtog "+overskrift);
-        if (A.debugging) Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
+        //if (A.debugging) Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
 
-        if (!gamle.contains(id))
-        bygNotifikation(context, overskrift, id, id_int);
-
+        if (gamle.contains(id))
+            p("Notifikation for "+id+" findes har været vist");
+        else
+            bygNotifikation(context, overskrift, id, id_int);
     }
 
     void bygNotifikation (Context context, String overskrift, String id, int id_int) {
@@ -48,21 +48,21 @@ public class Alarm_Lytter extends BroadcastReceiver {
                         .setAutoCancel(true)
                         .setCategory(Notification.CATEGORY_ALARM)
                         .setOnlyAlertOnce(true);
-        //ingen effekt.setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
+        //ingen effekt: .setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
 
         Intent resultIntent = new Intent(context, Forside_akt.class);
         resultIntent.putExtra("overskrift", overskrift);
         resultIntent.putExtra("tekstId", id);
         resultIntent.putExtra("id_int", id_int);
         resultIntent.putExtra("fraAlarm", true);
-        resultIntent.setAction(id); //lille hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+        resultIntent.setAction(id); //-- lille hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         //stackBuilder.addParentStack(Forside.class);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(
                         0,
-                        PendingIntent.FLAG_CANCEL_CURRENT //FLAG_ONE_SHOT//
+                        PendingIntent.FLAG_CANCEL_CURRENT
                 );
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =
@@ -71,7 +71,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         Notification n = mBuilder
                 .build();
 
-        //Hvis brugeren sletter notifikationen ved swipe eller tømmer alle notifikationer
+        //-- Hvis brugeren sletter notifikationen ved swipe eller tømmer alle notifikationer
         Intent sletteIntent = new Intent(context, SletNotifikation_Lytter.class);
         sletteIntent.putExtra("tekstId", id)
                 .putExtra("id_int", id_int);
@@ -79,8 +79,6 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
         n.deleteIntent = PendingIntent.getBroadcast(context, 0, sletteIntent, 0);
         mNotificationManager.notify(id_int, n);
-
-
     }
 
 

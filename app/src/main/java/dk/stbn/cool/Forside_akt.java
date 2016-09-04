@@ -22,6 +22,8 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 
+import java.util.ArrayList;
+
 public class Forside_akt extends AppCompatActivity implements View.OnClickListener, Observatør{
 
     PagerAdapter pa;
@@ -143,6 +145,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     else {
                         del.setImageResource(R.drawable.ic_share_black_24dp);
                         kontakt.setImageResource(R.drawable.ic_send_black_24dp);
+                        //-- Færdig med at teste, nultil listen over forældede tekster
+                        IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
+                        a.skalTekstlistenOpdateres(); //ikke testet
                     }
                     return true;
                 }
@@ -283,6 +288,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 int id = startBundle.getInt("id_int");
 
                 p(opstart+" NOTIFIKATION: "+ startBundle.getString("overskrift") + "id_int: "+id);
+                IO.føjTilGamle(id,this);
 
                 int husk = -1;
                 for (int i = 0; i < a.synligeTekster.size(); i++) {

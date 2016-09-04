@@ -37,13 +37,10 @@ public class Util {
         p("Util.notiBrugt kaldt");
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 
-        //tjek om første opstart
+        //tjek om første opstart. Hmm ER det nu også nødvendigt?
         boolean førsteOpstart = sp.getBoolean("førstegang", true);
-        ArrayList<Integer> gamle;
 
-        //Set<String> brugteNotifikationer = sp.getStringSet("gamle", new HashSet<String>());
-        if (førsteOpstart) gamle = new ArrayList<>();
-        else gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
+        if (førsteOpstart) IO.gemObj(new ArrayList<Integer>(), "gamle", c);
 
         sp.edit().putBoolean("førstegang", false).commit();
         String id = "";
@@ -52,22 +49,13 @@ public class Util {
 
         p("Util.notiBrugt modtog: id: "+id + "id_int: "+id_int);
 
-        boolean føradd = gamle.contains(id_int);
-        gamle.add(id_int);
-        //sp.edit().putStringSet("gamle", gamle).apply();
-        IO.gemObj(gamle, "gamle", c);
-        boolean efteradd = gamle.contains(id_int);
-
+        IO.føjTilGamle(id_int, c);
         p("Util.notiBrugt tjek sættet:");
-        for (Integer s : gamle) System.out.println(s);
-
-        if (A.debugging) t(c,"notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
-        p("Util.notiBrugt("+id+") før add: "+føradd+ "efter add: "+efteradd);
 
         PendingIntent i = PendingIntent.getBroadcast(c, id_int, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alm = A.alm;
         if (alm == null) alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
-        else p("Util.notiBrugt(): alarmManager ekisterer");
+        else p("Util.notiBrugt(): alarmManager eksisterer");
         i.cancel();
         alm.cancel(i);
     }

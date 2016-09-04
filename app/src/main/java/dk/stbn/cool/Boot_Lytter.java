@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 /**
  * Created by sune on 6/6/16.
@@ -26,7 +25,7 @@ public class Boot_Lytter extends BroadcastReceiver  {
             {
 
 
-                if (A.debugging) Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
+                //if (A.debugging) Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
 
                 int modenhed = pref.getInt("modenhed", -1);
 
