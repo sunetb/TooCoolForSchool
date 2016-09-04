@@ -858,8 +858,6 @@ public class A extends Application implements Observatør{
                     pref.edit().putInt("tekstversion", version).commit();
                 }
             }
-
-
         }.execute();
 
     }
