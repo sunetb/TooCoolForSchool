@@ -6,8 +6,11 @@ Men der er en del regler for hvilke tekster der skal vises hvornår.
 Der er fire typer af tekster:
 
 O-tekster = 'obligatoriske' tekster
+
 I-tekster = 'info' tekster.
+
 M-tekster = 'mærkedagstekster'
+
 H-tekster = 'hjælp'tekster
 
 O-tekster (der er to stk i alt) er introducerende og vises kun mens appen er nyinstalleret. De handler om at formidle til brugeren hvad han/hun kan bruge denne app til og hvordan.
