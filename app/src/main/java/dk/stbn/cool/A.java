@@ -951,6 +951,7 @@ public class A extends Application implements Observatør{
 
         return -1;
     }
+
     //-- Htekster har samme id_int
     int findTekstnr (String overskrift) {
         for (int i = 0; i < synligeTekster.size(); i++)
