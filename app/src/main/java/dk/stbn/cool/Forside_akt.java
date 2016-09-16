@@ -187,6 +187,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             vp.addOnPageChangeListener(sideLytter);
             if (A.debugging) pa.notifyDataSetChanged(); //lidt groft ?
             visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
+            if (visPosition >= a.synligeTekster.size()) visPosition = -1;
             if (visPosition == -1) visPosition = a.synligeTekster.size() - 1;
             vp.setCurrentItem(visPosition);
             knapstatus(visPosition, "onStart()");
@@ -442,7 +443,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                             vp.setCurrentItem(a.synligeTekster.size()-1);
                         }
                         else {
-                            vp.setCurrentItem(a.findTekstnr(valgtHTekst.id_int));
+                            vp.setCurrentItem(a.findTekstnr(valgtHTekst.overskrift));
                         }
                         hListeadapter = null;
                         klikket = true;

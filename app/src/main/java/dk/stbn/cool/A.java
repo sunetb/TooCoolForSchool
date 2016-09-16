@@ -39,9 +39,9 @@ public class A extends Application implements Observatør{
 
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
-    ArrayList<Tekst> synligeTekster = new ArrayList();  //brugeas af pageradapteren
-    ArrayList<Tekst> htekster = new ArrayList();
+    ArrayList<Tekst> synligeTekster = new ArrayList();  //bruges af pageradapteren
 
+    ArrayList<Tekst> htekster = new ArrayList();
     ArrayList<String> hteksterOverskrifter = new ArrayList();
 
     public String henteurl = "http://www.lightspeople.net/sune/skole/tekster.xml";
@@ -105,12 +105,19 @@ public class A extends Application implements Observatør{
      * Hvis der går lang tid mellem at appen er åben, når appen forbi de noti som er 'bestilt'
     * Lazy loading måske?
     *
-    * crasher den stadig nogle gange når den vælges fra joblisten?
-    *
     * Lad O-tekster blive indtil de "skubbes ud"
     *
-    * Mulighed for at loade en test-tekstfil
+    * Mulighed for at loade en test-tekstfil som skal testes, INDEN den udgives
     *
+    * Koks i H-tekster:
+    * Efter H-tekster, er Frem-knappen enabled, men bliver disablet nåpr den trykkes. Burde være fikset
+    * Alvorligere: Når der har været åbnet et par Htekster: A: Der går rod i visning af
+     *tekster, nogle får ikke vist brødtekst. Jeg har set en enkelt gang at overskriften fra
+    * M-teksten blev hængende selv om man bladrer (kun set én gang) b: Vælges den samme h-tekst to gange,
+    * burde den scrolle til den allerede åbne udgave af den tekst man har valgt. Men nu scroller den til
+    * først viste h-tekst.
+    *
+    * Det har ikke været sådan hele tiden. Hvornår og hvorfor begyndte den på det?
     *
     * NiceToHave
     * en metode svarende til gemAlleNyeTekster i Util. Kaldes i service/baggundstråd  når alarmMODTAGEREN kaldes.
@@ -154,10 +161,7 @@ public class A extends Application implements Observatør{
 
         modenhed = tjekModenhed();
         tjekOpstart();
-        p("Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
-
-
-
+        p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
     }//Oncreate færdig
 
@@ -192,6 +196,7 @@ public class A extends Application implements Observatør{
                 synligeTekster = hentsynligeTekster();
 
             }
+            tjekVisOtekst();
 
             //-- Hvis nu nogle h-tekster skulle være gemt
             int før = synligeTekster.size();
@@ -207,14 +212,11 @@ public class A extends Application implements Observatør{
 
 
             if (skalTekstlistenOpdateres()) {
-                pref.edit().putInt("seneste position", -1).commit();
+                pref.edit().putInt("seneste position", -1).commit(); //Sætter ViewPagerens position til nyeste element
             }
 
             //-- Tjek om der er opdateringer til tekstene
-
             tjekTekstversion("tjekOpstart()");
-
-
 
         }
 
@@ -284,7 +286,7 @@ public class A extends Application implements Observatør{
                         if (aktivitetenVises)
                             Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
                         else
-                            p("Aktiviteten blev klar EFTER at dat blev klar");
+                            p("Aktiviteten blev klar EFTER at data blev klar");
 
                         IO.gemObj(o1, "otekst1", ctx);
 
@@ -434,6 +436,10 @@ public class A extends Application implements Observatør{
                 p("itekster længde: "+ itekster.size());
 
                 ArrayList<Tekst> tempSynlige = new ArrayList<>();
+                if (modenhed != MODENHED_MODEN){
+                    tempSynlige.add((Tekst) IO.læsObj("otekst1", ctx));
+                    tempSynlige.add((Tekst) IO.læsObj("otekst2", ctx));
+                }
 
                 boolean iFundet = false;
 
@@ -504,7 +510,7 @@ public class A extends Application implements Observatør{
 
                 IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
-                if(modenhed == MODENHED_MODEN) {  ///
+                if(modenhed == MODENHED_MODEN) {  /// Kun når appen er moden og der derfor allerede er indlæst et sæt tekster.
 
                     ArrayList<Tekst> tempHTekster = Util.erstatAfsnit(alleTekster[3]);
                     ArrayList<String> TempHOverskrifter = new ArrayList<String>();
@@ -795,7 +801,8 @@ public class A extends Application implements Observatør{
             else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
                     pref.edit().putInt("modenhed", MODENHED_MODEN).apply();
-                else pref.edit().putInt("modenhed", MODENHED_MODEN).commit();
+                else
+                    pref.edit().putInt("modenhed", MODENHED_MODEN).commit();
                 tredjeDagFørsteGang = true;
                 p("tjekModenhed() Tredje dag første gang sat til true");
             }
@@ -862,7 +869,14 @@ public class A extends Application implements Observatør{
 
     }
 
-    void tjekOmOteksterSkalVises(){
+    void tjekVisOtekst(){ //TODO ikke færdig
+        int synligeLængde = synligeTekster.size();
+
+        if (synligeLængde == 3) return;
+        else if (synligeLængde == 2){
+            //tjek om der er en m-tekst
+        }
+
         //todo
     }
 
@@ -915,8 +929,6 @@ public class A extends Application implements Observatør{
             @Override
             protected Object doInBackground(Object[] params) {
 
-                //--  Init h-tekster
-
                 htekster = (ArrayList<Tekst>) IO.læsObj("htekster", ctx);
                 for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift);
 
@@ -939,8 +951,15 @@ public class A extends Application implements Observatør{
 
         return -1;
     }
+    int findTekstnr (String id) {
+        for (int i = 0; i < synligeTekster.size(); i++)
+            if (id.equals(synligeTekster.get(i).overskrift)) return i;
 
-    void t(String s){
+        return -1;
+
+    }
+
+        void t(String s){
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
     void p(Object o){
