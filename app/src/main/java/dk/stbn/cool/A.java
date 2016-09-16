@@ -951,6 +951,7 @@ public class A extends Application implements Observatør{
 
         return -1;
     }
+
     int findTekstnr (String id) {
         for (int i = 0; i < synligeTekster.size(); i++)
             if (id.equals(synligeTekster.get(i).overskrift)) return i;
