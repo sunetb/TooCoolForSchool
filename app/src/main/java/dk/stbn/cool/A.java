@@ -951,10 +951,10 @@ public class A extends Application implements Observatør{
 
         return -1;
     }
-
-    int findTekstnr (String id) {
+    //-- Htekster har samme id_int
+    int findTekstnr (String overskrift) {
         for (int i = 0; i < synligeTekster.size(); i++)
-            if (id.equals(synligeTekster.get(i).overskrift)) return i;
+            if (overskrift.equals(synligeTekster.get(i).overskrift)) return i;
 
         return -1;
 
