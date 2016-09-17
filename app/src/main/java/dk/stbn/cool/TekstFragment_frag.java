@@ -39,7 +39,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        p("Fragment oncreateView");
+        p("Fragment oncreateView Pos: "+position);
 
         View v = inflater.inflate(R.layout.fragment_tekst_fragment_frag, container, false);
         TextView t = (TextView) v.findViewById(R.id.overskrift);
@@ -49,7 +49,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
 
 		if (a.synligeTekster.size() == 0 || tekst == null){
-			p("onCreatView() ingen data");
+			p("onCreateView() ingen data");
 			t.setText(Html.fromHtml("Vent et øjeblik"));
 			w.loadData(A.hoved +"Netforbindelsen er vist langsom. Hvis der ikke sker noget meget snart, så prøv at genstarte appen.."+ A.hale, "text/html; charset=utf-8", "UTF-8");
 		}
@@ -59,6 +59,12 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
 				w.loadData(tekst.brødtekst, "text/html; charset=utf-8", "UTF-8");
 
+				p("Webviev loadet. Brødtekst var: "+ tekst.brødtekst.substring(169,190));
+				//p("øvrige data: længde: "+w. getOriginalUrl().length());
+			}
+			else {
+				p("Webviev blev GENBRUGT. Brødtekst var: "+ tekst.brødtekst.substring(169,190));
+				//p("øvrige data: længde: "+w.getOriginalUrl().length());
 			}
 		}
 		//-- Hvis teksten er M eller H: gul overskrift

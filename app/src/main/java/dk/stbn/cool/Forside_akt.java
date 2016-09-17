@@ -410,13 +410,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     }
 
-    void p(Object o){
-        String kl = "Forside.";
-        Util.p(kl+o);
-    }
-    void t(String s){
-        Util.t(this,s);
-    }
 
     //----Bygger en AlertDialog med listen over Ekstra-tekster
     boolean klikket = false; //Holder KUN dialogen i live hvis skærmen bliver vendt.
@@ -469,6 +462,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         dlg.getWindow().setAttributes(lp);
+    }
+
+    void p(Object o){
+        String kl = "Forside.";
+        Util.p(kl+o);
+    }
+    void t(String s){
+        Util.t(this,s);
     }
 
 }

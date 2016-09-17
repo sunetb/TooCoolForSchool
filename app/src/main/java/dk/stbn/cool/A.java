@@ -86,7 +86,7 @@ public class A extends Application implements Observatør{
 	
 ////TEST / DEBUGGING////////////////////////////////////////////////
 
-    public static String hoved = "<!DOCTYPE html ><html><head><meta content=\"text/html; charset=ISO-8859-1\" http-equiv=\"content-type\"><title>o17092016.txt</title></head><body  style=\"color: white; background-color: black;\">";
+    public static String hoved = "<!DOCTYPE html ><html><head><meta content=\"text/html; charset=ISO-8859-1\" http-equiv=\"content-type\"><title>Log</title></head><body style=\"color: white; background-color: black;\">";
     public static String debugmsg = hoved;
     public static String hale = "</body></html>";
 
@@ -109,15 +109,11 @@ public class A extends Application implements Observatør{
     *
     * Mulighed for at loade en test-tekstfil som skal testes, INDEN den udgives
     *
-    * Koks i H-tekster:
-    * Efter H-tekster, er Frem-knappen enabled, men bliver disablet nåpr den trykkes. Burde være fikset
-    * Alvorligere: Når der har været åbnet et par Htekster: A: Der går rod i visning af
-     *tekster, nogle får ikke vist brødtekst. Jeg har set en enkelt gang at overskriften fra
-    * M-teksten blev hængende selv om man bladrer (kun set én gang) b: Vælges den samme h-tekst to gange,
-    * burde den scrolle til den allerede åbne udgave af den tekst man har valgt. Men nu scroller den til
-    * først viste h-tekst.
-    *
-    * Det har ikke været sådan hele tiden. Hvornår og hvorfor begyndte den på det?
+    * FEJL Nogle gange forsvinder brødtekster.
+    * Teori: Noget med genbrug.
+    * Men: det har vist noget med skærmvending at gøre..
+    * FAKTA: Webview er nogle gange null i onSaveInstancestate
+    * LOG FRAGMENTET
     *
     * NiceToHave
     * en metode svarende til gemAlleNyeTekster i Util. Kaldes i service/baggundstråd  når alarmMODTAGEREN kaldes.

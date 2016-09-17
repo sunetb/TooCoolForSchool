@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 public class Kontakt extends AppCompatActivity implements View.OnClickListener {
 
-    A instans = A.a;
+    A a = A.a;
 
     Button send;
 
@@ -107,7 +107,7 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         p("endMail()");
 
         String afstedtekst = besked +"\n\n"+"Med venlig hilsen\n"+ navn;
-        if (sendlog.isChecked()) afstedtekst+= "\n\n\n\n"+ A.debugmsg;
+        if (sendlog.isChecked()) afstedtekst+= "\n\n\n\n"+ A.debugmsg + A.hale;
 
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("message/rfc822");
