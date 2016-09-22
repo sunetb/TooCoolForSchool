@@ -92,8 +92,11 @@ public class A extends Application implements Observatør{
 
     static boolean debugging = true;
     static boolean testtilstand = false;
+    static boolean testtilstand_2 = false;
     public String henteurltest = "http://www.lightspeople.net/sune/skole/tekstertest.xml";
-     int hændelsesId = 0;
+    int hændelsesId = 0;
+    int skærmVendt = 0;
+    int nyPageradapter = 0;
 
 
 //////////-------------------------//////////
@@ -879,7 +882,9 @@ public class A extends Application implements Observatør{
     // - - Til test
     void rul (int antaldage) {
         p("rul() kaldt");
+
         masterDato = masterDato.plusDays(antaldage);
+        if (testtilstand_2) masterDato = new DateTime();
         t("Idag er "+ masterDato.getDayOfMonth() + " / " + masterDato.getMonthOfYear() + " - " + masterDato.getYear());
 
         synligeTekster = new ArrayList();  //brugeas af pageradapteren

@@ -44,15 +44,20 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         getSupportActionBar().setIcon(R.drawable.cool_nobkgr_50x50_rund);
 
         p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
-        p(" idag er: "+ A.masterDato.getDayOfMonth() + ": " + A.masterDato.getMonthOfYear() + " - "+ A.masterDato.getYear());
         a = A.a;
+        p(" idag er: "+ A.masterDato.getDayOfMonth() + ": " + A.masterDato.getMonthOfYear() + " - "+ A.masterDato.getYear());
+
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         initUI();
         a.aktivitetenVises = true; //skal den stå tidligere?
         tjekOpstartstype(savedInstanceState);
+
         if (A.testtilstand){
-            if (prefs.getBoolean("vistestdialog", true)) testDialog();
+            if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_1);
+        }
+        else if (A.testtilstand_2){
+            if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_2);
         }
 
     }
@@ -70,18 +75,21 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else if (v == extras)
             showDialog(1);
         else if (v == del){
-            if (A.testtilstand) {
-                //startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
-                //datoÆndret = true;
-                t("Spoler 1 dag frem...");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        a.rul(1);
-                    }
-                }, 110);
-                finish();
-            }
+            if (A.testtilstand || A.testtilstand_2) {
+                if (A.testtilstand_2) {
+                    startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
+                    datoÆndret = true;
+                }
+                else {
+                    t("Spoler 1 dag frem...");
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            a.rul(1);
+                        }
+                    }, 110);
+                    finish();
+                }            }
             else {
                 p("klikket på Anbefal");
 //Todo: Ny aktivitet med forklaring af pointsystem mm
@@ -117,6 +125,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     private void initUI() {
         vp = (ViewPager) findViewById(R.id.pager);
+        vp.setOffscreenPageLimit(7); //Lappeløsning nu og her
         pa = new PagerAdapter(getSupportFragmentManager());
         vp.setAdapter(pa);
         p("adapteren sat på viewpageren");
@@ -137,7 +146,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                     A.testtilstand =  !A.testtilstand;
                     if (A.testtilstand) {
-                        testDialog();
+                        testDialog(TESTTILSTAND_1);
 
                         del.setImageResource(R.drawable.en);
                         kontakt.setImageResource(R.drawable.seks);
@@ -147,7 +156,29 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         kontakt.setImageResource(R.drawable.ic_send_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
                         IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        a.skalTekstlistenOpdateres(); //ikke testet
+                        a.skalTekstlistenOpdateres();
+                    }
+                    return true;
+                }
+            });
+        }
+        if (A.debugging) {
+            kontakt.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    A.testtilstand_2 =  !A.testtilstand_2;
+                    if (A.testtilstand_2) {
+                        testDialog(TESTTILSTAND_2);
+
+                        del.setImageResource(R.drawable.cool_nobkgr_50x50_rund);
+
+                    }
+                    else {
+                        del.setImageResource(R.drawable.ic_share_black_24dp);
+                        //-- Færdig med at teste, nultil listen over forældede tekster
+                        IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
+                        a.skalTekstlistenOpdateres();
                     }
                     return true;
                 }
@@ -179,7 +210,13 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         if (datoÆndret){
             p("onStart: Dato ændret");
             datoÆndret = false;
-            //her
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    a.rul(1);
+                }
+            }, 110);
+            finish();
 
         }
         else {
@@ -232,6 +269,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 del.setImageResource(R.drawable.en);
                 kontakt.setImageResource(R.drawable.seks);
             }
+            else if (A.testtilstand_2){
+                del.setImageResource(R.drawable.cool_nobkgr_50x50_rund);
+            }
         }
     }
 
@@ -267,7 +307,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }
         else if (a.sidstKendteVindueshøjde == vindueshøjdetmp) return false;
         else a.sidstKendteVindueshøjde = vindueshøjdetmp;
-
+        a.skærmVendt++;
+        p("Skærm vendt "+a.skærmVendt + " gange");
         return true;
     }
 
@@ -333,19 +374,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     }
 
     //kun til test
-    private void testDialog () {
+    private void testDialog (String besked) {
+
+
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
         alertDialogBuilder.setTitle("Test-tilstand aktiveret");
         alertDialogBuilder
-                .setMessage("Nu er 'DEL' og 'KONTAKT'-knapperne omdefineret:\n\n"+
-
-                        "-Knappen '1' ruller appens interne dato 1 dag frem\n\n"+
-                        "-Knappen '6' ruller appens interne dato 6 dage frem\n\n" +
-                        "\n"+
-                        "Du kan deaktivere test-tilstand igen ved at holde knappen '1' nede i et par sekunder"
-
-                )
+                .setMessage(besked)
                 .setCancelable(false)
                 .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
@@ -358,6 +394,22 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         alertDialog.show();
     }
+
+    String TESTTILSTAND_1 = "Nu er 'DEL' og 'KONTAKT'-knapperne omdefineret:\n\n"+
+
+            "-Knappen '1' ruller appens interne dato 1 dag frem\n\n"+
+            "-Knappen '6' ruller appens interne dato 6 dage frem\n\n" +
+            "\n"+
+            "Du kan deaktivere test-tilstand igen ved at holde knappen '1' nede i et par sekunder";
+
+    String TESTTILSTAND_2 = "TEST-TILSTAND 2\n" +
+            "\n" +
+            "Nu er 'DEL'-knappen omdefineret:\n\n"+
+
+            "-Den åbner telefonens indstillinger for Dato og Tid\n\n"+
+            "-Hvis der er hak i Automatisk dato og klokkelsæt, fjern dette hak og vælg en dato\n\n" +
+            "\n"+
+            "Husk at sætte hak i Automatisk dato og klokkeslæt igen når du er færdig med at teste";
 
     ///kun til test
     void bygNotifikation (Context context, String overskrift, String id, int id_int) {

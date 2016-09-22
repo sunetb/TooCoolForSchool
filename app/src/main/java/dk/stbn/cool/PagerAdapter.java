@@ -15,13 +15,14 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     public PagerAdapter(FragmentManager fm) {
         super(fm);
-        System.out.println("Pageradapter constructor");
         a= A.a;
+        a.nyPageradapter++;
+        p("Pageradapter constructor kaldt "+a.nyPageradapter + "gange");
     }
 
     @Override
     public Fragment getItem(int position) {
-        System.out.println("adapter getitem kaldt");
+        p("adapter getitem kaldt: "+position);
         Fragment f = new TekstFragment_frag();
         Bundle arg = new Bundle();
         arg.putInt("pos", position);
@@ -39,6 +40,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
 
         return "";//a.overskrifter.get(position);
+    }
+    void p (Object o){
+        Util.p("PagerAdapter."+o);
     }
 
     /*
