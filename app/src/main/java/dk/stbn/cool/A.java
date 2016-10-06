@@ -118,7 +118,11 @@ public class A extends Application implements Observatør{
     * FAKTA: Webview er nogle gange null i onSaveInstancestate
     * LOG FRAGMENTET
     *
+    *
+    *
     * NiceToHave
+    *
+    * Bedre struktur
     * en metode svarende til gemAlleNyeTekster i Util. Kaldes i service/baggundstråd  når alarmMODTAGEREN kaldes.
     * Gemmer en ny synligeTekster Arraylist under samme navn, så den altid henter en rigtig liste ved opstart
     * Smart fordi det er det tidligste tidspunkt vi kan vide det.
