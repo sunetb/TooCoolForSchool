@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.data;
 
 import android.app.AlarmManager;
 import android.app.Application;
@@ -25,36 +25,40 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import dk.stbn.cool.aktivitetFragment.Forside_akt;
+import dk.stbn.cool.diverse.IO;
+import dk.stbn.cool.lyttere.Lyttersystem;
+import dk.stbn.cool.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by sune on 5/31/16.
  */
-public class A extends Application implements Observatør{
+public class A extends Application implements Observatør {
 
-    static A a;
+    public static A a;
 	SharedPreferences pref;
-    Context ctx;
+    public Context ctx;
     static AlarmManager alm;
 
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
-    ArrayList<Tekst> synligeTekster = new ArrayList();  //bruges af pageradapteren
+    public ArrayList<Tekst> synligeTekster = new ArrayList();  //bruges af pageradapteren
 
-    ArrayList<Tekst> htekster = new ArrayList();
-    ArrayList<String> hteksterOverskrifter = new ArrayList();
+    public ArrayList<Tekst> htekster = new ArrayList();
+    public ArrayList<String> hteksterOverskrifter = new ArrayList();
 
-    public String henteurl = "http://www.lightspeople.net/sune/skole/tekster.xml";
+    public String henteurl = "http://www.lightspeople.net/sune/skole/tekster_test.xml";
     public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
 
-    int sidstKendteVindueshøjde = 0;
+    public int sidstKendteVindueshøjde = 0;
 
 //////////-------------------------//////////
 	
 
 //////////---------- UI TILSTAND / Lytterstystem ----------//////////
-    static boolean hteksterKlar = false;
-    boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
+    public static boolean hteksterKlar = false;
+    public boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
 
 //////////-------------------------//////////
 
@@ -90,13 +94,13 @@ public class A extends Application implements Observatør{
     public static String debugmsg = hoved;
     public static String hale = "</body></html>";
 
-    static boolean debugging = true;
-    static boolean testtilstand = false;
-    static boolean testtilstand_2 = false;
+    public static boolean debugging = true;
+    public static boolean testtilstand = false;
+    public static boolean testtilstand_2 = false;
     public String henteurltest = "http://www.lightspeople.net/sune/skole/tekstertest.xml";
-    int hændelsesId = 0;
-    int skærmVendt = 0;
-    int nyPageradapter = 0;
+    public int hændelsesId = 0;
+    public int skærmVendt = 0;
+    public int nyPageradapter = 0;
 
 
 //////////-------------------------//////////
@@ -145,8 +149,10 @@ public class A extends Application implements Observatør{
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
-
+        boolean EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator");
+        if (!EMULATOR) {
+            Fabric.with(this, new Crashlytics());
+        }
         Util.starttid = System.currentTimeMillis();
         p("oncreate() kaldt: UI-tråd: "+Thread.currentThread().getName());
         a= this;
@@ -565,7 +571,7 @@ public class A extends Application implements Observatør{
         }.execute();
     }
 
-    boolean skalTekstlistenOpdateres() {
+    public boolean skalTekstlistenOpdateres() {
         p("skalTekstlistenOpdateres() start________");
 
         new AsyncTask() {
@@ -873,18 +879,18 @@ public class A extends Application implements Observatør{
     }
 
     void tjekVisOtekst(){ //TODO ikke færdig
-        int synligeLængde = synligeTekster.size();
+        //int synligeLængde = synligeTekster.size();
 
-        if (synligeLængde == 3) return;
-        else if (synligeLængde == 2){
+        //if (synligeLængde == 3) return;
+        //else if (synligeLængde == 2){
             //tjek om der er en m-tekst
-        }
+       // }
 
         //todo
     }
 
     // - - Til test
-    void rul (int antaldage) {
+    public void rul(int antaldage) {
         p("rul() kaldt");
 
         masterDato = masterDato.plusDays(antaldage);
@@ -958,7 +964,7 @@ public class A extends Application implements Observatør{
     }
 
     //-- Htekster har samme id_int
-    int findTekstnr (String overskrift) {
+    public int findTekstnr(String overskrift) {
         for (int i = 0; i < synligeTekster.size(); i++)
             if (overskrift.equals(synligeTekster.get(i).overskrift)) return i;
 

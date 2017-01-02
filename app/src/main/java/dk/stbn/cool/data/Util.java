@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.data;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -22,6 +22,10 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import dk.stbn.cool.diverse.IO;
+import dk.stbn.cool.lyttere.Alarm_Lytter;
+import dk.stbn.cool.lyttere.Boot_Lytter;
+
 /**
  * Created by sune on 6/3/16.
  */
@@ -33,7 +37,7 @@ public class Util {
         return (double) (System.currentTimeMillis()-starttid)/1000.0;
     }
 
-    static void notiBrugt(Context c, Intent intent){
+    public static void notiBrugt(Context c, Intent intent){
         p("Util.notiBrugt kaldt");
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 
@@ -89,7 +93,7 @@ public class Util {
         alarmMgr.set(AlarmManager.RTC, t.dato.getMillis(), alarmIntent);
     }
 
-    static void opdaterKalender(Context c, String kaldtfra){
+    public static void opdaterKalender(Context c, String kaldtfra){
         p("opdaterKalender() kaldt fra "+kaldtfra);
         ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
         System.out.println("opdaterKalender() tjek sættet:");
@@ -281,7 +285,12 @@ public class Util {
                         else if (celletæller == 3) {
 
                             put  = put.replaceFirst("<title", "<!--title")
-                                    .replaceFirst("</title>", "<title-->");
+                                    .replaceFirst("</title>", "<title-->")
+                                    .replaceFirst("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">", "");
+                            put = put.replaceAll("&lt;br&gt;", "");
+                            //put = put.replaceAll("&lt;br &gt;", "");
+                            put = put.replaceAll("&lt;", "<");
+                            put = put.replaceAll("&gt;", ">");
 
                             if (tempTekst.kategori.equalsIgnoreCase("h"))
                                 put =  put.replaceFirst("<body", "<body style=\"color: yellow; background-color: black;\"");
@@ -389,11 +398,11 @@ public class Util {
         return temp;
     }
 
-    static void t(Context c, String s){
+    public static void t(Context c, String s){
         Toast.makeText(c, s, Toast.LENGTH_LONG).show();
     }
 
-    static void p(Object o){
+    public static void p(Object o){
         String kl = o +"   #t:" + tid();
         System.out.println("_____"+kl);
         A.debugmsg += kl +"<br>";

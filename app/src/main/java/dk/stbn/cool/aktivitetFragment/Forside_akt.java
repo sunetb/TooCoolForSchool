@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.aktivitetFragment;
 
 import android.app.Dialog;
 import android.app.Notification;
@@ -24,7 +24,16 @@ import android.widget.ImageButton;
 
 import java.util.ArrayList;
 
-public class Forside_akt extends AppCompatActivity implements View.OnClickListener, Observatør{
+import dk.stbn.cool.R;
+import dk.stbn.cool.data.A;
+import dk.stbn.cool.data.Tekst;
+import dk.stbn.cool.data.Util;
+import dk.stbn.cool.diverse.IO;
+import dk.stbn.cool.lyttere.Lyttersystem;
+import dk.stbn.cool.lyttere.Observatør;
+import dk.stbn.cool.lyttere.SletNotifikation_Lytter;
+
+public class Forside_akt extends AppCompatActivity implements View.OnClickListener, Observatør {
 
     PagerAdapter pa;
     ViewPager vp;
@@ -125,8 +134,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     private void initUI() {
         vp = (ViewPager) findViewById(R.id.pager);
-        vp.setOffscreenPageLimit(7); //Lappeløsning nu og her
-        pa = new PagerAdapter(getSupportFragmentManager());
+        //vp.setOffscreenPageLimit(7); //Lappeløsning nu og her
+
+        pa = new PagerAdapter(getSupportFragmentManager());//getChildFragmentManager());//
         vp.setAdapter(pa);
         p("adapteren sat på viewpageren");
         tilbage = (ImageButton) findViewById(R.id.tilbage);

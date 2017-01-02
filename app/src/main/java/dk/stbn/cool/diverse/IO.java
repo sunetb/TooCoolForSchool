@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.diverse;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,6 +14,8 @@ import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 
+import dk.stbn.cool.data.Util;
+
 /**
  * Created by sune on 6/24/16.
  */
@@ -21,7 +23,7 @@ public class IO {
 
     //TODO Lav typetjek
 
-    static Object læsObj (String filename, Context c) {
+    public static Object læsObj(String filename, Context c) {
         p("hentet: "+filename);
         ObjectInputStream input = null;
         Object mitObj = null;
@@ -47,7 +49,7 @@ public class IO {
         return mitObj;
     }
 
-    static void gemObj (Object mitObjI, String filnavnI, Context cI) {
+    public static void gemObj(Object mitObjI, String filnavnI, Context cI) {
         final Object mitObj = mitObjI;
         final String filnavn = filnavnI;
         final Context c = cI;
@@ -77,7 +79,7 @@ public class IO {
         p("gemt: "+filnavn);
     }
 
-    static void føjTilGamle(int id_int, Context c){
+    public static void føjTilGamle(int id_int, Context c){
         final Integer id = id_int;
         final Context ctx = c;
 

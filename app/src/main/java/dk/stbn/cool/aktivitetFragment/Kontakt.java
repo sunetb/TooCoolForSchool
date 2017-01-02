@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.aktivitetFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,10 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import dk.stbn.cool.R;
+import dk.stbn.cool.data.A;
+import dk.stbn.cool.data.Util;
 //import android.content.*;
 
 

@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.aktivitetFragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+
+import dk.stbn.cool.R;
+import dk.stbn.cool.data.A;
+import dk.stbn.cool.data.Util;
 
 public class Splash extends AppCompatActivity implements Runnable {
 

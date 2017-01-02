@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.diverse;
 
 /**
  * Created by sune on 6/28/16.

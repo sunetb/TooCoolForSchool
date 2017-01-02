@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.lyttere;
 
 /**
  * Created by sune on 7/8/16.

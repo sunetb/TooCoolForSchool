@@ -1,8 +1,10 @@
-package dk.stbn.cool;
+package dk.stbn.cool.lyttere;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import dk.stbn.cool.data.Util;
 
 /**
  * Created by sune on 6/11/16.

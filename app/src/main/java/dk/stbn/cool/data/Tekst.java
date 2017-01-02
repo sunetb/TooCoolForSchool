@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.data;
 
 import org.joda.time.DateTime;
 
@@ -9,11 +9,11 @@ public class Tekst implements Serializable {
 	static final long serialVersionUID = 1234567890;
 
 
-	String kategori;
+	public String kategori;
 	String id;
-	int id_int;
-	String overskrift;
-	String brødtekst;
+	public int id_int;
+	public String overskrift;
+	public String brødtekst;
 
 	DateTime dato;
 

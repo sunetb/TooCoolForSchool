@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
 	android:background="#00000000"
-    tools:context="dk.stbn.cool.Forside_akt">
+    tools:context="dk.stbn.cool.aktivitetFragment.Forside_akt">
 
     <LinearLayout
         android:layout_width="0px"

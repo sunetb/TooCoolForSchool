@@ -1,6 +1,9 @@
-package dk.stbn.cool;
+package dk.stbn.cool.lyttere;
 
 import java.util.ArrayList;
+
+import dk.stbn.cool.data.A;
+import dk.stbn.cool.data.Util;
 
 /**
  * Created by sune on 8/23/16.
@@ -13,13 +16,13 @@ public class Lyttersystem {
 
     static int tæller= 0;
 
-    static final int SYNLIGETEKSTER_OPDATERET = 1;
+    public static final int SYNLIGETEKSTER_OPDATERET = 1;
     static final String ET = "SYNLIGETEKSTER_OPDATERET";
 
-    static final int HTEKSTER_OPDATERET = 2;
+    public static final int HTEKSTER_OPDATERET = 2;
     static final String TO = "HTEKSTER_OPDATERET";
 
-    static final int NYE_TEKSTER_ONLINE = 3;
+    public static final int NYE_TEKSTER_ONLINE = 3;
     static final String TRE = "NYE_TEKSTER_ONLINE";
 
 
@@ -28,15 +31,15 @@ public class Lyttersystem {
 
 
 
-    static void lyt(Observatør o) {
+    public static void lyt(Observatør o) {
         if (!observatører.contains(o)) observatører.add(o);
     }
 
-    static void afregistrer(Observatør o) {
+    public static void afregistrer(Observatør o) {
         observatører.remove(o);
     }
 
-    static void nulstil(){
+    public static void nulstil(){
         observatører.clear();
     }
 
@@ -48,7 +51,7 @@ public class Lyttersystem {
     }
 
     // -- Må KUN kaldes fra hovedtråden
-    static void givBesked (int hændelse, String besked, int id) {
+    public static void givBesked(int hændelse, String besked, int id) {
         p("1: givebesked MODTOG: : "+besked+ " hændelse: "+hændelsestekst(hændelse)+ " id: "+id);
         //senesteHændelse =hændelse;
         setSenesteHændelse(hændelse);
@@ -70,7 +73,7 @@ public class Lyttersystem {
         p("3: Hændelse: "+hændelse + " VS. senesteHændelse: "+getSenesteHændelse()+ " id: "+id);
     }
 
-    static String hændelsestekst(int hændelse){
+    public static String hændelsestekst(int hændelse){
 
         String tekst = "FEJL: Ukendt eventtype";
 

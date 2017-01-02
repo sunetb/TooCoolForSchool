@@ -1,9 +1,12 @@
-package dk.stbn.cool;
+package dk.stbn.cool.aktivitetFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import dk.stbn.cool.data.A;
+import dk.stbn.cool.data.Util;
 
 
 /**
@@ -27,9 +30,10 @@ public class PagerAdapter extends FragmentPagerAdapter {
         Bundle arg = new Bundle();
         arg.putInt("pos", position);
         f.setArguments(arg);
-
+        if (f == null) p("FEJL!! pagerAdapter getitem() returnerer null!!");
         return f;
     }
+
 
     @Override
     public int getCount() {
@@ -41,6 +45,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
         return "";//a.overskrifter.get(position);
     }
+
     void p (Object o){
         Util.p("PagerAdapter."+o);
     }
@@ -56,5 +61,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
             android:paddingBottom="4dp"
             android:paddingTop="4dp" />
     * */
+
 
 }

@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.cool.aktivitetFragment;
 
 
 import android.graphics.Color;
@@ -12,6 +12,10 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.TextView;
 
+import dk.stbn.cool.R;
+import dk.stbn.cool.data.A;
+import dk.stbn.cool.data.Tekst;
+import dk.stbn.cool.data.Util;
 
 
 public class TekstFragment_frag extends Fragment implements View.OnClickListener {
@@ -39,7 +43,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        p("Fragment oncreateView Pos: "+position + "Var bundle null? "+ (savedInstanceState == null));
+        p("Fragment oncreateView Pos: "+position + "    Var bundle null? "+ (savedInstanceState == null));
 
         View v = inflater.inflate(R.layout.fragment_tekst_fragment_frag, container, false);
         TextView t = (TextView) v.findViewById(R.id.overskrift);
