@@ -48,7 +48,7 @@ public class A extends Application implements Observatør {
     public ArrayList<Tekst> htekster = new ArrayList();
     public ArrayList<String> hteksterOverskrifter = new ArrayList();
 
-    public String henteurl = "http://www.lightspeople.net/sune/skole/tekster_test.xml";
+    public String henteurl = "http://www.lightspeople.net/sune/skole/tekster.xml";
     public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
 
     public int sidstKendteVindueshøjde = 0;
