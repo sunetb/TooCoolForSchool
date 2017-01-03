@@ -101,6 +101,7 @@ public class A extends Application implements Observatør {
     public int hændelsesId = 0;
     public int skærmVendt = 0;
     public int nyPageradapter = 0;
+    boolean tvingTeksthentningEnGang = true;
 
 
 //////////-------------------------//////////
@@ -168,6 +169,14 @@ public class A extends Application implements Observatør {
 
         masterDato = new DateTime();
 
+        tvingTeksthentningEnGang = pref.getBoolean("tvingNyTekst", true);
+
+        if (tvingTeksthentningEnGang)  {
+
+            pref.edit().putInt("tekstversion", 0).commit();
+            pref.edit().putBoolean("tvingNyTekst", false).commit();
+        }
+
         modenhed = tjekModenhed();
         tjekOpstart();
         p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
@@ -207,11 +216,14 @@ public class A extends Application implements Observatør {
             }
             tjekVisOtekst();
 
-            //-- Hvis nu nogle h-tekster skulle være gemt
-            int før = synligeTekster.size();
-            for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
-            int efter = synligeTekster.size();
-            if (før != efter) pref.edit().putInt("seneste position", -1).commit();
+            if (synligeTekster == null) synligeTekster = new ArrayList(); //oplevet at den der blev hentet på disk var null i forbindelse med opdatering
+            else {
+                //-- Hvis nu nogle h-tekster skulle være gemt
+                int før = synligeTekster.size();
+                for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
+                int efter = synligeTekster.size();
+                if (før != efter) pref.edit().putInt("seneste position", -1).commit();
+            }
             synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
             indlæsHtekster();
 
