@@ -13,8 +13,8 @@ import android.webkit.WebView;
 import android.widget.TextView;
 
 import dk.stbn.cool.R;
+import dk.stbn.cool.Tekst;
 import dk.stbn.cool.data.A;
-import dk.stbn.cool.data.Tekst;
 import dk.stbn.cool.data.Util;
 
 

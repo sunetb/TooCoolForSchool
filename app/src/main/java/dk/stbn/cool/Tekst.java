@@ -1,4 +1,4 @@
-package dk.stbn.cool.data;
+package dk.stbn.cool;
 
 import org.joda.time.DateTime;
 
@@ -10,12 +10,12 @@ public class Tekst implements Serializable {
 
 
 	public String kategori;
-	String id;
+	public String id;
 	public int id_int;
 	public String overskrift;
 	public String brødtekst;
 
-	DateTime dato;
+	public DateTime dato;
 
 	public Tekst () {
 		id_int = 0;

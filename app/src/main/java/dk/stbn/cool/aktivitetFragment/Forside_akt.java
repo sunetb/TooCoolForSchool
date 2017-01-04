@@ -25,8 +25,8 @@ import android.widget.ImageButton;
 import java.util.ArrayList;
 
 import dk.stbn.cool.R;
+import dk.stbn.cool.Tekst;
 import dk.stbn.cool.data.A;
-import dk.stbn.cool.data.Tekst;
 import dk.stbn.cool.data.Util;
 import dk.stbn.cool.diverse.IO;
 import dk.stbn.cool.lyttere.Lyttersystem;

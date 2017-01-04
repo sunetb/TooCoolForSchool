@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import dk.stbn.cool.Tekst;
 import dk.stbn.cool.aktivitetFragment.Forside_akt;
 import dk.stbn.cool.diverse.IO;
 import dk.stbn.cool.lyttere.Lyttersystem;
@@ -101,7 +102,7 @@ public class A extends Application implements Observatør {
     public int hændelsesId = 0;
     public int skærmVendt = 0;
     public int nyPageradapter = 0;
-    boolean tvingTeksthentningEnGang = true;
+    boolean tvingTeksthentningEnGangTil = true;
 
 
 //////////-------------------------//////////
@@ -169,12 +170,12 @@ public class A extends Application implements Observatør {
 
         masterDato = new DateTime();
 
-        tvingTeksthentningEnGang = pref.getBoolean("tvingNyTekst", true);
+        //tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst", true);
 
-        if (tvingTeksthentningEnGang)  {
-
+        if (tvingTeksthentningEnGangTil)  {
+            hentNyeTekster();
             pref.edit().putInt("tekstversion", 0).commit();
-            pref.edit().putBoolean("tvingNyTekst", false).commit();
+            //pref.edit().putBoolean("tvingNyTekst", false).commit();
         }
 
         modenhed = tjekModenhed();
@@ -220,7 +221,8 @@ public class A extends Application implements Observatør {
             else {
                 //-- Hvis nu nogle h-tekster skulle være gemt
                 int før = synligeTekster.size();
-                for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
+                p("synligetekster size: "+før);
+                if  (før != 0) for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
                 int efter = synligeTekster.size();
                 if (før != efter) pref.edit().putInt("seneste position", -1).commit();
             }

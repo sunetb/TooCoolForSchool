@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import dk.stbn.cool.Tekst;
 import dk.stbn.cool.diverse.IO;
 import dk.stbn.cool.lyttere.Alarm_Lytter;
 import dk.stbn.cool.lyttere.Boot_Lytter;
