@@ -270,8 +270,11 @@ public class Util {
 
                                     //vi regner selv ud hvilket år vi skal skrive, så vi kan spare opdatering af datafilen
                                     int år = idag.getYear();
-                                    if (måned < 7) år++; //Vi har passeret årsskiftet
-
+                                    int måneddd = idag.getMonthOfYear();
+                                    boolean andetHalvår = måneddd > 6 ;
+                                    boolean førsteHalvår = måneddd < 7;
+                                    if (andetHalvår && måned < 7) år++; //Vi er i efteråret, og tekster fra og med januar skal være næste år
+                                    else if (førsteHalvår && måned > 6) år--; //vi er i foråret og tekster juli-dec skal være sidste år
 
                                     tempTekst.dato = new DateTime(år,måned,dag,0,0);
 
@@ -286,12 +289,7 @@ public class Util {
                         else if (celletæller == 3) {
 
                             put  = put.replaceFirst("<title", "<!--title")
-                                    .replaceFirst("</title>", "<title-->")
-                                    .replaceFirst("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">", "");
-                            put = put.replaceAll("&lt;br&gt;", "");
-                            //put = put.replaceAll("&lt;br &gt;", "");
-                            put = put.replaceAll("&lt;", "<");
-                            put = put.replaceAll("&gt;", ">");
+                                    .replaceFirst("</title>", "<title-->");
 
                             if (tempTekst.kategori.equalsIgnoreCase("h"))
                                 put =  put.replaceFirst("<body", "<body style=\"color: yellow; background-color: black;\"");

@@ -170,12 +170,14 @@ public class A extends Application implements Observatør {
 
         masterDato = new DateTime();
 
-        //tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst", true);
+        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst", true);
+
 
         if (tvingTeksthentningEnGangTil)  {
-            hentNyeTekster();
+            //hentNyeTekster();
+            sletData();
             pref.edit().putInt("tekstversion", 0).commit();
-            //pref.edit().putBoolean("tvingNyTekst", false).commit();
+            pref.edit().putBoolean("tvingNyTekst", false).commit();
         }
 
         modenhed = tjekModenhed();
@@ -220,11 +222,12 @@ public class A extends Application implements Observatør {
             if (synligeTekster == null) synligeTekster = new ArrayList(); //oplevet at den der blev hentet på disk var null i forbindelse med opdatering
             else {
                 //-- Hvis nu nogle h-tekster skulle være gemt
-                int før = synligeTekster.size();
+               /* int før = synligeTekster.size();
                 p("synligetekster size: "+før);
                 if  (før != 0) for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
                 int efter = synligeTekster.size();
-                if (før != efter) pref.edit().putInt("seneste position", -1).commit();
+                if (før != efter) pref.edit().putInt("seneste position", -1).commit();7
+                */
             }
             synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
             indlæsHtekster();
@@ -554,7 +557,7 @@ public class A extends Application implements Observatør {
 
                     //-- Fyrer argument til event
                     publishProgress(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
-                    p("tjek synligetekster efter init:");
+                    p("tjek synligetekster efter init: længde: "+synligeTekster.size());
                     for (Tekst t : synligeTekster) p(t.toString());
                     gemSynligeTekster();
 
@@ -1000,6 +1003,22 @@ public class A extends Application implements Observatør {
         if (hændelse == Lyttersystem.NYE_TEKSTER_ONLINE) {
             if (modenhed == MODENHED_MODEN) hentNyeTekster();
         }
+
+    }
+
+    void sletData(){
+        pref.edit().clear().commit();
+
+        pref.edit().putInt("modenhed", MODENHED_MODEN).commit();
+
+        ArrayList tomTekst = new ArrayList<Tekst>();
+        IO.gemObj(tomTekst, "tempsynligeTekster", this);
+        IO.gemObj(tomTekst, "htekster", this);
+        ArrayList<Integer> tomTal = new ArrayList<>();
+        IO.gemObj(tomTal, "synligeDatoer", this);
+        IO.gemObj(tomTal, "gamle", this);
+
+
 
     }
 }
