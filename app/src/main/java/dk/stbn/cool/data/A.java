@@ -1006,7 +1006,7 @@ public class A extends Application implements Observatør {
 
     }
 
-    void sletData(){
+    public void sletData(){
         pref.edit().clear().commit();
 
         pref.edit().putInt("modenhed", MODENHED_MODEN).commit();

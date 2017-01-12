@@ -1,7 +1,11 @@
 package dk.stbn.cool.aktivitetFragment;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,12 +34,14 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
 
     EditText et_navn, et_emne, et_besked;
 
+    TextView version;
 
     //-> ress
     String manglerNavn = "Du mangler at skrive dit navn";
-    String manglerMail = "Du mangler at skrive din email-adresse";
     String manglerBesked = "Du har ikke skrevet nogen besked i feltet";
-    String beskedSendt = "Din besked er afsendt";
+    String ver;
+
+    SharedPreferences pref;
 
 
     @Override
@@ -47,7 +53,7 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         }
         p("Kontakt startet");
         setContentView(R.layout.activity_kontakt);
-
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
         send = (Button) findViewById(R.id.send);
         send.setOnClickListener(this);
 
@@ -70,7 +76,17 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
             }
         });
 
+        version = (TextView) findViewById(R.id.version);
+        PackageInfo pInfo = null;
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        ver = "App-version: " + pInfo.versionName + "|" + pInfo.versionCode + "  Kildetekst-version: " + pref.getInt("tekstversion", 0);
+        p(ver);
+        version.setText(ver);
     }
 
 

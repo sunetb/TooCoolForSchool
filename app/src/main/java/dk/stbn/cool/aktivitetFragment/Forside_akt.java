@@ -63,10 +63,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         tjekOpstartstype(savedInstanceState);
 
         if (A.testtilstand){
-            if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_1);
+            if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_1, "Test-tilstand aktiveret");
         }
         else if (A.testtilstand_2){
-            if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_2);
+            if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
         }
 
     }
@@ -150,53 +150,16 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
 
         if (A.debugging) {
-            del.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
 
-                    A.testtilstand =  !A.testtilstand;
-                    if (A.testtilstand) {
-                        testDialog(TESTTILSTAND_1);
-
-                        del.setImageResource(R.drawable.en);
-                        kontakt.setImageResource(R.drawable.seks);
-                    }
-                    else {
-                        del.setImageResource(R.drawable.ic_share_black_24dp);
-                        kontakt.setImageResource(R.drawable.ic_send_black_24dp);
-                        //-- Færdig med at teste, nultil listen over forældede tekster
-                        IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        a.skalTekstlistenOpdateres();
-                    }
-                    return true;
-                }
-            });
         }
-        if (A.debugging) {
-            kontakt.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
 
-                    A.testtilstand_2 =  !A.testtilstand_2;
-                    if (A.testtilstand_2) {
-                        testDialog(TESTTILSTAND_2);
 
-                        del.setImageResource(R.drawable.cool_nobkgr_50x50_rund);
-
-                    }
-                    else {
-                        del.setImageResource(R.drawable.ic_share_black_24dp);
-                        //-- Færdig med at teste, nultil listen over forældede tekster
-                        IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        a.skalTekstlistenOpdateres();
-                    }
-                    return true;
-                }
-            });
-        }
         //if (A.debugging) del.setImageResource(R.mipmap.ic_launcher);
         extras = (ImageButton) findViewById(R.id.extras);
         extras.setOnClickListener(this);
+        if (A.debugging) {
+
+        }
         if (!A.hteksterKlar) {
             extras.setEnabled(false);
             extras.getBackground().setAlpha(100);
@@ -212,6 +175,70 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onPageScrollStateChanged(int state) {}
         };
+
+
+        // -- DEBUGGING
+        if (A.debugging) {
+
+            del.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    A.testtilstand =  !A.testtilstand;
+                    if (A.testtilstand) {
+                        testDialog(TESTTILSTAND_1,"Test-tilstand aktiveret");
+
+                        del.setImageResource(R.drawable.en);
+                        kontakt.setImageResource(R.drawable.seks);
+                    }
+                    else {
+                        del.setImageResource(R.drawable.ic_share_black_24dp);
+                        kontakt.setImageResource(R.drawable.ic_send_black_24dp);
+                        //-- Færdig med at teste, nultil listen over forældede tekster
+                        IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
+                        a.skalTekstlistenOpdateres();
+                    }
+                    return true;
+                }
+            });
+
+            kontakt.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    A.testtilstand_2 =  !A.testtilstand_2;
+                    if (A.testtilstand_2) {
+                        testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
+
+                        del.setImageResource(R.drawable.cool_nobkgr_50x50_rund);
+
+                    }
+                    else {
+                        del.setImageResource(R.drawable.ic_share_black_24dp);
+                        //-- Færdig med at teste, nultil listen over forældede tekster
+                        IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
+                        a.skalTekstlistenOpdateres();
+                    }
+                    return true;
+                }
+            });
+
+            extras.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    t("Nulstiller og genindlæser appens data");
+                    p("Nulstiller og genindlæser appens data");
+
+                    prefs.edit().putInt("tekstversion", 0).commit();
+                    prefs.edit().putBoolean("tvingNyTekst", true).commit();
+                    //a.sletData();
+                    testDialog("Nu er det vigtigt at du lukker appen. BÅDE med tilbage-knappen OG ved at trykke på firkant-knappen / holde HOME nede i lang tid til joblisten dukker op, og derefter swiper appen ud", "OBS OBS OBS");
+                    return true;
+                }
+            });
+        }
+
     }
 
     @Override
@@ -384,12 +411,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     }
 
     //kun til test
-    private void testDialog (String besked) {
+    private void testDialog (String besked, String overskrift) {
 
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
-        alertDialogBuilder.setTitle("Test-tilstand aktiveret");
+        alertDialogBuilder.setTitle(overskrift);
         alertDialogBuilder
                 .setMessage(besked)
                 .setCancelable(false)
@@ -424,11 +451,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     ///kun til test
     void bygNotifikation (Context context, String overskrift, String id, int id_int) {
 
-        p("bygnotifokation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
-
-
-
-
+        p("bygnotifokation test modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
