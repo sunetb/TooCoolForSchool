@@ -102,7 +102,7 @@ public class A extends Application implements Observatør {
     public int hændelsesId = 0;
     public int skærmVendt = 0;
     public int nyPageradapter = 0;
-    boolean tvingTeksthentningEnGangTil = true;
+    boolean tvingTeksthentningEnGangTilTil = true;
 
 
 //////////-------------------------//////////
@@ -170,14 +170,14 @@ public class A extends Application implements Observatør {
 
         masterDato = new DateTime();
 
-        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst", true);
+        tvingTeksthentningEnGangTilTil = pref.getBoolean("tvingNyTekstIgen", true);
 
 
-        if (tvingTeksthentningEnGangTil)  {
+        if (tvingTeksthentningEnGangTilTil)  {
             //hentNyeTekster();
             sletData();
             pref.edit().putInt("tekstversion", 0).commit();
-            pref.edit().putBoolean("tvingNyTekst", false).commit();
+            pref.edit().putBoolean("tvingNyTekstIgen", false).commit();
         }
 
         modenhed = tjekModenhed();
