@@ -398,6 +398,7 @@ public class A extends Application implements Observatør {
     }
 
     int hentNyeTeksterTæller = 1;
+
     void hentNyeTekster () {
         p("hentNyeTekster() kaldt. Gang nr "+hentNyeTeksterTæller);
         hentNyeTeksterTæller++;
@@ -548,6 +549,7 @@ public class A extends Application implements Observatør {
                     htekster = tempHTekster;
                     hteksterOverskrifter.clear();
                     hteksterOverskrifter = TempHOverskrifter;
+                    IO.gemObj(htekster, "htekster", ctx);
 
                     //-- Fyrer argument til event
                     publishProgress(Lyttersystem.HTEKSTER_OPDATERET);

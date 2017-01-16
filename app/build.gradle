@@ -23,8 +23,8 @@ android {
         applicationId "dk.stbn.cool"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 15
-        versionName "0.15"
+        versionCode 16
+        versionName "0.16"
     }
     buildTypes {
         release {
