@@ -68,11 +68,11 @@ public class A extends Application implements Observatør {
 //////////---------- APP TILSTAND ----------//////////
 
     public static DateTime masterDato;
-    int modenhed = 0;
+    public int modenhed = 0;
     final int MODENHED_HELT_FRISK = 0;
     final int MODENHED_FØRSTE_DAG = 1;
     final int MODENHED_ANDEN_DAG = 2;
-    final int MODENHED_MODEN = 3;
+    public final int MODENHED_MODEN = 3;
     boolean tredjeDagFørsteGang = false;
 
 //////////-------------------------//////////
@@ -237,7 +237,7 @@ public class A extends Application implements Observatør {
         if (modenhed == MODENHED_MODEN) {
 
 
-            if (skalTekstlistenOpdateres()) {
+            if (skalTekstlistenOpdateres("tjekOpstart, MODEN")) {
                 pref.edit().putInt("seneste position", -1).commit(); //Sætter ViewPagerens position til nyeste element
             }
 
@@ -534,6 +534,7 @@ public class A extends Application implements Observatør {
                 }
 
                 IO.gemObj(datoliste, "datoliste", ctx);
+                p("datoliste gemt fra gemAlleNyeTekster");
 
                 IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
@@ -585,13 +586,14 @@ public class A extends Application implements Observatør {
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
                 if (modenhed == MODENHED_MODEN)
-                    skalTekstlistenOpdateres(); ///KÆDE
+                    skalTekstlistenOpdateres("gemAlleNyeTekster"); ///KÆDE
             }
         }.execute();
-    }
 
-    public boolean skalTekstlistenOpdateres() {
-        p("skalTekstlistenOpdateres() start________");
+    } // END gemAlleNyeTekster()
+
+    public boolean skalTekstlistenOpdateres(String kaldtfra) {
+        p("skalTekstlistenOpdateres() start_____kaldt fra___"+kaldtfra);
 
         new AsyncTask() {
             @Override
@@ -610,7 +612,11 @@ public class A extends Application implements Observatør {
                 ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", ctx); //hvis denne gøres global, kan den initalisteres når som helst - dvs igså tidligere.
 
                 //-- Hvis datolisten er tom, er det fordi vi er nået til slutningen af skoleåret og der er ikke flere nye tekster
-                if (datoliste.size() == 0 || datoliste == null) {
+                if (datoliste == null) {
+                    p("Datolisten er null. appen er helt ny");
+                }
+                else if (datoliste.size() == 0) {
+                    p("Datolisten er tom. Vi er nået forbi sidste tekst");
 
                     return false;
                 }
@@ -1009,9 +1015,11 @@ public class A extends Application implements Observatør {
     }
 
     public void sletData(){
+
+        int tempModenhed = pref.getInt("modenhed", 0);
         pref.edit().clear().commit();
 
-        pref.edit().putInt("modenhed", MODENHED_MODEN).commit();
+        pref.edit().putInt("modenhed",tempModenhed).commit();
 
         ArrayList tomTekst = new ArrayList<Tekst>();
         IO.gemObj(tomTekst, "tempsynligeTekster", this);

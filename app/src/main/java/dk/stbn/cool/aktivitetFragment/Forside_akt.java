@@ -196,7 +196,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         kontakt.setImageResource(R.drawable.ic_send_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
                         IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        a.skalTekstlistenOpdateres();
+                        if (a.modenhed == a.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
                     }
                     return true;
                 }
@@ -217,7 +217,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         del.setImageResource(R.drawable.ic_share_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
                         IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        a.skalTekstlistenOpdateres();
+                        if (a.modenhed == a.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
                     }
                     return true;
                 }
