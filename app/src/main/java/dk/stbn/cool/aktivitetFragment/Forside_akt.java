@@ -124,6 +124,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 p("klikket på Kontakt");
                 Intent i = new Intent(this, Kontakt.class);
                 startActivity(i);
+                //Kontakt.intent(this).start();
             }
         }
         knapstatus (vp.getCurrentItem(), "onClick()");
@@ -498,6 +499,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     //----Bygger en AlertDialog med listen over Ekstra-tekster
     boolean klikket = false; //Holder KUN dialogen i live hvis skærmen bliver vendt.
+
     @Override
     protected Dialog onCreateDialog(int id){
 
