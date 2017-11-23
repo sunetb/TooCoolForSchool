@@ -190,7 +190,25 @@ public class A extends Application implements Observatør {
 
     }//Oncreate færdig
 
+    //** Debugging
+    public void testTekster(){
+        itekster = (ArrayList<Tekst>) IO.læsObj("itekster", this);
+        p("___Tester i-tekster fra disk");
+        for (Tekst it: itekster) p(it);
 
+        mtekster = (ArrayList<Tekst>) IO.læsObj("mtekster", this);
+        p("___Tester m-tekster fra disk");
+        for (Tekst mt: mtekster) p(mt);
+
+        ArrayList<Tekst> gemteSynlige = (ArrayList<Tekst>) IO.læsObj("synligeTekster", this);
+        p("Tester synlge tekster fra disk");
+        for (Tekst st: gemteSynlige) p(st);
+
+        p("Tester synlge tekster fra ram");
+        for (Tekst str: synligeTekster) p(str);
+
+
+    }
 
     private void tjekOpstart() {
 
@@ -402,6 +420,7 @@ public class A extends Application implements Observatør {
     }
 
     int hentNyeTeksterTæller = 1;
+
     void hentNyeTekster () {
         p("hentNyeTekster() kaldt. Gang nr "+hentNyeTeksterTæller);
         hentNyeTeksterTæller++;
@@ -563,7 +582,7 @@ public class A extends Application implements Observatør {
                     publishProgress(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
                     p("tjek synligetekster efter init: længde: "+synligeTekster.size());
                     for (Tekst t : synligeTekster) p(t.toString());
-                    gemSynligeTekster();
+
 
                 }
                 else IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
@@ -587,7 +606,25 @@ public class A extends Application implements Observatør {
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
                 if (modenhed == MODENHED_MODEN)
-                    skalTekstlistenOpdateres("a.gemalt()onPost"); ///KÆDE
+                    skalTekstlistenOpdateres("a.gemAlleNyeTekster()onPost"); ///KÆDE
+                    gemAlleTeksterTilDisk();
+            }
+        }.execute();
+    }
+
+    private void gemAlleTeksterTilDisk() {
+        if (itekster.size() >0)
+        new AsyncTask(){
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                IO.gemObj(itekster, "itekster", A.a);
+                IO.gemObj(mtekster, "mtekster", A.a);
+                IO.gemObj(htekster, "htekster", A.a);
+
+                itekster = null;
+                mtekster = null;
+
+                return null;
             }
         }.execute();
     }

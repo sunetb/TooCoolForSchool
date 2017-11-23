@@ -68,6 +68,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else if (A.testtilstand_2){
             if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
         }
+        a.testTekster ();
 
     }
 
