@@ -1,4 +1,4 @@
-package dk.stbn.cool.aktivitetFragment;
+package dk.stbn.alarm.aktivitetFragment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,9 +16,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import dk.stbn.cool.R;
-import dk.stbn.cool.data.A;
-import dk.stbn.cool.data.Util;
+import dk.stbn.alarm.R;
+import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Util;
 //import android.content.*;
 
 

@@ -1,4 +1,4 @@
-package dk.stbn.cool.data;
+package dk.stbn.alarm.data;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -22,10 +22,10 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 
-import dk.stbn.cool.Tekst;
-import dk.stbn.cool.diverse.IO;
-import dk.stbn.cool.lyttere.Alarm_Lytter;
-import dk.stbn.cool.lyttere.Boot_Lytter;
+import dk.stbn.alarm.Tekst;
+import dk.stbn.alarm.diverse.IO;
+import dk.stbn.alarm.lyttere.Alarm_Lytter;
+import dk.stbn.alarm.lyttere.Boot_Lytter;
 
 /**
  * Created by sune on 6/3/16.

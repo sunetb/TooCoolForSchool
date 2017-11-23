@@ -1,4 +1,4 @@
-package dk.stbn.cool.lyttere;
+package dk.stbn.alarm.lyttere;
 
 /**
  * Created by sune on 7/8/16.

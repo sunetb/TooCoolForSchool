@@ -1,4 +1,4 @@
-package dk.stbn.cool.data;
+package dk.stbn.alarm.data;
 
 import android.app.AlarmManager;
 import android.app.Application;
@@ -25,11 +25,11 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import dk.stbn.cool.Tekst;
-import dk.stbn.cool.aktivitetFragment.Forside_akt;
-import dk.stbn.cool.diverse.IO;
-import dk.stbn.cool.lyttere.Lyttersystem;
-import dk.stbn.cool.lyttere.Observatør;
+import dk.stbn.alarm.Tekst;
+import dk.stbn.alarm.aktivitetFragment.Forside_akt;
+import dk.stbn.alarm.diverse.IO;
+import dk.stbn.alarm.lyttere.Lyttersystem;
+import dk.stbn.alarm.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
 
 /**

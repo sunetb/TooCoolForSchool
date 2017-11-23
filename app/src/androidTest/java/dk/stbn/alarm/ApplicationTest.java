@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.alarm;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

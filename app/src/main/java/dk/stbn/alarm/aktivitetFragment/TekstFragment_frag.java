@@ -1,4 +1,4 @@
-package dk.stbn.cool.aktivitetFragment;
+package dk.stbn.alarm.aktivitetFragment;
 
 
 import android.graphics.Color;
@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.TextView;
 
-import dk.stbn.cool.R;
-import dk.stbn.cool.Tekst;
-import dk.stbn.cool.data.A;
-import dk.stbn.cool.data.Util;
+import dk.stbn.alarm.R;
+import dk.stbn.alarm.Tekst;
+import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Util;
 
 
 public class TekstFragment_frag extends Fragment implements View.OnClickListener {

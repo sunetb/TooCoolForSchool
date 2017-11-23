@@ -1,9 +1,9 @@
-package dk.stbn.cool.lyttere;
+package dk.stbn.alarm.lyttere;
 
 import java.util.ArrayList;
 
-import dk.stbn.cool.data.A;
-import dk.stbn.cool.data.Util;
+import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Util;
 
 /**
  * Created by sune on 8/23/16.

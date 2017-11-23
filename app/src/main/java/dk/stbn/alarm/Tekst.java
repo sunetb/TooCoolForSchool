@@ -1,4 +1,4 @@
-package dk.stbn.cool;
+package dk.stbn.alarm;
 
 import org.joda.time.DateTime;
 

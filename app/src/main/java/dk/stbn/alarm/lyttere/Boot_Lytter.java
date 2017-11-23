@@ -1,4 +1,4 @@
-package dk.stbn.cool.lyttere;
+package dk.stbn.alarm.lyttere;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
-import dk.stbn.cool.data.Util;
+import dk.stbn.alarm.data.Util;
 
 /**
  * Created by sune on 6/6/16.

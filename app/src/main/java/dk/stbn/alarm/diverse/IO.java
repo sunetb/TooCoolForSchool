@@ -1,4 +1,4 @@
-package dk.stbn.cool.diverse;
+package dk.stbn.alarm.diverse;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,7 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 
-import dk.stbn.cool.data.Util;
+import dk.stbn.alarm.data.Util;
 
 /**
  * Created by sune on 6/24/16.

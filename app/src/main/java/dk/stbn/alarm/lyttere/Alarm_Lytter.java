@@ -1,4 +1,4 @@
-package dk.stbn.cool.lyttere;
+package dk.stbn.alarm.lyttere;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -12,10 +12,10 @@ import android.support.v4.app.TaskStackBuilder;
 
 import java.util.ArrayList;
 
-import dk.stbn.cool.R;
-import dk.stbn.cool.aktivitetFragment.Forside_akt;
-import dk.stbn.cool.data.Util;
-import dk.stbn.cool.diverse.IO;
+import dk.stbn.alarm.R;
+import dk.stbn.alarm.aktivitetFragment.Forside_akt;
+import dk.stbn.alarm.data.Util;
+import dk.stbn.alarm.diverse.IO;
 
 /**
  * Created by sune on 6/6/16.
