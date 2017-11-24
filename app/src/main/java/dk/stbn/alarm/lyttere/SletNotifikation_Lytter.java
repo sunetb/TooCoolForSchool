@@ -23,6 +23,7 @@ public class SletNotifikation_Lytter extends BroadcastReceiver {
             p("Notifikation "+id+" slettet");
 
             Util.notiBrugt(context, intent);
+            Util.baglog("SletNotifikation_Lytter.onRecieve(): Modenhed = "+ id, context);
 
         }
 

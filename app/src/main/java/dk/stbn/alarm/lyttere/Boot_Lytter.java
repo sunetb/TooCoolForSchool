@@ -50,7 +50,7 @@ public class Boot_Lytter extends BroadcastReceiver  {
                     }.execute();
 */
                 }
-
+                Util.baglog("Boot_Lytter.onRecieve(): Modenhed = "+ pref.getInt("modenhed", -1), context);
             }
         }
 

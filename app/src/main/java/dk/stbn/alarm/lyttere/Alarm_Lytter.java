@@ -39,6 +39,8 @@ public class Alarm_Lytter extends BroadcastReceiver {
             p("Notifikation for "+id+" findes har været vist");
         else
             bygNotifikation(context, overskrift, id, id_int);
+
+        Util.baglog("Alarm_Lytter.onRecieve(): "+ id + " " +overskrift, context);
     }
 
     void bygNotifikation (Context context, String overskrift, String id, int id_int) {

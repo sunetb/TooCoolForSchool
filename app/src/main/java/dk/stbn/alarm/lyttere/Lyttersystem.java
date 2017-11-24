@@ -71,6 +71,7 @@ public class Lyttersystem {
          //   }
        // },0);
         p("3: Hændelse: "+hændelse + " VS. senesteHændelse: "+getSenesteHændelse()+ " id: "+id);
+        Util.baglog("Lyttersystem.givBesked(): Modenhed = "+ hændelsestekst(hændelse), A.a);
     }
 
     public static String hændelsestekst(int hændelse){

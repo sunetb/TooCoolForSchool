@@ -68,7 +68,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else if (A.testtilstand_2){
             if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
         }
-        a.testTekster ();
+
 
     }
 
@@ -397,6 +397,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
 
                 }
+                Util.baglog("Forside.tjekOpstartsType(): Startet fra noti: "+ id + " " +startBundle.getString("overskrift"), this);
             }
         }
     }

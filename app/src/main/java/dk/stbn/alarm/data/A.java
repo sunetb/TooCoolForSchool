@@ -154,6 +154,7 @@ public class A extends Application implements Observatør {
         boolean EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator");
         if (!EMULATOR) {
             Fabric.with(this, new Crashlytics());
+            Util.baglog = true;
         }
         Util.starttid = System.currentTimeMillis();
         p("oncreate() kaldt: UI-tråd: "+Thread.currentThread().getName());

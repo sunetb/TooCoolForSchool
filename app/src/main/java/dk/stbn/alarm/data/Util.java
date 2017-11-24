@@ -38,6 +38,8 @@ public class Util {
         return (double) (System.currentTimeMillis()-starttid)/1000.0;
     }
 
+    public static boolean baglog = false;
+
     public static void notiBrugt(Context c, Intent intent){
         p("Util.notiBrugt kaldt");
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -406,6 +408,22 @@ public class Util {
         System.out.println("_____"+kl);
         A.debugmsg += kl +"<br>";
     }
+
+    public static void baglog(String msg, Context c){
+        if (baglog) {
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+            String log = sp.getString("baggrundslog", "");
+            log += msg + "\n";
+            sp.edit().putString("baggrundslog", log).apply();
+        }
+    }
+
+    public static void skrivBaglog (Context c){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        String log = "%%%%%%%%%%%%%%%%%%%% Baggrrundslog %%%%%%%%%%%%%%%%%%%%\n" + sp.getString("baggrundslog", "");
+        p(log);
+    }
+
 
     public static void kørIBaggrund(Runnable r) {
         new Thread(r).start();

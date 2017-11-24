@@ -87,6 +87,8 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         ver = "App-version: " + pInfo.versionName + "|" + pInfo.versionCode + "  Kildetekst-version: " + pref.getInt("tekstversion", 0);
         p(ver);
         version.setText(ver);
+        //** Skriver tekst-data til loggen
+        a.testTekster ();
     }
 
 
