@@ -420,7 +420,7 @@ public class Util {
 
     public static void skrivBaglog (Context c){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-        String log = "%%%%%%%%%%%%%%%%%%%% Baggrrundslog %%%%%%%%%%%%%%%%%%%%\n" + sp.getString("baggrundslog", "");
+        String log = "%%%%%%%%%%%%%%%%%%%% Baggrundslog %%%%%%%%%%%%%%%%%%%%\n" + sp.getString("baggrundslog", "");
         p(log);
     }
 
