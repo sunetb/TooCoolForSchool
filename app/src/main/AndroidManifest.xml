@@ -25,7 +25,7 @@
 
         <receiver android:name=".lyttere.Alarm_Lytter">
             <intent-filter>
-                <action android:name="dk.stbn.cool.START_ALARM" />
+                <action android:name="dk.stbn.alarm.START_ALARM" />
             </intent-filter>
         </receiver>
         <receiver
