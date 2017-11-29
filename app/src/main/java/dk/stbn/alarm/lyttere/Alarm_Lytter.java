@@ -32,7 +32,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         String id = b.getString("tekstId");
         int id_int = b.getInt("id_int");
 
-        p("cool.onRecieve() modtog "+overskrift);
+        p("Alarm_Lytter.onRecieve() modtog "+overskrift);
         //if (A.debugging) Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
 
         if (gamle.contains(id))
