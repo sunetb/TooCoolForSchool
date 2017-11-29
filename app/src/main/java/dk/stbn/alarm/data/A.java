@@ -195,11 +195,13 @@ public class A extends Application implements Observatør {
     public void testTekster(){
         itekster = (ArrayList<Tekst>) IO.læsObj("itekster", this);
         p("___Tester i-tekster fra disk");
-        for (Tekst it: itekster) p(it);
+        if (itekster.size() > 0) for (Tekst it: itekster) p(it);
+        else p("Fejl: ingen itekster på disk");
 
         mtekster = (ArrayList<Tekst>) IO.læsObj("mtekster", this);
         p("___Tester m-tekster fra disk");
-        for (Tekst mt: mtekster) p(mt);
+        if (mtekster.size() > 0) for (Tekst mt: mtekster) p(mt);
+        else p("Fejl: ingen mtekster på disk");
 
         ArrayList<Tekst> gemteSynlige = (ArrayList<Tekst>) IO.læsObj("synligeTekster", this);
         p("Tester synlge tekster fra disk");
