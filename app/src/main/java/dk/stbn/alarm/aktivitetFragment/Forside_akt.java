@@ -17,6 +17,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -101,11 +102,19 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     finish();
                 }            }
             else {
-                p("klikket på Anbefal");
+                p("klikket på Del");
 //Todo: Ny aktivitet med forklaring af pointsystem mm
                 Intent i = new Intent();
                 i.setAction(Intent.ACTION_SEND);
-                i.putExtra(Intent.EXTRA_TEXT, "Hej tjek denne app ud: https://play.google.com/store/apps/details?id=dk.stbn.cool");
+
+               // i.putExtra(Intent.EXTRA_TEXT, "Hej tjek denne app ud: https://play.google.com/store/apps/details?id=dk.stbn.cool.alarm");
+
+                Tekst deletekst = a.synligeTekster.get(vp.getCurrentItem());
+
+                String s = deletekst.overskrift + "\n\n" + Html.fromHtml(deletekst.brødtekst).toString() + "\nTjek appen TOO COOL FOR SCHOOL ud på:  https://play.google.com/store/apps/details?id=dk.stbn.cool.alarm" ;
+                p(s);
+                i.putExtra(Intent.EXTRA_TEXT, s);
+
                 i.setType("text/plain");
                 startActivity(i);
             }
