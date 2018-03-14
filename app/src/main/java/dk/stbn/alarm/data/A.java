@@ -193,6 +193,7 @@ public class A extends Application implements Observatør {
         DatabaseReference myRef = database.getReference("message");
 
         myRef.setValue("Hello, World!");
+
         p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
     }//Oncreate færdig
