@@ -410,6 +410,7 @@ public class Util {
     }
 
     public static void baglog(String msg, Context c){
+        
         if (baglog) {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
             String log = sp.getString("baggrundslog", "");
