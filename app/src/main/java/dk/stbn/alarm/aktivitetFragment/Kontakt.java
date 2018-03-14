@@ -19,7 +19,7 @@ import android.widget.Toast;
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Util;
-//import android.content.*;
+
 
 
 public class Kontakt extends AppCompatActivity implements View.OnClickListener {
