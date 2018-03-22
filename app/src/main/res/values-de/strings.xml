@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kontakt">TTT_Send gerne ris, ros, spørgsmål og lignende</string>
+    <string name="navn">TTT_Navn</string>
+    <string name="log">TTT_Vedhæft log</string>
+    <string name="emne">TTT_Evt. emne</string>
+    <string name="besked">TTT_Besked</string>
+    <string name="appversion">TTT_App-version</string>
+    <string name="kildetekstversion">TTT_Kildetekst-version</string>
+    <string name="send">TTT_Send</string>
+    <string name="manglernavn">TTT_Du mangler at skrive dit navn</string>
+    <string name="manglerbesked">TTT_Du har ikke skrevet nogen besked</string>
+    <string name="hilsen">TTT_Med venlig hilsen</string>
+    <string name="sendmail">TTT_Send mail...</string>
+    <string name="manglermailklient">TTT_Der er ikke installeret nogen e-mail klient.</string>
+
+</resources>
