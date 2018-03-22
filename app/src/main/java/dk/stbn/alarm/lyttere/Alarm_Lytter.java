@@ -46,7 +46,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
     void bygNotifikation (Context context, String overskrift, String id, int id_int) {
 
         p("bygnotifikation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
-
+        Util.baglog("Notifikation bygget: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int, context);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
 						.setSmallIcon(R.drawable.cool_nobkgr_71x71)

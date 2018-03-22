@@ -111,7 +111,9 @@ public class Tekst implements Serializable {
 		String s = ": Dato: "+datokode() + " id: "+ id_int +
 		" | kat: "+kategori +
 		" | overskr:" + overskrift+
-		" | brødtekst:" + brødtekst.substring(0,15)+"...";
+		" | brødtekst:";
+		if (brødtekst.length() > 15) s += brødtekst.substring(0,15)+"..."; //for at undgå StringIndexOutOfBounds
+		else s +=brødtekst;
 
 		return s;
 	}

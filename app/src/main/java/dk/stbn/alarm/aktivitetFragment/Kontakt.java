@@ -84,8 +84,12 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
             e.printStackTrace();
         }
 
-        ver = "App-version: " + pInfo.versionName + "|" + pInfo.versionCode + "  Kildetekst-version: " + pref.getInt("tekstversion", 0);
-        p(ver);
+        ver =  getResources().getString(R.string.appversion)
+                + " " + pInfo.versionName
+                + " / " + pInfo.versionCode
+                + " | " + getResources().getString(R.string.kildetekstversion)
+                + " " + pref.getInt("tekstversion", 0);
+        p(ver);  p(ver);
         version.setText(ver);
         //-- Skriver tekst-data til loggen
         a.testTekster ();
@@ -101,14 +105,14 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         emne = et_emne.getText().toString();
 
         if (et_navn.getText().toString().equals(""))
-            Toast.makeText(this, manglerNavn, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.manglernavn), Toast.LENGTH_LONG).show();
         else {
             navn = et_navn.getText().toString();
             udfyldt = true;
         }
 
         if (udfyldt && et_besked.getText().toString().equals("")) {
-            Toast.makeText(this, manglerBesked, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.manglerbesked), Toast.LENGTH_LONG).show();
             udfyldt = false;
         }
 
@@ -129,7 +133,7 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
     void sendmail() {
         p("endMail()");
 
-        String afstedtekst = besked +"\n\n"+"Med venlig hilsen\n"+ navn;
+        String afstedtekst = besked +"\n\n"+getResources().getString(R.string.hilsen)+"\n"+ navn;
         if (sendlog.isChecked()) afstedtekst+= ver+"\n\n\n\n"+ A.debugmsg + A.hale;
 
         Intent i = new Intent(Intent.ACTION_SEND);
@@ -138,9 +142,9 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         i.putExtra(Intent.EXTRA_SUBJECT, emne);
         i.putExtra(Intent.EXTRA_TEXT   , afstedtekst);
         try {
-            startActivity(Intent.createChooser(i, "Send mail..."));
+            startActivity(Intent.createChooser(i, getResources().getString(R.string.sendmail)));
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this, "Der er ikke installeret nogen e-mail klient.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.manglermailklient), Toast.LENGTH_SHORT).show();
         }
 
     }

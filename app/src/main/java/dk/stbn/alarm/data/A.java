@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.aktivitetFragment.Forside_akt;
@@ -51,7 +52,8 @@ public class A extends Application implements Observatør {
     public ArrayList<Tekst> htekster = new ArrayList();
     public ArrayList<String> hteksterOverskrifter = new ArrayList();
 
-    public String henteurl = "http://www.lightspeople.net/sune/skole/tekster.xml";
+    public String henteurlDK = "http://www.lightspeople.net/sune/skole/tekster.xml";
+    public String henteurlDE = "http://www.lightspeople.net/sune/skole/tekster_de.xml";
     public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
 
     public int sidstKendteVindueshøjde = 0;
@@ -177,6 +179,11 @@ public class A extends Application implements Observatør {
 
         p("Modenhed global før tjekModenhed(): "+modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
         modenhed = tjekModenhed();
+
+        String sprog = Locale.getDefault().getLanguage();
+        String gemtSprog = pref.getString("sprog", "ikke sat");
+        pref.edit().putString("sprog", sprog).commit();
+        if (modenhed > MODENHED_HELT_FRISK && !sprog.equalsIgnoreCase(gemtSprog) ) tvingTeksthentningEnGangTil = true;
 
         tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst", true) && modenhed < MODENHED_ANDEN_DAG;
 
@@ -846,7 +853,12 @@ public class A extends Application implements Observatør {
         p("hentTeksterOnline() kaldt fra "+kaldtFra);
         String input = "";
         try {
-            InputStream is = new URL(henteurl).openStream();
+            //Tjekker sprog:
+            String sprog = Locale.getDefault().getLanguage();
+            pref.edit().putString("sprog", sprog).commit();
+            URL u = new URL(henteurlDK);
+            if (sprog.equalsIgnoreCase("de")) u = new URL(henteurlDE);
+            InputStream is = u.openStream();
             is = new BufferedInputStream(is);
             is.mark(1);
             int read;

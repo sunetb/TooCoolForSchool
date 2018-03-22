@@ -1,6 +1,16 @@
 <resources>
-    <string name="app_name">Cool</string>
+    <string name="kontakt">Send gerne ris, ros, spørgsmål og lignende</string>
+    <string name="navn">Navn</string>
+    <string name="log">Vedhæft log</string>
+    <string name="emne">Evt. emne</string>
+    <string name="besked">Besked</string>
+    <string name="appversion">App-version</string>
+    <string name="kildetekstversion">Kildetekst-version</string>
+    <string name="send">Send</string>
+    <string name="manglernavn">Du mangler at skrive dit navn</string>
+    <string name="manglerbesked">Du har ikke skrevet nogen besked</string>
+    <string name="hilsen">Med venlig hilsen</string>
+    <string name="sendmail">Send mail...</string>
+    <string name="manglermailklient">Der er ikke installeret nogen e-mail klient.</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
