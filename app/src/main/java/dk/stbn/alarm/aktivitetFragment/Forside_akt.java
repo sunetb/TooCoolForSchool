@@ -56,7 +56,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
         a = A.a;
         p(" idag er: "+ A.masterDato.getDayOfMonth() + ": " + A.masterDato.getMonthOfYear() + " - "+ A.masterDato.getYear());
-
+        a.setupLangReceiver();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         initUI();
@@ -413,6 +413,11 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     @Override
     protected void onDestroy() {
+        try {
+            unregisterReceiver(a.mLangReceiver);
+        }catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
         super.onDestroy();
         p("onDestroy() blev kaldt");
     }
