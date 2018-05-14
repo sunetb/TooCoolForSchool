@@ -18,10 +18,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -521,7 +523,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         p("Dialog: htekster længde: "+a.htekster.size());
         final AlertDialog.Builder extraliste = new AlertDialog.Builder(this);
 
-        extraliste.setTitle("Extras");
+        TextView t  = new TextView(this);
+        t.setText("Extras");
+        t.setGravity(Gravity.CENTER);
+        t.setPadding(10, 10, 10, 10);
+        t.setTextSize(22);
+        //extraliste.setTitle("Extras");
+        extraliste.setCustomTitle(t);
+
         ArrayAdapter aad =
                 new ArrayAdapter(this, android.R.layout.simple_list_item_1, a.hteksterOverskrifter); // ArrayAdapter slut
 

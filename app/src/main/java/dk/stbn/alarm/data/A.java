@@ -582,15 +582,15 @@ public class A extends Application implements Observatør {
                 if(modenhed == MODENHED_MODEN) {  /// Kun når appen er moden og der derfor allerede er indlæst et sæt tekster.
 
                     ArrayList<Tekst> tempHTekster = Util.erstatAfsnit(alleTekster[3]);
-                    ArrayList<String> TempHOverskrifter = new ArrayList<String>();
+                    ArrayList<String> tempHOverskrifter = new ArrayList<String>();
                     for (Tekst t : tempHTekster)
-                        TempHOverskrifter.add(t.overskrift);
+                        tempHOverskrifter.add(t.overskrift.toUpperCase());
 
 
                     htekster.clear();
                     htekster = tempHTekster;
                     hteksterOverskrifter.clear();
-                    hteksterOverskrifter = TempHOverskrifter;
+                    hteksterOverskrifter = tempHOverskrifter;
 
                     //-- Fyrer argument til event
                     publishProgress(Lyttersystem.HTEKSTER_OPDATERET);
@@ -1050,7 +1050,7 @@ public class A extends Application implements Observatør {
             protected Object doInBackground(Object[] params) {
 
                 htekster = (ArrayList<Tekst>) IO.læsObj("htekster", ctx);
-                for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift);
+                for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift.toUpperCase());
 
                 return null;
             }
