@@ -394,7 +394,7 @@ public class A extends Application implements Observatør {
                 htekster = Util.erstatAfsnit(alleTekster[3]);
 
                 for (Tekst t : htekster)
-                    hteksterOverskrifter.add(t.overskrift);
+                    hteksterOverskrifter.add(t.overskrift.toUpperCase());
 
                 publishProgress(1);
 
