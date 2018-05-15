@@ -12,7 +12,8 @@
         android:icon="@drawable/cool_nobkgr_71x71"
         android:label="Too Cool For School"
         android:supportsRtl="true"
-        android:theme="@style/SortBaggrund">
+        android:theme="@style/SortBaggrund"
+        android:fullBackupContent="@xml/backup_descriptor">
         <activity android:name=".aktivitetFragment.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,9 +21,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".aktivitetFragment.Forside_akt"></activity>
+        <activity android:name=".aktivitetFragment.Forside_akt" />
 
-        <receiver android:name=".lyttere.Alarm_Lytter">
+        <receiver android:name=".lyttere.Alarm_Lytter"
+            android:permission="">
             <intent-filter>
                 <action android:name="dk.stbn.alarm.START_ALARM" />
             </intent-filter>
@@ -37,7 +39,7 @@
         </receiver>
         <receiver android:name=".lyttere.SletNotifikation_Lytter" />
 
-        <activity android:name=".aktivitetFragment.Kontakt"></activity>
+        <activity android:name=".aktivitetFragment.Kontakt" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a473bb17c446dada4b78b47051b2b561970908f7" />

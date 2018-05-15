@@ -243,8 +243,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     t("Nulstiller og genindlæser appens data");
                     p("Nulstiller og genindlæser appens data");
 
-                    prefs.edit().putInt("tekstversion", 0).commit();
-                    prefs.edit().putBoolean("tvingNyTekst", true).commit();
+                    prefs.edit().putInt("tekstversion", 0).apply();
+                    prefs.edit().putBoolean("tvingNyTekst", true).apply();
                     //a.sletData();
                     testDialog("Nu er det vigtigt at du lukker appen. BÅDE med tilbage-knappen OG ved at trykke på firkant-knappen / holde HOME nede i lang tid til joblisten dukker op, og derefter swiper appen ud", "OBS OBS OBS");
                     return true;
@@ -288,7 +288,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         Lyttersystem.afregistrer(this);
         vp.removeOnPageChangeListener(sideLytter);
         a.aktivitetenVises = false;
-        prefs.edit().putInt("seneste position", vp.getCurrentItem()).commit();
+        prefs.edit().putInt("seneste position", vp.getCurrentItem()).apply();
 
     }
 
@@ -395,7 +395,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 if (husk != -1) {
                     vp.setCurrentItem(husk);
                     knapstatus(husk,"tjekOpstartstype()");
-                    prefs.edit().putInt("seneste position", vp.getCurrentItem()).commit();
+                    prefs.edit().putInt("seneste position", vp.getCurrentItem()).apply();
 
                 }
                 else {
@@ -403,7 +403,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     Tekst t = (Tekst) IO.læsObj(""+id, this);
                     a.synligeTekster.add(t);
                     pa.notifyDataSetChanged();
-                    prefs.edit().putInt("seneste position", a.synligeTekster.size()-1).commit();
+                    prefs.edit().putInt("seneste position", a.synligeTekster.size()-1).apply();
                    // vp.setCurrentItem(husk);
                     //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
 
@@ -440,7 +440,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 .setCancelable(false)
                 .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
-                        prefs.edit().putBoolean("vistestdialog", false).commit();
+                        prefs.edit().putBoolean("vistestdialog", false).apply();
                         dialog.cancel();
                     }
                 });
@@ -472,13 +472,16 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         p("bygnotifokation test modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
 
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.cool_nobkgr_71x71)
-                        .setContentTitle("Too Cool for School")
-                        .setContentText(overskrift)
-                        .setAutoCancel(true)
-                        .setCategory(Notification.CATEGORY_ALARM)
-                        .setOnlyAlertOnce(true);
+                null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.cool_nobkgr_71x71)
+                    .setContentTitle("Too Cool for School")
+                    .setContentText(overskrift)
+                    .setAutoCancel(true)
+                    .setCategory(Notification.CATEGORY_ALARM)
+                    .setOnlyAlertOnce(true);
+        }
         //ingen effekt.setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
 
         Intent resultIntent = new Intent(context, Forside_akt.class);

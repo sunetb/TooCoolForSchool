@@ -14,8 +14,8 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.FirebaseDatabase;
 
 import org.joda.time.DateTime;
 
@@ -187,7 +187,7 @@ public class A extends Application implements Observatør {
 
         String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
-        pref.edit().putString("sprog", sprog).commit();
+        pref.edit().putString("sprog", sprog).apply();
 
         if (modenhed > MODENHED_HELT_FRISK && !sprog.equalsIgnoreCase(gemtSprog) ) tvingTeksthentningEnGangTil = true;
 
@@ -195,14 +195,14 @@ public class A extends Application implements Observatør {
             p("Tvinger teksthentning");
             hentNyeTekster();
             sletData();
-            pref.edit().putInt("tekstversion", 0).commit();
-            pref.edit().putBoolean("tvingNyTekst", false).commit();
+            pref.edit().putInt("tekstversion", 0).apply();
+            pref.edit().putBoolean("tvingNyTekst", false).apply();
         }
         tjekOpstart();
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
+        //FirebaseDatabase database = FirebaseDatabase.getInstance();
+        //DatabaseReference myRef = database.getReference("message");
 
-        myRef.setValue("Hello, World!");
+        //myRef.setValue("Hello, World!");
 
         p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
@@ -237,7 +237,7 @@ public class A extends Application implements Observatør {
             if (tredjeDagFørsteGang){
                 p("tredje dag første gang!! ");
                 //-- Viewpageren nulstilles (og viser sidste element i listen når det starter)
-                pref.edit().putInt("seneste position", -1).commit();
+                pref.edit().putInt("seneste position", -1).apply();
 
                 AsyncTask.execute(new Runnable() {
                     @Override
@@ -280,7 +280,7 @@ public class A extends Application implements Observatør {
 
 
             if (skalTekstlistenOpdateres("a")) {
-                pref.edit().putInt("seneste position", -1).commit(); //Sætter ViewPagerens position til nyeste element
+                pref.edit().putInt("seneste position", -1).apply(); //Sætter ViewPagerens position til nyeste element
             }
 
             //-- Tjek om der er opdateringer til tekstene
@@ -305,8 +305,8 @@ public class A extends Application implements Observatør {
                 Tekst t = (Tekst) IO.læsObj("otekst2", ctx);
                 synligeTekster.add(t);
                 gemSynligeTekster();
-                pref.edit().putInt("seneste position", -1).commit();
-                pref.edit().putBoolean("andenDagFørsteGang", false).commit();
+                pref.edit().putInt("seneste position", -1).apply();
+                pref.edit().putBoolean("andenDagFørsteGang", false).apply();
             }
         }
         p("tjekOpstart() færdig");
@@ -341,7 +341,7 @@ public class A extends Application implements Observatør {
                         pref.edit()
                                 .putInt("modenhed", MODENHED_FØRSTE_DAG)
                                 .putInt("installationsdato", idag)
-                                .commit();
+                                .apply();
                     //-- hertil
 
                         ArrayList<Tekst> otekster = alleTekster[0];
@@ -658,7 +658,7 @@ public class A extends Application implements Observatør {
                 super.onPreExecute();
 
                 //-- nulstiller returværdien
-                pref.edit().putBoolean("nyTekst", false).commit();
+                pref.edit().putBoolean("nyTekst", false).apply();
             }
 
             @Override
@@ -814,8 +814,8 @@ public class A extends Application implements Observatør {
                 p("skalTekstlistenOpdateres() slut");
 
             //-- (lidt sløv) måde at overføre returværdi. 'o' er falsk hvis datolisten er tom og der ikke er flere tekster at vise
-                if ((boolean)o) pref.edit().putBoolean("nyTekst", ny).commit();
-                else pref.edit().putBoolean("nyTekst", false).commit();
+                if ((boolean)o) pref.edit().putBoolean("nyTekst", ny).apply();
+                else pref.edit().putBoolean("nyTekst", false).apply();
 
             }
 
@@ -834,7 +834,7 @@ public class A extends Application implements Observatør {
         Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET,"fuld frisk start", 1000);
 
 
-        pref.edit().putInt("modenhed", 0).commit();
+        pref.edit().putInt("modenhed", 0).apply();
         //rul(0);
 
         //initAllerFørsteGang();
@@ -858,7 +858,7 @@ public class A extends Application implements Observatør {
         try {
             //Tjekker sprog:
             String sprog = Locale.getDefault().getLanguage();
-            pref.edit().putString("sprog", sprog).commit();
+            pref.edit().putString("sprog", sprog).apply();
             URL u = new URL(henteurlDK);
             if (sprog.equalsIgnoreCase("de")) u = new URL(henteurlDE);
             InputStream is = u.openStream();
@@ -898,16 +898,10 @@ public class A extends Application implements Observatør {
 			int instDato  = pref.getInt("installationsdato", 0);
 			if (idag == instDato) return MODENHED_FØRSTE_DAG;
 			else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-                    pref.edit()
-					.putInt("modenhed", MODENHED_ANDEN_DAG)
-					.putInt("installationsdato2", idag)
-					.apply();
-
-                else  pref.edit()
-                        .putInt("modenhed", MODENHED_ANDEN_DAG)
-                        .putInt("installationsdato2", idag)
-                        .commit();
+                pref.edit()
+                .putInt("modenhed", MODENHED_ANDEN_DAG)
+                .putInt("installationsdato2", idag)
+                .apply();
 				return MODENHED_ANDEN_DAG;
 			}
 		}
@@ -915,10 +909,7 @@ public class A extends Application implements Observatør {
             int instDatoPlusEn = pref.getInt("installationsdato2", 0);
             if (idag == instDatoPlusEn) return MODENHED_ANDEN_DAG;
             else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-                    pref.edit().putInt("modenhed", MODENHED_MODEN).apply();
-                else
-                    pref.edit().putInt("modenhed", MODENHED_MODEN).commit();
+                pref.edit().putInt("modenhed", MODENHED_MODEN).apply();
                 tredjeDagFørsteGang = true;
                 p("tjekModenhed() Tredje dag første gang sat til true");
             }
@@ -979,7 +970,7 @@ public class A extends Application implements Observatør {
 
                 if (modenhed == MODENHED_MODEN && gemtTekstversion<version) {
                     Lyttersystem.givBesked(Lyttersystem.NYE_TEKSTER_ONLINE, "tjektekstverion, nye online, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
-                    pref.edit().putInt("tekstversion", version).commit();
+                    pref.edit().putInt("tekstversion", version).apply();
                 }
             }
         }.execute();
@@ -994,7 +985,7 @@ public class A extends Application implements Observatør {
             //tjek om der er en m-tekst
        // }
 
-        //todo
+
 
     }
 
@@ -1098,9 +1089,9 @@ public class A extends Application implements Observatør {
 
     void sletData(){
 
-        pref.edit().clear().commit();
+        pref.edit().clear().apply();
 
-        pref.edit().putInt("modenhed", modenhed).commit();
+        pref.edit().putInt("modenhed", modenhed).apply();
 
         ArrayList tomTekst = new ArrayList<Tekst>();
         IO.gemObj(tomTekst, "tempsynligeTekster", this);

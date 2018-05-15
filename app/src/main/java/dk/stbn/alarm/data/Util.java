@@ -49,7 +49,7 @@ public class Util {
 
         if (førsteOpstart) IO.gemObj(new ArrayList<Integer>(), "gamle", c);
 
-        sp.edit().putBoolean("førstegang", false).commit();
+        sp.edit().putBoolean("førstegang", false).apply();
         String id = "";
         id = intent.getExtras().getString("tekstId");
         int id_int = intent.getExtras().getInt("id_int", 0);

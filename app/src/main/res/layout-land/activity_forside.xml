@@ -19,7 +19,8 @@
             android:layout_height="0px"
             android:id="@+id/tilbage"
             android:src="@drawable/ic_navigate_before_black_24dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:contentDescription="Tilbage-knap" />
 
         <ImageButton
             style="?android:attr/buttonStyleSmall"
@@ -28,7 +29,8 @@
             android:layout_height="0px"
             android:layout_gravity="right"
             android:src="@drawable/ic_share_black_24dp"
-            android:id="@+id/anbefal"/>
+            android:id="@+id/anbefal"
+            tools:ignore="ContentDescription" />
 
         <ImageButton
             style="?android:attr/buttonStyleSmall"
@@ -37,7 +39,8 @@
             android:layout_height="0px"
             android:layout_gravity="right"
             android:src="@drawable/ic_send_black_24dp"
-            android:id="@+id/redigerFeedback" />
+            android:id="@+id/redigerFeedback"
+            tools:ignore="ContentDescription" />
 
         <ImageButton
             style="?android:attr/buttonStyleSmall"
@@ -46,7 +49,8 @@
             android:layout_height="0px"
             android:layout_gravity="right"
             android:src="@drawable/ic_add_black_24dp"
-            android:id="@+id/extras" />
+            android:id="@+id/extras"
+            tools:ignore="ContentDescription" />
 
         <ImageButton
             style="?android:attr/buttonStyleSmall"
@@ -55,7 +59,8 @@
             android:layout_height="0px"
             android:id="@+id/frem"
             android:gravity="center"
-            android:src="@drawable/ic_navigate_next_black_24dp" />
+            android:src="@drawable/ic_navigate_next_black_24dp"
+            tools:ignore="ContentDescription" />
 
 
     </LinearLayout>
