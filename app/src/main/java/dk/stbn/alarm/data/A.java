@@ -259,9 +259,9 @@ public class A extends Application implements Observatør {
                 synligeTekster = hentsynligeTekster();
 
             }
-            tjekVisOtekst();
+            tjekVisOtekst();//todo: ikke færdig
 
-            if (synligeTekster == null) synligeTekster = new ArrayList(); //oplevet at den der blev hentet på disk var null i forbindelse med opdatering
+            if (synligeTekster == null) synligeTekster = new ArrayList(); //har oplevet at den der blev hentet på disk var null i forbindelse med opdatering
             else {
                 //-- Hvis nu nogle h-tekster skulle være gemt
                /* int før = synligeTekster.size();
@@ -995,6 +995,7 @@ public class A extends Application implements Observatør {
        // }
 
         //todo
+
     }
 
     // - - Til test
@@ -1011,14 +1012,11 @@ public class A extends Application implements Observatør {
         hteksterOverskrifter = new ArrayList();
         sidstKendteVindueshøjde = 0;
 
-
         modenhed = 0;
         tredjeDagFørsteGang = false;
 
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
-
-        //singletonKlar = false;
 
         modenhed = tjekModenhed();
         tjekOpstart();
@@ -1081,7 +1079,7 @@ public class A extends Application implements Observatør {
 
     }
 
-        void t(String s){
+    void t(String s){
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
     void p(Object o){
@@ -1100,7 +1098,6 @@ public class A extends Application implements Observatør {
 
     void sletData(){
 
-
         pref.edit().clear().commit();
 
         pref.edit().putInt("modenhed", modenhed).commit();
@@ -1111,9 +1108,6 @@ public class A extends Application implements Observatør {
         ArrayList<Integer> tomTal = new ArrayList<>();
         IO.gemObj(tomTal, "synligeDatoer", this);
         IO.gemObj(tomTal, "gamle", this);
-
-
-
     }
 
 
