@@ -99,10 +99,15 @@ public class Util {
     public static void opdaterKalender(Context c, String kaldtfra){
         p("opdaterKalender() kaldt fra "+kaldtfra);
         ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
+        if (gamle == null) gamle  = new ArrayList<>();
         System.out.println("opdaterKalender() tjek sættet:");
-        for (Integer s : gamle) System.out.println(s);
+        //for (Integer s : gamle) System.out.println(s);
 
         ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", c);
+
+        //Hvis kaldet sker fra onrevieve i alarmlytteren, er det en ekstra gang for en sikkerheds skyld. Vi fjerner det nyeste element for at undgå loop
+        boolean forskyd = kaldtfra.equals("Alarm_Lytter.onrecieve");
+        if (forskyd) datoliste.remove(datoliste.size()-1);
 
         for (int i = 0 ; i < datoliste.size(); i++){
 

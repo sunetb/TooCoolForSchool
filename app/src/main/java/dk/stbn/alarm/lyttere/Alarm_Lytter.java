@@ -1,11 +1,13 @@
 package dk.stbn.alarm.lyttere;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -35,27 +37,43 @@ public class Alarm_Lytter extends BroadcastReceiver {
         p("Alarm_Lytter.onRecieve() modtog "+overskrift);
         //if (A.debugging) Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
 
-        if (gamle.contains(id))
+        if (gamle != null && gamle.contains(id))
             p("Notifikation for "+id+" findes har været vist");
         else
             bygNotifikation(context, overskrift, id, id_int);
 
         Util.baglog("Alarm_Lytter.onRecieve(): "+ id + " " +overskrift, context);
+        Util.opdaterKalender(context, "Alarm_Lytter.onrecieve");
     }
 
     void bygNotifikation (Context context, String overskrift, String id, int id_int) {
+        //opdateret i henhold til https://stackoverflow.com/questions/44489657/android-o-reporting-notification-not-posted-to-channel-but-it-is
 
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         p("bygnotifikation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
         Util.baglog("Notifikation bygget: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int, context);
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
+        Notification.Builder mBuilder =
+                new Notification.Builder(context)
 						.setSmallIcon(R.drawable.cool_nobkgr_71x71)
                         .setContentTitle("Too Cool for School")
                         .setContentText(overskrift)
                         .setAutoCancel(true)
-                        .setCategory(Notification.CATEGORY_ALARM)
                         .setOnlyAlertOnce(true);
         //ingen effekt: .setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setCategory(Notification.CATEGORY_ALARM);
+        }
+        CharSequence name = context.getString(R.string.app_name);
+        String description = "Too Cool for School";
+        final String NOTIFICATION_CHANNEL_ID = "4565";
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            notificationManager.createNotificationChannel(channel);
+        }
 
         Intent resultIntent = new Intent(context, Forside_akt.class);
         resultIntent.putExtra("overskrift", overskrift);

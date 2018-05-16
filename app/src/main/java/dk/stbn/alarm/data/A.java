@@ -173,6 +173,13 @@ public class A extends Application implements Observatør {
         //hertil
         Lyttersystem.nulstil();
         Lyttersystem.lyt(this);
+        new AsyncTask(){
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                Util.opdaterKalender(a, "A.onCreate()");
+                return null;
+            }
+        }.execute();
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
 

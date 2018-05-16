@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Too Cool for School</string>
+
     <string name="kontakt">TTT_Send gerne ris, ros, spørgsmål og lignende</string>
     <string name="navn">TTT_Navn</string>
     <string name="log">TTT_Vedhæft log</string>
