@@ -509,7 +509,9 @@ public class A extends Application implements Observatør {
                 p("Tjek dummytekst id: "+dummyITekst.id_int);
 
                 //itekster = Util.sorterStigende(alleTekster[1]);
+
                 p("itekster længde: "+ itekster.size());
+
 
                 ArrayList<Tekst> tempSynlige = new ArrayList<>();
                 if (modenhed != MODENHED_MODEN){
