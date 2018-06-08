@@ -238,6 +238,8 @@ public class A extends Application implements Observatør {
     }
 
     private void tjekOpstart() {
+        //-- Tjek om der er opdateringer til tekstene
+        tjekTekstversion("tjekOpstart()");
 
         if (modenhed > MODENHED_HELT_FRISK) {
 
@@ -290,8 +292,7 @@ public class A extends Application implements Observatør {
                 pref.edit().putInt("seneste position", -1).apply(); //Sætter ViewPagerens position til nyeste element
             }
 
-            //-- Tjek om der er opdateringer til tekstene
-            tjekTekstversion("tjekOpstart()");
+
 
         }
 
@@ -977,7 +978,7 @@ public class A extends Application implements Observatør {
                 int gemtTekstversion = pref.getInt("tekstversion", 0);
                 p("gemt tekstversion: "+gemtTekstversion);
 
-                if (modenhed == MODENHED_MODEN && gemtTekstversion<version) {
+                if (gemtTekstversion<version){//(modenhed == MODENHED_MODEN && gemtTekstversion<version) {
                     Lyttersystem.givBesked(Lyttersystem.NYE_TEKSTER_ONLINE, "tjektekstverion, nye online, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
                     pref.edit().putInt("tekstversion", version).apply();
                 }
