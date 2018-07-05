@@ -116,6 +116,14 @@ public class A extends Application implements Observatør {
 
     /*-----------------------------noter
 
+    Tjekke om rækkefølgen har betydning
+    Tjekke logning af notifikationer
+    Firebase sceduler før testversion
+    Obbbbbs på at de to mærkedages-noti er identiske (intents ens?)
+    Test-regneark med 1-2 ekstra i startren af august
+    Firebase log med log over notifikationer
+
+
     * NeedToHave:
      *
      * Hvis der går lang tid mellem at appen er åben, når appen forbi de noti som er 'bestilt'
