@@ -2,18 +2,18 @@
 <resources>
     <string name="app_name">Too Cool for School</string>
 
-    <string name="kontakt">TTT_Send gerne ris, ros, spørgsmål og lignende</string>
-    <string name="navn">TTT_Navn</string>
-    <string name="log">TTT_Vedhæft log</string>
-    <string name="emne">TTT_Evt. emne</string>
-    <string name="besked">TTT_Besked</string>
-    <string name="appversion">TTT_App-version</string>
-    <string name="kildetekstversion">TTT_Kildetekst-version</string>
-    <string name="send">TTT_Send</string>
-    <string name="manglernavn">TTT_Du mangler at skrive dit navn</string>
-    <string name="manglerbesked">TTT_Du har ikke skrevet nogen besked</string>
-    <string name="hilsen">TTT_Med venlig hilsen</string>
-    <string name="sendmail">TTT_Send mail...</string>
-    <string name="manglermailklient">TTT_Der er ikke installeret nogen e-mail klient.</string>
+    <string name="kontakt">Teile mit uns Lob, Kritik, Fragen u.s.w.</string>
+    <string name="navn">Name</string>
+    <string name="log">Log anhängen</string>
+    <string name="emne">Thema</string>
+    <string name="besked">Bescheid</string>
+    <string name="appversion">App-Version</string>
+    <string name="kildetekstversion">Quell-Version</string>
+    <string name="send">Send</string>
+    <string name="manglernavn">Deine Name fehlt</string>
+    <string name="manglerbesked">Du hast noch keinen Nachricht geschrieben</string>
+    <string name="hilsen">Mit freundlichen Grüßen</string>
+    <string name="sendmail">Mail senden....</string>
+    <string name="manglermailklient">Da ist keine E-mail-kleient installiert.</string>
 
 </resources>
