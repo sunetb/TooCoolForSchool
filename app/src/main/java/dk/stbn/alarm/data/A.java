@@ -75,11 +75,12 @@ public class A extends Application implements Observatør {
 //////////---------- APP TILSTAND ----------//////////
 
     public static DateTime masterDato;
-    public int modenhed = 0;
+    int modenhed = 0;
     final int MODENHED_HELT_FRISK = 0;
     final int MODENHED_FØRSTE_DAG = 1;
     final int MODENHED_ANDEN_DAG = 2;
-    public final int MODENHED_MODEN = 3;
+    final int MODENHED_MODEN = 3;
+    final int SOMMERFERIE = 4;
     boolean tredjeDagFørsteGang = false;
 
 //////////-------------------------//////////
@@ -901,8 +902,15 @@ public class A extends Application implements Observatør {
 
     private int tjekModenhed() {
 
+        DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
+        p(sommerferie_start);
+        DateTime sommerferie_slut =  new DateTime().withDayOfMonth(17).withMonthOfYear(8);
+        p(sommerferie_start);
+        if (masterDato.isAfter(sommerferie_start) && masterDato.isBefore(sommerferie_slut)) return SOMMERFERIE;
+
         int moden = pref.getInt("modenhed", MODENHED_HELT_FRISK);
         p("Modenhed i tjekModenhed() er "+moden);
+
 		if (moden == MODENHED_MODEN) return MODENHED_MODEN;
 		
 		int idag = Util.lavDato(masterDato);
