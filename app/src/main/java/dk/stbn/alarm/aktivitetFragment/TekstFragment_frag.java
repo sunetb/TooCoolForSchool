@@ -73,6 +73,8 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 				//p("øvrige data: længde: "+w.getOriginalUrl().length());
 			}
 		}
+		p("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+		p(a.synligeTekster.size());
 		//-- Hvis teksten er M eller H: gul overskrift
 		if (tekst.kategori.equals("h") || tekst.kategori.equals("m")) t.setTextColor(Color.YELLOW);
 		else t.setTextColor(Color.WHITE);

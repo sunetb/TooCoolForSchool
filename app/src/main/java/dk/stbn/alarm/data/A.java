@@ -75,11 +75,11 @@ public class A extends Application implements Observatør {
 //////////---------- APP TILSTAND ----------//////////
 
     public static DateTime masterDato;
-    int modenhed = 0;
+    public int modenhed = 0;
     final int MODENHED_HELT_FRISK = 0;
     final int MODENHED_FØRSTE_DAG = 1;
     final int MODENHED_ANDEN_DAG = 2;
-    final int MODENHED_MODEN = 3;
+    public final int MODENHED_MODEN = 3;
     final int SOMMERFERIE = 4;
     boolean tredjeDagFørsteGang = false;
 
@@ -182,13 +182,10 @@ public class A extends Application implements Observatør {
         //hertil
         Lyttersystem.nulstil();
         Lyttersystem.lyt(this);
-        new AsyncTask(){
-            @Override
-            protected Object doInBackground(Object[] objects) {
-                Util.opdaterKalender(a, "A.onCreate()");
-                return null;
-            }
-        }.execute();
+
+        erDerGået5dage();
+
+
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
 
@@ -199,7 +196,7 @@ public class A extends Application implements Observatør {
         p("Modenhed global før tjekModenhed(): "+modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
         modenhed = tjekModenhed();
 
-        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst", true) && modenhed < MODENHED_ANDEN_DAG;
+        tvingTeksthentningEnGangTil = true;//pref.getBoolean("tvingNyTekst", true) && modenhed < MODENHED_ANDEN_DAG;
 
         String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
@@ -223,6 +220,25 @@ public class A extends Application implements Observatør {
         p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
     }//Oncreate færdig
+
+    private void erDerGået5dage() {
+
+        //Hvis appen sidst var startet for mere end 6 dage siden, skal Alarmmanageren opdateres
+
+        DateTime sidstGemteDato = (DateTime) IO.læsObj("gamleDato", ctx);
+        IO.gemObj(masterDato, "gamleDato", ctx);
+
+        if (sidstGemteDato == null) return;
+        if (sidstGemteDato.plusDays(6).isBefore(masterDato)) {
+            new AsyncTask() {
+                @Override
+                protected Object doInBackground(Object[] objects) {
+                    Util.opdaterKalender(a, "A.onCreate()");
+                    return null;
+                }
+            }.execute();
+        }
+    }
 
     //** Debugging
     public void testTekster(){
@@ -249,7 +265,15 @@ public class A extends Application implements Observatør {
     private void tjekOpstart() {
         //-- Tjek om der er opdateringer til tekstene
         tjekTekstversion("tjekOpstart()");
-
+        if (modenhed == SOMMERFERIE) {
+            p("sommerferie!!!");
+            synligeTekster.add((Tekst) IO.læsObj("otekst1", this));
+            synligeTekster.add((Tekst) IO.læsObj("otekst2", this));
+            synligeTekster.add((Tekst) IO.læsObj("otekst3", this));
+            indlæsHtekster();
+            for (Tekst t : synligeTekster) p(t);
+            return;
+        }
         if (modenhed > MODENHED_HELT_FRISK) {
 
             if (tredjeDagFørsteGang){
@@ -277,6 +301,7 @@ public class A extends Application implements Observatør {
                 synligeTekster = hentsynligeTekster();
 
             }
+
             tjekVisOtekst();//todo: ikke færdig
 
             if (synligeTekster == null) synligeTekster = new ArrayList(); //har oplevet at den der blev hentet på disk var null i forbindelse med opdatering
@@ -427,6 +452,13 @@ public class A extends Application implements Observatør {
 
                 IO.gemObj(o2, "otekst2", ctx);
 
+                Tekst o3 = otekster.get(2);
+                String nyBrødtekst3 = o3.brødtekst.replaceAll("\n", " ");
+
+                o3.brødtekst = nyBrødtekst3;
+                p("otekst3 lige hentet: "+o3);
+                IO.gemObj(o3, "otekst3", ctx);
+
                 //-- Gemmer resten
                 itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
                 mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
@@ -565,6 +597,30 @@ public class A extends Application implements Observatør {
                 p("Tjek M dummytekst id: "+dummyMTekst.id_int);
 
 
+                //Gem o-tekster enkeltvis
+
+                ArrayList<Tekst> otekster = alleTekster[0];
+                Tekst o1 = otekster.get(0);
+                String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
+                o1.brødtekst = nyBrødtekst;
+                IO.gemObj(o1, "otekst1", ctx);
+
+                Tekst o2 = otekster.get(1);
+                String nyBrødtekst2 = o2.brødtekst.replaceAll("\n", " ");
+
+                o2.brødtekst = nyBrødtekst2;
+
+                IO.gemObj(o2, "otekst2", ctx);
+
+                Tekst o3 = otekster.get(2);
+                String nyBrødtekst3 = o3.brødtekst.replaceAll("\n", " ");
+
+                o3.brødtekst = nyBrødtekst3;
+
+                IO.gemObj(o3, "otekst3", ctx);
+
+
+                //Søg i M-tekster
                 boolean mFundet = false;
 
                 //ArrayList<Tekst> mtekster = Util.sorterStigende(alleTekster[2]);
@@ -660,8 +716,8 @@ public class A extends Application implements Observatør {
                 IO.gemObj(mtekster, "mtekster", A.a);
                 IO.gemObj(htekster, "htekster", A.a);
 
-                itekster = null;
-                mtekster = null;
+                //itekster = null;
+                //mtekster = null;
 
                 return null;
             }
@@ -670,6 +726,8 @@ public class A extends Application implements Observatør {
 
     public boolean skalTekstlistenOpdateres(String kaldtfra) {
         p("skalTekstlistenOpdateres("+kaldtfra+") start________");
+
+        if (modenhed == SOMMERFERIE) return false;
 
         new AsyncTask() {
             @Override
@@ -689,7 +747,7 @@ public class A extends Application implements Observatør {
 
                 //-- Hvis datolisten er null, er appen helt frisk
                 if (datoliste == null){
-
+                    return false;
                 }
                 //-- Hvis datolisten er tom, er det fordi vi er nået til slutningen af skoleåret og der er ikke flere nye tekster
                 else if (datoliste.size() == 0 ) {
@@ -904,9 +962,12 @@ public class A extends Application implements Observatør {
 
         DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
         p(sommerferie_start);
-        DateTime sommerferie_slut =  new DateTime().withDayOfMonth(17).withMonthOfYear(8);
+        DateTime sommerferie_slut =  new DateTime().withDayOfMonth(20).withMonthOfYear(8);
         p(sommerferie_start);
-        if (masterDato.isAfter(sommerferie_start) && masterDato.isBefore(sommerferie_slut)) return SOMMERFERIE;
+        if (masterDato.isAfter(sommerferie_start) && masterDato.isBefore(sommerferie_slut)) {
+            pref.edit().putInt("modenhed", MODENHED_HELT_FRISK).commit();
+            return SOMMERFERIE;
+        }
 
         int moden = pref.getInt("modenhed", MODENHED_HELT_FRISK);
         p("Modenhed i tjekModenhed() er "+moden);
@@ -1100,7 +1161,7 @@ public class A extends Application implements Observatør {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
     void p(Object o){
-        String kl = "A.";
+        String kl = "Singleton.";
         Util.p(kl+o);
     }
 
