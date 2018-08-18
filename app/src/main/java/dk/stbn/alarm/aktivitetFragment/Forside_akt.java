@@ -61,7 +61,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         p(" idag er: "+ A.masterDato.getDayOfMonth() + ": " + A.masterDato.getMonthOfYear() + " - "+ A.masterDato.getYear());
         a.setupLangReceiver();
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = a.pref;
         initUI();
         a.aktivitetenVises = true; //skal den stå tidligere?
         tjekOpstartstype(savedInstanceState);
@@ -245,8 +245,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     t("Nulstiller og genindlæser appens data");
                     p("Nulstiller og genindlæser appens data");
 
-                    prefs.edit().putInt("tekstversion", 0).apply();
-                    prefs.edit().putBoolean("tvingNyTekst", true).apply();
+                    prefs.edit().putInt("tekstversion", 0).commit();
+                    prefs.edit().putBoolean("tvingNyTekst", true).commit();
                     //a.sletData();
                     testDialog("Nu er det vigtigt at du lukker appen. BÅDE med tilbage-knappen OG ved at trykke på firkant-knappen / holde HOME nede i lang tid til joblisten dukker op, og derefter swiper appen ud", "OBS OBS OBS");
                     return true;
@@ -275,9 +275,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             Lyttersystem.lyt(this);
             vp.addOnPageChangeListener(sideLytter);
             if (A.debugging) pa.notifyDataSetChanged(); //lidt groft ?
-            visPosition = prefs.getInt("seneste position", vp.getCurrentItem());
+            visPosition = prefs.getInt("senesteposition", vp.getCurrentItem());
+            p("onstart visposition fra prefs: "+visPosition);
+            p("Hvad var der i prefs? "+prefs.getInt("senesteposition", 100000));
+            p("hvor lang er tekstlisten "+a.synligeTekster.size());
             if (visPosition >= a.synligeTekster.size()) visPosition = -1;
             if (visPosition == -1) visPosition = a.synligeTekster.size() - 1;
+            p("onstart visposition efter tjek: "+visPosition);
+
             vp.setCurrentItem(visPosition);
             knapstatus(visPosition, "onStart()");
         }
@@ -290,7 +295,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         Lyttersystem.afregistrer(this);
         vp.removeOnPageChangeListener(sideLytter);
         a.aktivitetenVises = false;
-        prefs.edit().putInt("seneste position", vp.getCurrentItem()).apply();
+        prefs.edit().putInt("senesteposition", vp.getCurrentItem()).commit();
 
     }
 
@@ -397,7 +402,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 if (husk != -1) {
                     vp.setCurrentItem(husk);
                     knapstatus(husk,"tjekOpstartstype()");
-                    prefs.edit().putInt("seneste position", vp.getCurrentItem()).apply();
+                    prefs.edit().putInt("senesteposition", vp.getCurrentItem()).commit();
 
                 }
                 else {
@@ -405,7 +410,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     Tekst t = (Tekst) IO.læsObj(""+id, this);
                     a.synligeTekster.add(t);
                     pa.notifyDataSetChanged();
-                    prefs.edit().putInt("seneste position", a.synligeTekster.size()-1).apply();
+                    prefs.edit().putInt("senesteposition", a.synligeTekster.size()-1).commit();
                    // vp.setCurrentItem(husk);
                     //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
 
@@ -442,7 +447,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 .setCancelable(false)
                 .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
-                        prefs.edit().putBoolean("vistestdialog", false).apply();
+                        prefs.edit().putBoolean("vistestdialog", false).commit();
                         dialog.cancel();
                     }
                 });
