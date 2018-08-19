@@ -183,7 +183,7 @@ public class A extends Application implements Observatør {
         Lyttersystem.nulstil();
         Lyttersystem.lyt(this);
 
-        erDerGået5dage();
+        erDerGået5dageOgHarViPasseretSommerferie();
 
 
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
@@ -196,7 +196,7 @@ public class A extends Application implements Observatør {
         p("Modenhed global før tjekModenhed(): "+modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
         modenhed = tjekModenhed();
 
-        tvingTeksthentningEnGangTil = true;//pref.getBoolean("tvingNyTekst", true) && modenhed < MODENHED_ANDEN_DAG;
+        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst", true) && modenhed < MODENHED_ANDEN_DAG;
 
         String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
@@ -221,14 +221,22 @@ public class A extends Application implements Observatør {
 
     }//Oncreate færdig
 
-    private void erDerGået5dage() {
+    private void erDerGået5dageOgHarViPasseretSommerferie() {
 
         //Hvis appen sidst var startet for mere end 6 dage siden, skal Alarmmanageren opdateres
 
         DateTime sidstGemteDato = (DateTime) IO.læsObj("gamleDato", ctx);
+
+
         IO.gemObj(masterDato, "gamleDato", ctx);
 
         if (sidstGemteDato == null) return;
+        else {//har vi passeret sommereferien?
+            DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
+            if (sidstGemteDato.isBefore(sommerferie_start)) sletAlt();
+
+        }
+//        Er der gået 5 dage siden sidste start? Så opdater kalenderpunkter i Alarmmanageren
         if (sidstGemteDato.plusDays(6).isBefore(masterDato)) {
             new AsyncTask() {
                 @Override
@@ -238,6 +246,8 @@ public class A extends Application implements Observatør {
                 }
             }.execute();
         }
+
+
     }
 
     //** Debugging
@@ -829,7 +839,7 @@ public class A extends Application implements Observatør {
                     for (Integer j : slettes) IO.føjTilGamle(j, ctx);
                 }
                 else //hvis listen er tom, er det fordi appen er et år gammel og der skal nulstilles
-                        sletAlt();
+                        //sletAlt(); //Ikke længere relevant. Håndteres nu i erDerGået5DageOg...
 
 /* Igang: slet intents for gamle notifikationer)
                 if (alm == null) alm = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
