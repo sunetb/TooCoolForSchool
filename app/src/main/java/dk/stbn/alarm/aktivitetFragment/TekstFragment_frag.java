@@ -16,6 +16,7 @@ import dk.stbn.alarm.R;
 import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Util;
+import dk.stbn.alarm.lyttere.Lyttersystem;
 
 
 public class TekstFragment_frag extends Fragment implements View.OnClickListener {
@@ -35,7 +36,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
         super.onCreate(savedInstanceState);
         a = A.a;
 		position = getArguments().getInt("pos", 0);
-		if (position >= a.synligeTekster.size()) position = a.synligeTekster.size()-1;
+		if (position >= a.synligeTekster.size() || position < 0) position = a.synligeTekster.size()-1;
 		tekst= a.synligeTekster.get(position);
 		
         p("Fragment oncreate. Pos: "+position);
@@ -51,8 +52,9 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 		w = (WebView) v.findViewById(R.id.brodtekstweb);
 		w.setBackgroundColor(Color.BLACK); //forhindrer hvidt blink ved skærmvending
 
-
+		p("synligeTekster.size="+a.synligeTekster.size());
 		if (a.synligeTekster.size() == 0 || tekst == null){
+			a.opdater(Lyttersystem.NYE_TEKSTER_ONLINE);
 			p("onCreateView() FEJL ingen data");
 			t.setText(Html.fromHtml("Vent et øjeblik"));
 			w.loadData(A.hoved +"Netforbindelsen er måske langsom. Hvis der ikke sker noget om lidt, så prøv at genstarte appen.."+ A.hale, "text/html; charset=utf-8", "UTF-8");
@@ -73,7 +75,16 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 				//p("øvrige data: længde: "+w.getOriginalUrl().length());
 			}
 		}
+		p("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+		p(a.synligeTekster.size());
+
 		//-- Hvis teksten er M eller H: gul overskrift
+		if (null == tekst || null == tekst.kategori) {
+			t.setText(Html.fromHtml("Vent lidt"));
+			w.loadData(A.hoved +"Der er sket en fejl. Vi arbejder på sagen. Netforbindelsen er måske langsom. Hvis der ikke sker noget om lidt, så prøv at genstarte appen.."+ A.hale, "text/html; charset=utf-8", "UTF-8");
+
+			return v;
+		}
 		if (tekst.kategori.equals("h") || tekst.kategori.equals("m")) t.setTextColor(Color.YELLOW);
 		else t.setTextColor(Color.WHITE);
 

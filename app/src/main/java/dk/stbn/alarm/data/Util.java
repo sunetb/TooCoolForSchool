@@ -38,7 +38,7 @@ public class Util {
         return (double) (System.currentTimeMillis()-starttid)/1000.0;
     }
 
-    public static boolean baglog = false;
+    public static boolean baglog = true;
 
     public static void notiBrugt(Context c, Intent intent){
         p("Util.notiBrugt kaldt");
@@ -239,11 +239,10 @@ public class Util {
                             }
                             if ("o".equalsIgnoreCase(txt)){
                                 tempTekst.kategori = "o";
+                                p("||||||||||||||||||||OOOOOOOOOOOOOOO|||||||||||||||||||||");
                             }
                             else if ("stop".equalsIgnoreCase(txt)){
                                 p("parseXML() stop fundet");
-
-
                                 break;
                             }
                             else {
@@ -334,6 +333,7 @@ public class Util {
 
         ArrayList[] data = {oteksterTmp, teksterTmp, mteksterTmp, hteksterTmp};
         p("Util.parseXML(): Data længde: "+ data.length + " | o: "+oteksterTmp.size() + " | i: "+teksterTmp.size() + " | m: "+mteksterTmp.size() + " | h: "+hteksterTmp.size());
+        p("Otekst 3 parsexml: "+oteksterTmp.get(2));
         return data;
     }
 

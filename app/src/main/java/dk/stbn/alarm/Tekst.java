@@ -34,6 +34,7 @@ public class Tekst implements Serializable {
 
 	int datokode() {
 		if (kategori.equals("h")) return 0;
+		else if (kategori.equals("o")) return 1;
 		int i = (dato.getYear()*10000)+(( dato.getMonthOfYear()*100)+dato.getDayOfMonth());
 		return  i;
 
@@ -43,6 +44,11 @@ public class Tekst implements Serializable {
 		if (kategori.equals("h")) {
 			id = "h";
 			id_int = 400000;
+			return;
+		}
+		else if (kategori.equals("o")) {
+			id = "o";
+			id_int = 500000;
 			return;
 		}
 		id_int = lavIntId();
