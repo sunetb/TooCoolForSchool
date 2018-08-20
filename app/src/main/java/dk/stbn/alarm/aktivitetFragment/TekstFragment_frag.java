@@ -51,7 +51,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 		w = (WebView) v.findViewById(R.id.brodtekstweb);
 		w.setBackgroundColor(Color.BLACK); //forhindrer hvidt blink ved skærmvending
 
-
+		p("synligeTekster.size="+a.synligeTekster.size());
 		if (a.synligeTekster.size() == 0 || tekst == null){
 			p("onCreateView() FEJL ingen data");
 			t.setText(Html.fromHtml("Vent et øjeblik"));
@@ -76,6 +76,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 		p("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
 		p(a.synligeTekster.size());
 		//-- Hvis teksten er M eller H: gul overskrift
+		if (tekst.kategori == null) return v;
 		if (tekst.kategori.equals("h") || tekst.kategori.equals("m")) t.setTextColor(Color.YELLOW);
 		else t.setTextColor(Color.WHITE);
 
