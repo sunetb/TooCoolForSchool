@@ -30,7 +30,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
         Bundle arg = new Bundle();
         arg.putInt("pos", position);
         f.setArguments(arg);
-        if (f == null) p("FEJL!! pagerAdapter getitem() returnerer null!!");
         return f;
     }
 

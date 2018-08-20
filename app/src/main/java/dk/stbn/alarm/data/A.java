@@ -196,7 +196,7 @@ public class A extends Application implements Observatør {
         p("Modenhed global før tjekModenhed(): "+modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
         modenhed = tjekModenhed();
 
-        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst", true) && modenhed < MODENHED_ANDEN_DAG;
+        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst1", true) && modenhed < MODENHED_ANDEN_DAG;
 
         String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
@@ -209,7 +209,7 @@ public class A extends Application implements Observatør {
             hentNyeTekster();
             sletData();
             pref.edit().putInt("tekstversion", 0).commit();
-            pref.edit().putBoolean("tvingNyTekst", false).commit();
+            pref.edit().putBoolean("tvingNyTekst1", false).commit();
         }
         tjekOpstart();
         //FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -281,9 +281,11 @@ public class A extends Application implements Observatør {
             synligeTekster.add((Tekst) IO.læsObj("otekst2", this));
             synligeTekster.add((Tekst) IO.læsObj("otekst3", this));
             indlæsHtekster();
+
             synligeDatoer = new ArrayList<>();
-            synligeDatoer.add(-1);//der skal være noget synligeDatoer, ellers kaldes sletAlt()
+            synligeDatoer.add(1000);//der skal være noget synligeDatoer, ellers kaldes sletAlt()
             for (Tekst t : synligeTekster) p(t);
+
             return;
         }
         if (modenhed > MODENHED_HELT_FRISK) {
@@ -913,21 +915,6 @@ public class A extends Application implements Observatør {
         return pref.getBoolean("nyTekst", false);
     }
 
-    //-- Kaldes når appen er kørt igennnem og skal starte forfra med tekst1
-    private void sletAlt() {
-        p("sletAlt kaldt");
-
-        sletData();
-        synligeTekster.clear();
-        synligeTekster.add((Tekst) IO.læsObj("otekst1", ctx));
-        Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET,"fuld frisk start", 1000);
-
-
-        pref.edit().putInt("modenhed", 0).commit();
-        //rul(0);
-
-        //initAllerFørsteGang();
-    }
 
     private ArrayList<Tekst> hentsynligeTekster(){
 		//new Asynctask
@@ -1189,11 +1176,27 @@ public class A extends Application implements Observatør {
     public void opdater(int hændelse) {
 
         if (hændelse == Lyttersystem.NYE_TEKSTER_ONLINE) {
-            if (modenhed == MODENHED_MODEN) hentNyeTekster();
+            if (modenhed == MODENHED_MODEN || modenhed == SOMMERFERIE) hentNyeTekster();
         }
 
     }
 
+
+    //-- Kaldes når appen er kørt igennnem og skal starte forfra med tekst1
+    private void sletAlt() {
+        p("sletAlt kaldt");
+
+        sletData();
+        synligeTekster.clear();
+        synligeTekster.add((Tekst) IO.læsObj("otekst1", ctx));
+        Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET,"fuld frisk start", 1000);
+
+
+        pref.edit().putInt("modenhed", 0).commit();
+        //rul(0);
+
+        //initAllerFørsteGang();
+    }
     void sletData(){
         p("Slet data blev kaldt");
         pref.edit().clear().commit();
@@ -1206,7 +1209,10 @@ public class A extends Application implements Observatør {
         ArrayList<Integer> tomTal = new ArrayList<>();
         IO.gemObj(tomTal, "synligeDatoer", this);
         IO.gemObj(tomTal, "gamle", this);
+
     }
+
+
 
 
 

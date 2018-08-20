@@ -26,8 +26,8 @@ android {
         applicationId 'dk.stbn.cool.alarm'
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 13
-        versionName '1.7.1'
+        versionCode 15
+        versionName '1.7.3'
     }
     buildTypes {
         release {
