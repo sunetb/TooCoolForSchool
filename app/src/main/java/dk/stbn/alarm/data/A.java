@@ -14,6 +14,8 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 //import com.google.firebase.database.DatabaseReference;
 //import com.google.firebase.database.FirebaseDatabase;
 
@@ -115,6 +117,9 @@ public class A extends Application implements Observatør {
 
 //////////-------------------------//////////
 
+
+    DatabaseReference myRef;
+
     /*-----------------------------noter
 
     Tjekke om rækkefølgen har betydning
@@ -172,12 +177,18 @@ public class A extends Application implements Observatør {
             Fabric.with(this, new Crashlytics());
             Util.baglog = true;
         }
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
         Util.starttid = System.currentTimeMillis();
         p("oncreate() kaldt: UI-tråd: "+Thread.currentThread().getName());
         a= this;
         ctx=this;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-       //til test
+        myRef = database.getReference("navn");
+        myRef.setValue("sune");
+
+
+        //til test
         //pref.edit().putInt("tekstversion",1).commit();
         //hertil
         Lyttersystem.nulstil();

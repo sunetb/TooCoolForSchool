@@ -106,7 +106,7 @@ public class Util {
         ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", c);
 
         if (datoliste == null) return;
-        //Hvis kaldet sker fra onrevieve i alarmlytteren, er det en ekstra gang for en sikkerheds skyld. Vi fjerner det nyeste element for at undgå loop
+        //Hvis kaldet sker fra onrecieve i alarmlytteren, er det en ekstra gang for en sikkerheds skyld. Vi fjerner det nyeste element for at undgå loop
         boolean forskyd = kaldtfra.equals("Alarm_Lytter.onrecieve");
         if (forskyd) datoliste.remove(datoliste.size()-1);
 
