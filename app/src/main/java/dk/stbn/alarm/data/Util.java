@@ -114,6 +114,10 @@ public class Util {
 
             if (!gamle.contains((datoliste.get(i)))) {
                 Tekst t = (Tekst) IO.læsObj(""+datoliste.get(i), c);
+                if (t==null) {
+                    p("FEJL: Teksten var null, UTIL lin ca 118");
+                    return;
+                }
                 if (t.id_int <300000000){  //Hvis I-tekst
 
                     if (t.dato.isBeforeNow())
