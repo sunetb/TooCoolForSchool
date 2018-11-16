@@ -110,7 +110,9 @@ public class Util {
         boolean forskyd = kaldtfra.equals("Alarm_Lytter.onrecieve");
         if (forskyd) datoliste.remove(datoliste.size()-1);
 
+        int antalAlarmerAffyret = 0;
         for (int i = 0 ; i < datoliste.size(); i++){
+            if (antalAlarmerAffyret > 6) break;
 
             if (!gamle.contains((datoliste.get(i)))) {
                 Tekst t = (Tekst) IO.læsObj(""+datoliste.get(i), c);
@@ -122,8 +124,10 @@ public class Util {
 
                     if (t.dato.isBeforeNow())
                         gamle.add(t.id_int);
-                    else
+                    else{
                         Util.startAlarm(c,t);
+                        antalAlarmerAffyret++;
+                    }
                 }
                 else{ //-- Hvis m-tekst
                     if(t.dato.isBeforeNow())
@@ -131,12 +135,16 @@ public class Util {
                     else {
                         //-- M-tekster har både notifikation på dagen ...
                         Util.startAlarm(c,t);
+                        antalAlarmerAffyret++;
 
                         //-- ...og syv dage før
                         Tekst temp = t;
                         temp.dato = temp.dato.minusDays(7);
                         temp.kategori="mgentag";
                         Util.startAlarm(c,temp);
+
+                        antalAlarmerAffyret++;
+
 
                     }
                 }

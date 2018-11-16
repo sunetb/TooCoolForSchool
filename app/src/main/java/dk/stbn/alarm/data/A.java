@@ -68,7 +68,7 @@ public class A extends Application implements Observatør {
 //////////---------- UI TILSTAND / Lytterstystem ----------//////////
     public static boolean hteksterKlar = false;
     public boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
-    public BroadcastReceiver mLangReceiver = null;
+
 
 //////////-------------------------//////////
 
@@ -515,7 +515,7 @@ public class A extends Application implements Observatør {
 
     int hentNyeTeksterTæller = 1;
 
-    void hentNyeTekster () {
+    public void hentNyeTekster() {
         p("hentNyeTekster() kaldt. Gang nr "+hentNyeTeksterTæller);
         hentNyeTeksterTæller++;
 
@@ -1227,25 +1227,5 @@ public class A extends Application implements Observatør {
 
 
 
-    //Fra https://stackoverflow.com/questions/34285383/android-how-to-detect-language-has-been-changes-on-phone-setting
-    public BroadcastReceiver setupLangReceiver(){
 
-        if(mLangReceiver == null) {
-
-            mLangReceiver = new BroadcastReceiver() {
-
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    p("Sprog ændret til: "+Locale.getDefault().getLanguage());
-                    hentNyeTekster();
-                }
-
-            };
-
-            IntentFilter filter = new IntentFilter(Intent.ACTION_LOCALE_CHANGED);
-            registerReceiver(mLangReceiver, filter);
-        }
-
-        return mLangReceiver;
-    }
 }
