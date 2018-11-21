@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -106,20 +107,29 @@ public class Util {
         ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", c);
 
         if (datoliste == null) return;
-        //Hvis kaldet sker fra onrevieve i alarmlytteren, er det en ekstra gang for en sikkerheds skyld. Vi fjerner det nyeste element for at undgå loop
+        //Hvis kaldet sker fra onrecieve i alarmlytteren, er det en ekstra gang for en sikkerheds skyld. Vi fjerner det nyeste element for at undgå loop
         boolean forskyd = kaldtfra.equals("Alarm_Lytter.onrecieve");
         if (forskyd) datoliste.remove(datoliste.size()-1);
 
+        int antalAlarmerAffyret = 0;
         for (int i = 0 ; i < datoliste.size(); i++){
+            if (antalAlarmerAffyret > 6) break;
 
             if (!gamle.contains((datoliste.get(i)))) {
                 Tekst t = (Tekst) IO.læsObj(""+datoliste.get(i), c);
+                if (t==null) {
+                    p("FEJL: Teksten var null, UTIL lin ca 118");
+                    return;
+                }
                 if (t.id_int <300000000){  //Hvis I-tekst
 
                     if (t.dato.isBeforeNow())
                         gamle.add(t.id_int);
-                    else
+
+                    else{
                         Util.startAlarm(c,t);
+                        antalAlarmerAffyret++;
+                    }
                 }
                 else{ //-- Hvis m-tekst
                     if(t.dato.isBeforeNow())
@@ -127,12 +137,16 @@ public class Util {
                     else {
                         //-- M-tekster har både notifikation på dagen ...
                         Util.startAlarm(c,t);
+                        antalAlarmerAffyret++;
 
                         //-- ...og syv dage før
                         Tekst temp = t;
                         temp.dato = temp.dato.minusDays(7);
                         temp.kategori="mgentag";
                         Util.startAlarm(c,temp);
+
+                        antalAlarmerAffyret++;
+
 
                     }
                 }
@@ -144,6 +158,57 @@ public class Util {
 
         IO.gemObj(gamle, "gamle", c);
     }
+
+    static void rensUdIAlarmer(final Context c){
+        p("Util.rensUdIAlarmer kaldt");
+        final Context cx = c;
+
+        new AsyncTask(){
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                ArrayList<Tekst> tempi = (ArrayList<Tekst>) IO.læsObj("itekster", c);
+                ArrayList<Tekst> tempm = (ArrayList<Tekst>) IO.læsObj( "mtekster", c);
+
+                for (Tekst t: tempi) sletAlarm(cx, t);
+                for (Tekst t: tempm) sletAlarm(cx, t);
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+                opdaterKalender(c, "rensUdIAlarmer");
+            }
+        }.execute();
+
+
+
+
+
+
+    }
+
+    static void sletAlarm (Context c, Tekst t){
+        p("Util.sletAlarm kaldt med tekst: "+t.toString(0));
+
+        Intent intent = new Intent(c, Alarm_Lytter.class);
+
+        intent.putExtra("id_int", t.id_int);
+        intent.putExtra("tekstId", t.id);
+        intent.putExtra("overskrift", t.overskrift);
+        String action = ""+t.id_int;
+        if (t.kategori.equals("mgentag")) action+="gentag"; //--M-tekster har TO notifikationer: en syv dage før og en på dagen
+        intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+
+        PendingIntent i = PendingIntent.getBroadcast(c, t.id_int, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alm = A.alm;
+        if (alm == null) alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+        i.cancel();
+        alm.cancel(i);
+
+    }
+
 
     static boolean visMtekst(DateTime mTid){
         String logbesked = "Util.visMtekst() "+ mTid.getDayOfMonth()+ "/"+mTid.getMonthOfYear();

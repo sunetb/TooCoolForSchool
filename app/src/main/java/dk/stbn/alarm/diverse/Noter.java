@@ -14,7 +14,8 @@ package dk.stbn.alarm.diverse;
  *
  *
  *
- *
+ *firebase deploy =
+ * '/home/sune/.npm-global/lib/node_modules/firebase-tools/bin/firebase' deploy
  *
  *
  *

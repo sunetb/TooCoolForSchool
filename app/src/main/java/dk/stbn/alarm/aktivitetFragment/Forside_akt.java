@@ -4,9 +4,11 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
@@ -27,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.Tekst;
@@ -48,6 +51,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     int visPosition = 0;
     boolean datoÆndret = false;
     ArrayAdapter hListeadapter = null;
+    public BroadcastReceiver mLangReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +63,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
         a = A.a;
         p(" idag er: "+ A.masterDato.getDayOfMonth() + ": " + A.masterDato.getMonthOfYear() + " - "+ A.masterDato.getYear());
-        a.setupLangReceiver();
+        setupLangReceiver();
 
         prefs = a.pref;
         initUI();
@@ -423,7 +427,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onDestroy() {
         try {
-            unregisterReceiver(a.mLangReceiver);
+            unregisterReceiver(mLangReceiver);
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }
@@ -524,6 +528,27 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     }
 
 
+    //Fra https://stackoverflow.com/questions/34285383/android-how-to-detect-language-has-been-changes-on-phone-setting
+    public BroadcastReceiver setupLangReceiver(){
+
+        if(mLangReceiver == null) {
+
+            mLangReceiver = new BroadcastReceiver() {
+
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    p("Sprog ændret til: "+ Locale.getDefault().getLanguage());
+                    a.hentNyeTekster();
+                }
+
+            };
+
+            IntentFilter filter = new IntentFilter(Intent.ACTION_LOCALE_CHANGED);
+            registerReceiver(mLangReceiver, filter);
+        }
+
+        return mLangReceiver;
+    }
     //----Bygger en AlertDialog med listen over Ekstra-tekster
     boolean klikket = false; //Holder KUN dialogen i live hvis skærmen bliver vendt.
 
