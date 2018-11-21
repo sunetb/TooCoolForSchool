@@ -1,42 +1,28 @@
-# TooCoolForSchool
-Denne app kan grundlæggende én ting: Vise en liste med tekster. 
+Privatlivspolitik
 
-Men der er en del regler for hvilke tekster der skal vises hvornår.
+Denne app lagrer eller sender INGEN data om din person eller data som på nogen måde kan henføres til din person.
 
-Der er fire typer af tekster:
+Du er 100% anonym som bruger af denne app.
 
-O-tekster = 'obligatoriske' tekster
+Appen bruger en form for kvalitetsikring, et værktøj ved navn Fabric, til nedbrudsrapportering. Opstår der en fejl i programmet mens det kører, sendes informationer om telefonmodel, version af Android, typen af fejl, hvor i programmet fejlen opstod og lignende. Intet af dette kan henføres til din person.
 
-I-tekster = 'info' tekster.
+Vælger du at sende en email via appen, kender udvikleren selvfølgelig din emailadresse. Og sætter du hak i "Send log", vil forskellige tilstandsdata blive sendt til udvikleren. Intet af dette indeholder personfølsomme oplysninger. Du kan selv gennemse de data som bliver sendt pr mail INDEN du sender den.
 
-M-tekster = 'mærkedagstekster'
+Begge typer data tjener udelukkende det formål at højne appens kvalitet og brugerens oplevelse.
 
-H-tekster = 'hjælp'tekster
 
-O-tekster (der er to stk i alt) er introducerende og vises kun mens appen er nyinstalleret. De handler om at formidle til brugeren hvad han/hun kan bruge denne app til og hvordan.
 
-Appen installeres. På installationsdagen vises O-tekst nr 1 og ikke andet.
-Dagen efter vises O-tekst 1 og Otekst nr 2 og ikke andet.
+Privacy policy
 
-På dag 3 efter at appen er installeret, låses op for I-tekster.
+This app does not send or store ANY data about your person or data that can can be used to identify you in any way.
 
-I-tekster er de vigtigste tekster i appen. De handler om tips og ideer, indsigter og ting man kan prøve hvis man er skoletræt.
-Mekanikken i I-tekster er: Der vises maksimalt 3 I-tekster. Hvis der allerede vies tre tekster og der kommer en ny I-tekst som skal vises, slettes den ældste I-tekst fra listen (First In First Out). Den "skubbes ud"
+You are 100% anonymous when using this app.
 
-Hver I-tekst har tilknyttet en dato. Når vi når til den dato i kalenderen skal teksten vises i listen og der skal genereres en notifikation om at der er en ny tekst.
+The app uses a tool named Fabric, that helps improve the quality of the app by reporting errors to the developer.
+If an error occurs while the app is running, it will send information about phone model, Android version the type of error, where in the program the error occured etc. None of this data can be used to to identify you.
 
-M-tekster er tekster til forskellige mærkedage, fx kvindernes internationale kampdag 8. marts. De vises fra en uge før selve dagen, til og med mærekedagens dato. Derefter vises de ikke igen.
-Der vises en notifikation for M-teksten første dag teksten vises og sidste dag den vises.
+If you choose to send an email via the app the developer can of course see your email address. And if you choose to check the checkbox "Send log", different data about the internal state of the app will be sent to the developer. None of this can be used to identify you. You can review the data that will be sent BEFORE you choose to send them.
 
-H-tekster er egentlig ikke hjælp-tekster men nærmere underholdning med stille beskæftigelser.
-De kan når som helst vælges fra en liste og den/de valgte H-tekster tilføjes midlertidigt til listen. Helt nøjagtigt slettes de sammen med Application-objektet, når appen ikke længere er i RAM.
-
-Der ud over er der mulighed for at dele appen, ved at sende et link til en ven. Link til appen på Google Play.
- 
-Endelig kan man skrive en mail inde fra appen. Den sendes til appens ejer.
-
-Teksterne som vises i appen, hentes første gang appen installeres fra en xml-fil som appens ejer kan lægge nye versioner op af. I en TXT-fil samme sted ligger et versionsnummer for teksterne. Denne fil hentes og læses hver gang appen startes, for at se om der skal hentes en ny version af filen med tekster.
-
-Til test er indlagt en hemmelig testtilstand som aktiveres ved langt tryk på Del-knappen. Her bliver det muligt at sætte appens interne dato, så man spole hurtigt frem (1 eller 6 dage ad gangen)
+Both types of data are collected only in order to improve the quality of the app and the user experience.
 
 
