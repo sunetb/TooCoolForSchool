@@ -2,10 +2,8 @@ package dk.stbn.alarm.data;
 
 import android.app.AlarmManager;
 import android.app.Application;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -15,7 +13,6 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 //import com.google.firebase.database.DatabaseReference;
 //import com.google.firebase.database.FirebaseDatabase;
 
@@ -177,15 +174,18 @@ public class A extends Application implements Observatør {
             Fabric.with(this, new Crashlytics());
             Util.baglog = true;
         }
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        FirebaseApp.initializeApp(ctx);
+//        FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         Util.starttid = System.currentTimeMillis();
         p("oncreate() kaldt: UI-tråd: "+Thread.currentThread().getName());
         a= this;
         ctx=this;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        myRef = database.getReference("navn");
-        myRef.setValue("sune");
+
+
+  //      myRef = database.getReference("navn");
+   //     myRef.setValue("sune");
 
 
         //til test
@@ -227,10 +227,22 @@ public class A extends Application implements Observatør {
         //DatabaseReference myRef = database.getReference("message");
 
         //myRef.setValue("Hello, World!");
-
+        overgangTilLazyLoadingAfAlarmer();
         p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
 
     }//Oncreate færdig
+
+    private void overgangTilLazyLoadingAfAlarmer() {
+
+        if (pref.getBoolean("sletAlarmer", true) && modenhed > MODENHED_ANDEN_DAG){
+
+            Util.rensUdIAlarmer(ctx);
+
+            pref.edit().putBoolean("sletAlarmer", false).commit();
+
+
+        }
+    }
 
     private void erDerGået5dageOgHarViPasseretSommerferie() {
 
@@ -854,19 +866,11 @@ public class A extends Application implements Observatør {
                 else //hvis listen er tom, er det fordi appen er et år gammel og der skal nulstilles
                         //sletAlt(); //Ikke længere relevant. Håndteres nu i erDerGået5DageOg...
 
-/* Igang: slet intents for gamle notifikationer)
-                if (alm == null) alm = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
-
-                for (int i = 0 ; i < gamle.size() ; i++){
-                    PendingIntent pi = PendingIntent.getBroadcast(ctx, gamle.get(i), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                    pi.cancel();
-                    alm.cancel(pi);
-                }
-*/
               	for (Integer i : slettes) datoliste.remove(i);
 
                 IO.gemObj( datoliste, "datoliste", ctx);
+
+
 
                 p("skalTekstlistenOpdateres() async slut");
 
@@ -876,8 +880,7 @@ public class A extends Application implements Observatør {
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-				boolean alleTeksterErBrugt = (boolean) o;
-                boolean ny = false;
+				boolean ny = false;
 
 
                 if (synligeDatoer.size() != synligeTekster.size()) {
@@ -911,6 +914,7 @@ public class A extends Application implements Observatør {
                     gemSynligeTekster();
                     IO.gemObj(synligeDatoer, "synligeDatoer", ctx);
 
+                    Util.rensUdIAlarmer(ctx);
                 }
                 else p("skalTekstlistenOpdateres Ingen ny synlige");
                 p("skalTekstlistenOpdateres() slut");
@@ -918,6 +922,7 @@ public class A extends Application implements Observatør {
             //-- (lidt sløv) måde at overføre returværdi. 'o' er falsk hvis datolisten er tom og der ikke er flere tekster at vise
                 if ((boolean)o) pref.edit().putBoolean("nyTekst", ny).commit();
                 else pref.edit().putBoolean("nyTekst", false).commit();
+
 
             }
 
@@ -1222,6 +1227,7 @@ public class A extends Application implements Observatør {
         IO.gemObj(tomTal, "gamle", this);
 
     }
+
 
 
 
