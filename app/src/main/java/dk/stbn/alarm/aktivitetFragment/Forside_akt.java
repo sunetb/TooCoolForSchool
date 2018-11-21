@@ -67,7 +67,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         prefs = a.pref;
         initUI();
-        a.aktivitetenVises = true; //skal den stå tidligere?
+        a.aktivitetenVises = true;
         tjekOpstartstype(savedInstanceState);
 
         if (A.testtilstand){
