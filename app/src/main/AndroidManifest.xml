@@ -8,7 +8,7 @@
 
     <application
         android:name=".data.A"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/cool_nobkgr_71x71"
         android:label="Too Cool For School"
         android:supportsRtl="true"
