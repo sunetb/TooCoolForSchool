@@ -81,6 +81,7 @@ public class A extends Application implements Observatør {
     public final int MODENHED_MODEN = 3;
     final int SOMMERFERIE = 4;
     boolean tredjeDagFørsteGang = false;
+    private String sprog = "DA";
 
 //////////-------------------------//////////
 	
@@ -209,9 +210,10 @@ public class A extends Application implements Observatør {
 
         tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst1", true) && modenhed < MODENHED_ANDEN_DAG;
 
-        String sprog = Locale.getDefault().getLanguage();
+        sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
         pref.edit().putString("sprog", sprog).commit();
+        p("SPROG "+ sprog);
 
         if (modenhed > MODENHED_HELT_FRISK && !sprog.equalsIgnoreCase(gemtSprog) ) tvingTeksthentningEnGangTil = true;
 
@@ -559,6 +561,7 @@ public class A extends Application implements Observatør {
         new AsyncTask(){
             @Override
             protected Object doInBackground(Object[] params) {
+
                 itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
                 mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
                 return null;
@@ -594,8 +597,9 @@ public class A extends Application implements Observatør {
 
                 ArrayList<Tekst> tempSynlige = new ArrayList<>();
                 if (modenhed != MODENHED_MODEN){
-                    tempSynlige.add((Tekst) IO.læsObj("otekst1", ctx));
-                    tempSynlige.add((Tekst) IO.læsObj("otekst2", ctx));
+
+                    tempSynlige.add((Tekst) alleTekster[0].get(0));//IO.læsObj("otekst1", ctx));
+                    tempSynlige.add((Tekst) alleTekster[0].get(1));//IO.læsObj("otekst2", ctx));
                 }
 
                 boolean iFundet = false;

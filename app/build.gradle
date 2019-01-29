@@ -9,7 +9,7 @@ buildscript {
     }
 }
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+//apply plugin: 'io.fabric' // giver fejl:  variant.getExternalNativeBuildTasks()' is obsolete and has been replaced with 'variant.getExternalNativeBuildProviders()'.
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }

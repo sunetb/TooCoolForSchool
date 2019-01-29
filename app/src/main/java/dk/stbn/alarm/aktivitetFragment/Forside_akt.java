@@ -532,7 +532,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     public BroadcastReceiver setupLangReceiver(){
 
         if(mLangReceiver == null) {
-
+            p("Opretter sproglytter");
             mLangReceiver = new BroadcastReceiver() {
 
                 @Override
@@ -545,6 +545,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
             IntentFilter filter = new IntentFilter(Intent.ACTION_LOCALE_CHANGED);
             registerReceiver(mLangReceiver, filter);
+            p("Sproglytter oprettet");
         }
 
         return mLangReceiver;
