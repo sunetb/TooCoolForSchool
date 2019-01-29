@@ -724,7 +724,6 @@ public class A extends Application implements Observatør {
                // else IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
                 gemSynligeTekster();
-                p("gemAlleNyeTekster() slut");
 
                 return null;
             }
@@ -744,6 +743,8 @@ public class A extends Application implements Observatør {
                 if (modenhed == MODENHED_MODEN)
                     skalTekstlistenOpdateres("a.gemAlleNyeTekster()onPost"); ///KÆDE
                     gemAlleTeksterTilDisk();
+                    p("gemAlleNyeTekster() slut");
+
             }
         }.execute();
     }
