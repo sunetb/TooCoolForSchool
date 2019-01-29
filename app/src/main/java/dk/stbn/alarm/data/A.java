@@ -81,7 +81,7 @@ public class A extends Application implements Observatør {
     public final int MODENHED_MODEN = 3;
     final int SOMMERFERIE = 4;
     boolean tredjeDagFørsteGang = false;
-    private String sprog = "DA";
+
 
 //////////-------------------------//////////
 	
@@ -210,7 +210,7 @@ public class A extends Application implements Observatør {
 
         tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst1", true) && modenhed < MODENHED_ANDEN_DAG;
 
-        sprog = Locale.getDefault().getLanguage();
+        String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
         pref.edit().putString("sprog", sprog).commit();
         p("SPROG "+ sprog);
@@ -695,7 +695,7 @@ public class A extends Application implements Observatør {
 
                 IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
-                if(modenhed == MODENHED_MODEN) {  /// Kun når appen er moden og der derfor allerede er indlæst et sæt tekster.
+              //  if(modenhed == MODENHED_MODEN) {  /// Kun når appen er moden og der derfor allerede er indlæst et sæt tekster.
 
                     ArrayList<Tekst> tempHTekster = Util.erstatAfsnit(alleTekster[3]);
                     ArrayList<String> tempHOverskrifter = new ArrayList<String>();
@@ -720,8 +720,8 @@ public class A extends Application implements Observatør {
                     for (Tekst t : synligeTekster) p(t.toString());
 
 
-                }
-                else IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
+                //}
+               // else IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
                 gemSynligeTekster();
                 p("gemAlleNyeTekster() slut");
@@ -955,6 +955,7 @@ public class A extends Application implements Observatør {
             //Tjekker sprog:
             String sprog = Locale.getDefault().getLanguage();
             pref.edit().putString("sprog", sprog).commit();
+            p("henter nye tekster på sprog: "+ sprog);
             URL u = new URL(henteurlDK);
             if (sprog.equalsIgnoreCase("de")) u = new URL(henteurlDE);
             InputStream is = u.openStream();
