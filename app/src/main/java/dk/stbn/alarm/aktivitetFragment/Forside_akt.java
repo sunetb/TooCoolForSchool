@@ -28,6 +28,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -36,6 +38,7 @@ import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.IO;
+import dk.stbn.alarm.lyttere.Alarm_Lytter;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import dk.stbn.alarm.lyttere.SletNotifikation_Lytter;
@@ -77,6 +80,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
         }
 
+        Tekst test = new Tekst("Test", "TEST", "t", new DateTime().plusSeconds(30));
+        p(test);
+        Util.startAlarm(this, test);
+        //TESTET feb 2019 og virker: Alarm_Lytter.bygNotifikation (this, "hej", test.id, test.id_int);
 
 
     }
@@ -484,7 +491,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         NotificationCompat.Builder mBuilder =
                 null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             mBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.cool_nobkgr_71x71)
                     .setContentTitle("Too Cool for School")
@@ -492,7 +499,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     .setAutoCancel(true)
                     .setCategory(Notification.CATEGORY_ALARM)
                     .setOnlyAlertOnce(true);
-        }
+       // }
+
         //ingen effekt.setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
 
         Intent resultIntent = new Intent(context, Forside_akt.class);

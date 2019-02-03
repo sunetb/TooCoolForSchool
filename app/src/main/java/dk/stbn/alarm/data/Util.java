@@ -68,7 +68,7 @@ public class Util {
         alm.cancel(i);
     }
 
-    static void startAlarm (Context c, Tekst t) {
+    public static void startAlarm (Context c, Tekst t) {
         p("Util.startAlarm() modtog "+t.overskrift);
 
         ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
@@ -361,7 +361,7 @@ public class Util {
                         else if (celletæller == 3) {
 
                             put  = put.replaceFirst("<title", "<!--title")
-                                    .replaceFirst("</title>", "<title-->");
+                                    .replaceFirst("</title>", "<title-->").replaceAll("\"#212121\"", "white").replaceAll("#000000", "#ffffff");
 
                             if (tempTekst.kategori.equalsIgnoreCase("h"))
                                 put =  put.replaceFirst("<body", "<body style=\"color: yellow; background-color: black;\"");

@@ -46,24 +46,11 @@ public class Alarm_Lytter extends BroadcastReceiver {
         Util.opdaterKalender(context, "Alarm_Lytter.onrecieve");
     }
 
-    void bygNotifikation (Context context, String overskrift, String id, int id_int) {
+    public static void bygNotifikation (Context context, String overskrift, String id, int id_int) {
         //opdateret i henhold til https://stackoverflow.com/questions/44489657/android-o-reporting-notification-not-posted-to-channel-but-it-is
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        p("bygnotifikation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
-        Util.baglog("Notifikation bygget: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int, context);
-        Notification.Builder mBuilder =
-                new Notification.Builder(context)
-						.setSmallIcon(R.drawable.cool_nobkgr_71x71)
-                        .setContentTitle("Too Cool for School")
-                        .setContentText(overskrift)
-                        .setAutoCancel(true)
-                        .setOnlyAlertOnce(true);
-        //ingen effekt: .setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mBuilder.setCategory(Notification.CATEGORY_ALARM);
-        }
         CharSequence name = context.getString(R.string.app_name);
         String description = "Too Cool for School";
         final String NOTIFICATION_CHANNEL_ID = "4565";
@@ -74,6 +61,24 @@ public class Alarm_Lytter extends BroadcastReceiver {
             channel.setDescription(description);
             notificationManager.createNotificationChannel(channel);
         }
+
+
+         p("bygnotifikation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
+        Util.baglog("Notifikation bygget: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int, context);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
+
+        mBuilder.setSmallIcon(R.drawable.cool_nobkgr_71x71)
+                        .setContentTitle("Too Cool for School")
+                        .setContentText(overskrift)
+                        .setAutoCancel(true)
+                        .setOnlyAlertOnce(true);
+        //ingen effekt: .setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setCategory(Notification.CATEGORY_ALARM);
+        }
+
 
         Intent resultIntent = new Intent(context, Forside_akt.class);
         resultIntent.putExtra("overskrift", overskrift);
@@ -93,8 +98,12 @@ public class Alarm_Lytter extends BroadcastReceiver {
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Notification n = mBuilder
-                .build();
+        Notification n = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            n = mBuilder
+                    .build();
+        }
+        else return;
 
         //-- Hvis brugeren sletter notifikationen ved swipe eller tømmer alle notifikationer
         Intent sletteIntent = new Intent(context, SletNotifikation_Lytter.class);
@@ -107,8 +116,8 @@ public class Alarm_Lytter extends BroadcastReceiver {
     }
 
 
-    void p (Object o){
-        Util.p("AlarmModtag."+o);
+    static void p (Object o){
+        Util.p("AlarmLytter."+o);
     }
 
 }
