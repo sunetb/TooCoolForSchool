@@ -80,9 +80,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
         }
 
-        Tekst test = new Tekst("Test", "TEST", "t", new DateTime().plusSeconds(30));
-        p(test);
-        Util.startAlarm(this, test);
+       // Tekst test = new Tekst("Test", "TEST", "t", new DateTime().plusSeconds(30));
+        //p(test);
+        //Util.startAlarm(this, test);
         //TESTET feb 2019 og virker: Alarm_Lytter.bygNotifikation (this, "hej", test.id, test.id_int);
 
 
