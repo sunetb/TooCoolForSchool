@@ -13,7 +13,8 @@
         android:label="Too Cool For School"
         android:supportsRtl="true"
         android:theme="@style/SortBaggrund"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:usesCleartextTraffic="true">
         <activity android:name=".aktivitetFragment.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
