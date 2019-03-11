@@ -11,8 +11,9 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.appspector.sdk.AppSpector;
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.DatabaseReference;
 //import com.google.firebase.database.DatabaseReference;
 //import com.google.firebase.database.FirebaseDatabase;
 
@@ -116,7 +117,7 @@ public class A extends Application implements Observatør {
 //////////-------------------------//////////
 
 
-    DatabaseReference myRef;
+    //DatabaseReference myRef;
 
     /*-----------------------------noter
 
@@ -174,6 +175,7 @@ public class A extends Application implements Observatør {
         if (!EMULATOR) {
             Fabric.with(this, new Crashlytics());
             Util.baglog = true;
+
         }
 //        FirebaseApp.initializeApp(ctx);
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
