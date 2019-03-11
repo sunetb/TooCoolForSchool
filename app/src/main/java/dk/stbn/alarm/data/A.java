@@ -177,6 +177,10 @@ public class A extends Application implements Observatør {
             Util.baglog = true;
 
         }
+        AppSpector
+                .build(this)
+                .withDefaultMonitors()
+                .run("android_ZDdiOWY3YWQtZGVjNy00ZWNiLThkMTAtYTI4YmI2OWIzNDEy");
 //        FirebaseApp.initializeApp(ctx);
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
 
