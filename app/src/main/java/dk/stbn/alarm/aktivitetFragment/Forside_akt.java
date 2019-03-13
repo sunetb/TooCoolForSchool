@@ -11,10 +11,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
@@ -28,8 +26,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import org.joda.time.DateTime;
-
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -38,7 +34,7 @@ import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.IO;
-import dk.stbn.alarm.lyttere.Alarm_Lytter;
+import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import dk.stbn.alarm.lyttere.SletNotifikation_Lytter;
@@ -222,7 +218,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         kontakt.setImageResource(R.drawable.ic_send_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
                         IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        if (a.modenhed == a.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
+                        if (a.getModenhed() == K.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
                     }
                     return true;
                 }
@@ -243,7 +239,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         del.setImageResource(R.drawable.ic_share_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
                         IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        if (a.modenhed == a.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
+                        if (a.getModenhed() == K.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
                     }
                     return true;
                 }

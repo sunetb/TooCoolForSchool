@@ -33,6 +33,7 @@ import java.util.Locale;
 import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.aktivitetFragment.Forside_akt;
 import dk.stbn.alarm.diverse.IO;
+import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
@@ -74,13 +75,10 @@ public class A extends Application implements Observatør {
 	
 //////////---------- APP TILSTAND ----------//////////
 
+
+
     public static DateTime masterDato;
-    public int modenhed = 0;
-    final int MODENHED_HELT_FRISK = 0;
-    final int MODENHED_FØRSTE_DAG = 1;
-    final int MODENHED_ANDEN_DAG = 2;
-    public final int MODENHED_MODEN = 3;
-    final int SOMMERFERIE = 4;
+    private int modenhed = 0;
     boolean tredjeDagFørsteGang = false;
 
 
@@ -215,14 +213,14 @@ public class A extends Application implements Observatør {
         p("Modenhed global før tjekModenhed(): "+modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
         modenhed = tjekModenhed();
 
-        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst1", true) && modenhed < MODENHED_ANDEN_DAG;
+        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst1", true) && modenhed < K.MODENHED_ANDEN_DAG;
 
         String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
         pref.edit().putString("sprog", sprog).commit();
         p("SPROG "+ sprog);
 
-        if (modenhed > MODENHED_HELT_FRISK && !sprog.equalsIgnoreCase(gemtSprog) ) tvingTeksthentningEnGangTil = true;
+        if (modenhed > K.MODENHED_HELT_FRISK && !sprog.equalsIgnoreCase(gemtSprog) ) tvingTeksthentningEnGangTil = true;
 
         if (tvingTeksthentningEnGangTil)  {
             p("Tvinger teksthentning");
@@ -243,7 +241,7 @@ public class A extends Application implements Observatør {
 
     private void overgangTilLazyLoadingAfAlarmer() {
 
-        if (pref.getBoolean("sletAlarmer", true) && modenhed > MODENHED_ANDEN_DAG){
+        if (pref.getBoolean("sletAlarmer", true) && modenhed > K.MODENHED_ANDEN_DAG){
 
             Util.rensUdIAlarmer(ctx);
 
@@ -307,7 +305,7 @@ public class A extends Application implements Observatør {
     private void tjekOpstart() {
         //-- Tjek om der er opdateringer til tekstene
         tjekTekstversion("tjekOpstart()");
-        if (modenhed == SOMMERFERIE) {
+        if (modenhed == K.SOMMERFERIE) {
             p("sommerferie!!!");
             synligeTekster.add((Tekst) IO.læsObj("otekst1", this));
             synligeTekster.add((Tekst) IO.læsObj("otekst2", this));
@@ -320,7 +318,7 @@ public class A extends Application implements Observatør {
 
             return;
         }
-        if (modenhed > MODENHED_HELT_FRISK) {
+        if (modenhed > K.MODENHED_HELT_FRISK) {
 
             if (tredjeDagFørsteGang){
                 p("tredje dag første gang!! ");
@@ -365,7 +363,7 @@ public class A extends Application implements Observatør {
 
         }
 
-        if (modenhed == MODENHED_MODEN) {
+        if (modenhed == K.MODENHED_MODEN) {
 
 
             if (skalTekstlistenOpdateres("a")) {
@@ -376,17 +374,17 @@ public class A extends Application implements Observatør {
 
         }
 
-        else if (modenhed == MODENHED_HELT_FRISK) {
+        else if (modenhed == K.MODENHED_HELT_FRISK) {
             p("oncreate() Modenhed: Helt frisk");
             initAllerFørsteGang();
             IO.gemObj(new DateTime(), "masterdato", this);
         }
 
-        else if (modenhed == MODENHED_FØRSTE_DAG) {
+        else if (modenhed == K.MODENHED_FØRSTE_DAG) {
             p("Dag 1, ikke første gang");
         }
 
-        else if (modenhed == MODENHED_ANDEN_DAG) {
+        else if (modenhed == K.MODENHED_ANDEN_DAG) {
             p("Dag 2 ");
             if (pref.getBoolean("andenDagFørsteGang", true)) {
                 p("Dag 2 første gang");
@@ -427,7 +425,7 @@ public class A extends Application implements Observatør {
                         int idag = Util.lavDato(masterDato);
 
                         pref.edit()
-                                .putInt("modenhed", MODENHED_FØRSTE_DAG)
+                                .putInt("modenhed", K.MODENHED_FØRSTE_DAG)
                                 .putInt("installationsdato", idag)
                                 .commit();
                     //-- hertil
@@ -603,7 +601,7 @@ public class A extends Application implements Observatør {
 
 
                 ArrayList<Tekst> tempSynlige = new ArrayList<>();
-                if (modenhed != MODENHED_MODEN){
+                if (modenhed != K.MODENHED_MODEN){
 
                     tempSynlige.add((Tekst) alleTekster[0].get(0));//IO.læsObj("otekst1", ctx));
                     tempSynlige.add((Tekst) alleTekster[0].get(1));//IO.læsObj("otekst2", ctx));
@@ -747,7 +745,7 @@ public class A extends Application implements Observatør {
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                if (modenhed == MODENHED_MODEN)
+                if (modenhed == K.MODENHED_MODEN)
                     skalTekstlistenOpdateres("a.gemAlleNyeTekster()onPost"); ///KÆDE
                     gemAlleTeksterTilDisk();
                     p("gemAlleNyeTekster() slut");
@@ -776,7 +774,7 @@ public class A extends Application implements Observatør {
     public boolean skalTekstlistenOpdateres(String kaldtfra) {
         p("skalTekstlistenOpdateres("+kaldtfra+") start________");
 
-        if (modenhed == SOMMERFERIE) return false;
+        if (modenhed == K.SOMMERFERIE) return false;
 
         new AsyncTask() {
             @Override
@@ -997,49 +995,49 @@ public class A extends Application implements Observatør {
          if (masterDato.isAfter(sommerferie_start) && masterDato.isBefore(sommerferie_slut)) {
             p("Tjekmodenhed siger SOMMERFERIE");
             p("SOMMER-prefs ");
-            pref.edit().putInt("modenhed", MODENHED_HELT_FRISK)
+            pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK)
                     .putInt("senesteposition", -1)
                     .commit();
 
-            return SOMMERFERIE;
+            return K.SOMMERFERIE;
         }
 
 
-        int moden = pref.getInt("modenhed", MODENHED_HELT_FRISK);
+        int moden = pref.getInt("modenhed", K.MODENHED_HELT_FRISK);
         p("Modenhed i tjekModenhed() er "+moden);
 
-		if (moden == MODENHED_MODEN) return MODENHED_MODEN;
+		if (moden == K.MODENHED_MODEN) return K.MODENHED_MODEN;
 		
 		int idag = Util.lavDato(masterDato);
 
-        if (moden == MODENHED_HELT_FRISK) {
+        if (moden == K.MODENHED_HELT_FRISK) {
            //koden herfra er flyttet til initAllerFørsteGang() for at den ikke bliver kørt med mindre appen får hentet sine data
 
-            return MODENHED_HELT_FRISK;
+            return K.MODENHED_HELT_FRISK;
         }
-        else if (moden == MODENHED_FØRSTE_DAG){
+        else if (moden == K.MODENHED_FØRSTE_DAG){
 			int instDato  = pref.getInt("installationsdato", 0);
-			if (idag == instDato) return MODENHED_FØRSTE_DAG;
+			if (idag == instDato) return K.MODENHED_FØRSTE_DAG;
 			else {
                 pref.edit()
-                .putInt("modenhed", MODENHED_ANDEN_DAG)
+                .putInt("modenhed", K.MODENHED_ANDEN_DAG)
                 .putInt("installationsdato2", idag)
                 .commit();
-				return MODENHED_ANDEN_DAG;
+				return K.MODENHED_ANDEN_DAG;
 			}
 		}
-        else if (moden == MODENHED_ANDEN_DAG){
+        else if (moden == K.MODENHED_ANDEN_DAG){
             int instDatoPlusEn = pref.getInt("installationsdato2", 0);
-            if (idag == instDatoPlusEn) return MODENHED_ANDEN_DAG;
+            if (idag == instDatoPlusEn) return K.MODENHED_ANDEN_DAG;
             else {
-                pref.edit().putInt("modenhed", MODENHED_MODEN).commit();
+                pref.edit().putInt("modenhed", K.MODENHED_MODEN).commit();
                 tredjeDagFørsteGang = true;
                 p("tjekModenhed() Tredje dag første gang sat til true");
             }
             //return MODENHED_MODEN;
         }
         p("tjekModenhed() slut ");
-        return MODENHED_MODEN;
+        return K.MODENHED_MODEN;
     }
 
     // -- 100% baggrund
@@ -1193,6 +1191,8 @@ public class A extends Application implements Observatør {
 
     }
 
+
+
     void t(String s){
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
@@ -1205,7 +1205,7 @@ public class A extends Application implements Observatør {
     public void opdater(int hændelse) {
 
         if (hændelse == Lyttersystem.NYE_TEKSTER_ONLINE) {
-            if (modenhed == MODENHED_MODEN || modenhed == SOMMERFERIE) hentNyeTekster();
+            if (modenhed == K.MODENHED_MODEN || modenhed == K.SOMMERFERIE) hentNyeTekster();
         }
 
     }
@@ -1242,8 +1242,10 @@ public class A extends Application implements Observatør {
     }
 
 
-
-
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GETTERS-SETTERS
+    public int getModenhed() {
+        return modenhed;
+    }
 
 
 
