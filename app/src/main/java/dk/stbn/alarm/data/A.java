@@ -78,7 +78,7 @@ public class A extends Application implements Observatør {
 
 
 
-    public static DateTime masterDato;
+    public static DateTime masterDato; //TODO: lav non-static
     private int modenhed = 0;
     boolean tredjeDagFørsteGang = false;
 
@@ -110,8 +110,6 @@ public class A extends Application implements Observatør {
     public int hændelsesId = 0;
     public int skærmVendt = 0;
     public int nyPageradapter = 0;
-    boolean tvingTeksthentningEnGangTil = true;
-
 
 //////////-------------------------//////////
 
@@ -214,23 +212,13 @@ public class A extends Application implements Observatør {
 
         p("Modenhed global før tjekModenhed(): "+modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
         modenhed = tjekModenhed();
-
-        tvingTeksthentningEnGangTil = pref.getBoolean("tvingNyTekst1", true) && modenhed < K.MODENHED_ANDEN_DAG;
+//Slet dette:
 
         String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
         pref.edit().putString("sprog", sprog).commit();
         p("SPROG "+ sprog);
 
-        if (modenhed > K.MODENHED_HELT_FRISK && !sprog.equalsIgnoreCase(gemtSprog) ) tvingTeksthentningEnGangTil = true;
-
-        if (tvingTeksthentningEnGangTil)  {
-            p("Tvinger teksthentning");
-            hentNyeTekster();
-            sletData();
-            pref.edit().putInt("tekstversion", 0).commit();
-            pref.edit().putBoolean("tvingNyTekst1", false).commit();
-        }
         tjekOpstart();
         //FirebaseDatabase database = FirebaseDatabase.getInstance();
         //DatabaseReference myRef = database.getReference("message");
