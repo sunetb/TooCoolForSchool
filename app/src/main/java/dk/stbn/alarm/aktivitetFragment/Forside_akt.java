@@ -206,7 +206,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public boolean onLongClick(View v) {
 
-                    A.testtilstand =  !A.testtilstand;
+                    a.testtilstand =  !a.testtilstand;
                     if (A.testtilstand) {
                         testDialog(TESTTILSTAND_1,"Test-tilstand aktiveret");
 
@@ -228,8 +228,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public boolean onLongClick(View v) {
 
-                    A.testtilstand_2 =  !A.testtilstand_2;
-                    if (A.testtilstand_2) {
+                    a.testtilstand_2 =  !a.testtilstand_2;
+                    if (a.testtilstand_2) {
                         testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
 
                         del.setImageResource(R.drawable.cool_nobkgr_50x50_rund);
@@ -279,7 +279,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         }
         else {
-            Lyttersystem.lyt(this);
+            a.lytter.lyt(this);
             vp.addOnPageChangeListener(sideLytter);
             if (A.debugging) pa.notifyDataSetChanged(); //lidt groft ?
             visPosition = prefs.getInt("senesteposition", vp.getCurrentItem());
@@ -299,7 +299,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-        Lyttersystem.afregistrer(this);
+        a.lytter.afregistrer(this);
         vp.removeOnPageChangeListener(sideLytter);
         a.aktivitetenVises = false;
         prefs.edit().putInt("senesteposition", vp.getCurrentItem()).commit();
@@ -342,7 +342,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void opdater(int event) {
-        if (event == Lyttersystem.SYNLIGETEKSTER_OPDATERET){
+        if (event == K.SYNLIGETEKSTER_OPDATERET){
              new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -353,7 +353,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             }, 50);
 
         }
-        else if (event == Lyttersystem.HTEKSTER_OPDATERET){
+        else if (event == K.HTEKSTER_OPDATERET){
             if (hListeadapter != null) hListeadapter.notifyDataSetChanged();
             extras.setEnabled(true);
             extras.getBackground().setAlpha(255);
@@ -582,7 +582,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                         if (!a.synligeTekster.contains(valgtHTekst)) {
                             a.synligeTekster.add(valgtHTekst);
-                            Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog", a.hændelsesId++);
+                            a.lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog", a.hændelsesId++);
                             pa.notifyDataSetChanged();
                             vp.setCurrentItem(a.synligeTekster.size()-1);
                         }

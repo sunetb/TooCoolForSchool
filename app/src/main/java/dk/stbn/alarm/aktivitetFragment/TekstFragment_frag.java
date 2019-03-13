@@ -16,6 +16,7 @@ import dk.stbn.alarm.R;
 import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Util;
+import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 
 
@@ -54,7 +55,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
 		p("synligeTekster.size="+a.synligeTekster.size());
 		if (a.synligeTekster.size() == 0 || tekst == null){
-			a.opdater(Lyttersystem.NYE_TEKSTER_ONLINE);
+			a.opdater(K.NYE_TEKSTER_ONLINE);
 			p("onCreateView() FEJL ingen data");
 			t.setText(Html.fromHtml("Vent et øjeblik"));
 			w.loadData(A.hoved +"Netforbindelsen er måske langsom. Hvis der ikke sker noget om lidt, så prøv at genstarte appen.."+ A.hale, "text/html; charset=utf-8", "UTF-8");
@@ -80,6 +81,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 
 		//-- Hvis teksten er M eller H: gul overskrift
 		if (null == tekst || null == tekst.kategori) {
+
 			t.setText(Html.fromHtml("Vent lidt"));
 			w.loadData(A.hoved +"Der er sket en fejl. Vi arbejder på sagen. Netforbindelsen er måske langsom. Hvis der ikke sker noget om lidt, så prøv at genstarte appen.."+ A.hale, "text/html; charset=utf-8", "UTF-8");
 

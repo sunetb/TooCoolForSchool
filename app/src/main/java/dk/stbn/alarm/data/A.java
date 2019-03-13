@@ -46,6 +46,7 @@ public class A extends Application implements Observatør {
     public static A a;
 	public SharedPreferences pref;
     public Context ctx;
+    public Lyttersystem lytter;
     static AlarmManager alm;
 
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
@@ -187,6 +188,7 @@ public class A extends Application implements Observatør {
 
         a= this;
         ctx=this;
+        lytter = Lyttersystem.getInstance();
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
 
@@ -197,8 +199,8 @@ public class A extends Application implements Observatør {
         //til test
         //pref.edit().putInt("tekstversion",1).commit();
         //hertil
-        Lyttersystem.nulstil();
-        Lyttersystem.lyt(this);
+        lytter.nulstil();
+        lytter.lyt(this);
 
         erDerGået5dageOgHarViPasseretSommerferie();
 
@@ -438,7 +440,7 @@ public class A extends Application implements Observatør {
                         p("Så er der O-tekst i array!");
 
                         if (aktivitetenVises)
-                            Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                            lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
                         else
                             p("Aktiviteten blev klar EFTER at data blev klar");
 
@@ -519,7 +521,7 @@ public class A extends Application implements Observatør {
             protected void onProgressUpdate(Object... values) {
                 super.onProgressUpdate(values);
                 p("Lyttersystem kaldes fra onProgress i initallerførstegang");
-                Lyttersystem.givBesked(Lyttersystem.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
 
             }
 
@@ -714,13 +716,13 @@ public class A extends Application implements Observatør {
                     hteksterOverskrifter = tempHOverskrifter;
 
                     //-- Fyrer argument til event
-                    publishProgress(Lyttersystem.HTEKSTER_OPDATERET);
+                    publishProgress(K.HTEKSTER_OPDATERET);
 
                     synligeTekster.clear();
                     synligeTekster = tempSynlige;
 
                     //-- Fyrer argument til event
-                    publishProgress(Lyttersystem.SYNLIGETEKSTER_OPDATERET);
+                    publishProgress(K.SYNLIGETEKSTER_OPDATERET);
                     p("tjek synligetekster efter init: længde: "+synligeTekster.size());
                     for (Tekst t : synligeTekster) p(t.toString());
 
@@ -737,9 +739,9 @@ public class A extends Application implements Observatør {
             protected void onProgressUpdate(Object... values) {
                 super.onProgressUpdate(values);
                 int hændelse = (int) values[0];
-                p("gemAlleNye..().Async.onprogress..()  modtog "+hændelse + " = "+ Lyttersystem.hændelsestekst(hændelse));
+                p("gemAlleNye..().Async.onprogress..()  modtog "+hændelse + " = "+ K.hændelsestekst(hændelse));
 
-                Lyttersystem.givBesked(hændelse, "gemallenye, Htekster OG Synlige, forgrund: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                lytter.givBesked(hændelse, "gemallenye, Htekster OG Synlige, forgrund: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
             }
 
             @Override
@@ -920,7 +922,7 @@ public class A extends Application implements Observatør {
                         synligeTekster.add( (Tekst) IO.læsObj(""+i,ctx));
 
                     }
-                    Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET, "skaltekstlistenopdaetere() synlige UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                    lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "skaltekstlistenopdaetere() synlige UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
                     gemSynligeTekster();
                     IO.gemObj(synligeDatoer, "synligeDatoer", ctx);
 
@@ -1090,7 +1092,7 @@ public class A extends Application implements Observatør {
                 p("gemt tekstversion: "+gemtTekstversion);
 
                 if (gemtTekstversion<version){//(modenhed == MODENHED_MODEN && gemtTekstversion<version) {
-                    Lyttersystem.givBesked(Lyttersystem.NYE_TEKSTER_ONLINE, "tjektekstverion, nye online, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                    lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstverion, nye online, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
                     pref.edit().putInt("tekstversion", version).commit();
                 }
             }
@@ -1148,7 +1150,7 @@ public class A extends Application implements Observatør {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET, "rul, synlige, UI-tråd? : "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "rul, synlige, UI-tråd? : "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
             }
         }, 10);
     }
@@ -1168,7 +1170,7 @@ public class A extends Application implements Observatør {
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                Lyttersystem.givBesked(Lyttersystem.HTEKSTER_OPDATERET, "tjekOpstart, htekster, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                lytter.givBesked(K.HTEKSTER_OPDATERET, "tjekOpstart, htekster, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
             }
         }.execute();
 
@@ -1204,7 +1206,7 @@ public class A extends Application implements Observatør {
     @Override
     public void opdater(int hændelse) {
 
-        if (hændelse == Lyttersystem.NYE_TEKSTER_ONLINE) {
+        if (hændelse == K.NYE_TEKSTER_ONLINE) {
             if (modenhed == K.MODENHED_MODEN || modenhed == K.SOMMERFERIE) hentNyeTekster();
         }
 
@@ -1218,7 +1220,7 @@ public class A extends Application implements Observatør {
         sletData();
         synligeTekster.clear();
         synligeTekster.add((Tekst) IO.læsObj("otekst1", ctx));
-        Lyttersystem.givBesked(Lyttersystem.SYNLIGETEKSTER_OPDATERET,"fuld frisk start", 1000);
+        lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET,"fuld frisk start", 1000);
 
 
         pref.edit().putInt("modenhed", 0).commit();
