@@ -171,11 +171,12 @@ public class A extends Application implements Observatør {
     @Override
     public void onCreate() {
         super.onCreate();
+        p("oncreate() kaldt");
         boolean EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator");
         if (!EMULATOR) {
             Fabric.with(this, new Crashlytics());
             Util.baglog = true;
-
+            p("Enhed: " + Build.MODEL + "  "+Build.PRODUCT);
         }
         AppSpector
                 .build(this)
@@ -185,7 +186,7 @@ public class A extends Application implements Observatør {
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         Util.starttid = System.currentTimeMillis();
-        p("oncreate() kaldt: UI-tråd: "+Thread.currentThread().getName());
+
         a= this;
         ctx=this;
         pref = PreferenceManager.getDefaultSharedPreferences(this);

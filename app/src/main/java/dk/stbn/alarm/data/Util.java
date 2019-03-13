@@ -304,7 +304,7 @@ public class Util {
                             }
                             if ("o".equalsIgnoreCase(txt)){
                                 tempTekst.kategori = "o";
-                                p("||||||||||||||||||||OOOOOOOOOOOOOOO|||||||||||||||||||||");
+                                p("persXML() Otekst fundet");
                             }
                             else if ("stop".equalsIgnoreCase(txt)){
                                 p("parseXML() stop fundet");

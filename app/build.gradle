@@ -7,11 +7,12 @@ buildscript {
     dependencies {
         classpath 'io.fabric.tools:gradle:1.27.0'
         classpath "com.appspector:android-sdk-plugin:1.+"
+        //classpath 'com.google.gms:google-services:4.2.0'  //til Firebase. Husk apply plugin: 'com.google.gms.google-services' skal stå nederst.
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'com.appspector.sdk'
-apply plugin: 'io.fabric' // giver fejl:  variant.getExternalNativeBuildTasks()' is obsolete and has been replaced with 'variant.getExternalNativeBuildProviders()'.
+apply plugin: 'io.fabric'
 
 
 repositories {
