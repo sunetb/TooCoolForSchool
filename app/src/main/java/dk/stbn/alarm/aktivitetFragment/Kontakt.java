@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joda.time.DateTime;
+
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Util;
@@ -36,9 +38,6 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
 
     TextView version;
 
-    //-> ress
-    String manglerNavn = "Du mangler at skrive dit navn";
-    String manglerBesked = "Du har ikke skrevet nogen besked i feltet";
     String ver;
 
     SharedPreferences pref;
@@ -92,9 +91,11 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         p(ver);  p(ver);
         version.setText(ver);
         //-- Skriver tekst-data til loggen
-        a.testTekster ();
+        //a.testTekster ();
         //-- Skriver baggrunds-lytter-log
         Util.skrivBaglog(this);
+        p("Tester isbefore: "+A.masterDato.isBefore(new DateTime()));
+        p("Tester isAfter: "+new DateTime().isAfter(A.masterDato));
     }
 
     @Override

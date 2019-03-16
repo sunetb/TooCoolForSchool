@@ -303,8 +303,8 @@ public class A extends Application implements Observatør {
             indlæsHtekster();
 
             synligeDatoer = new ArrayList<>();
-            synligeDatoer.add(1000);//der skal være noget synligeDatoer, ellers kaldes sletAlt()
-            for (Tekst t : synligeTekster) p(t);
+            synligeDatoer.add(1000);//der skal være noget i synligeDatoer, ellers kaldes sletAlt()
+            //for (Tekst t : synligeTekster) p(t);
 
             return;
         }
@@ -606,6 +606,8 @@ public class A extends Application implements Observatør {
                     p("IdTekst: "+itekst.id);
                     datoliste.add(itekst.id_int);
                     IO.gemObj(itekst, "" + tekstid, ctx);
+
+
                     if (tekstid >= dummyITekst.id_int) {
 
                         if (!iFundet && tekstid == dummyITekst.id_int) {
