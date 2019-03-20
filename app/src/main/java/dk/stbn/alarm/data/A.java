@@ -604,10 +604,11 @@ public class A extends Application implements Observatør {
                     int tekstid = itekst.id_int;
                     p("Tjek Itekster: " + tekstid);
                     p("IdTekst: "+itekst.id);
+
                     datoliste.add(itekst.id_int);
                     IO.gemObj(itekst, "" + tekstid, ctx);
 
-
+                    //Tjek om teksten skal vises
                     if (tekstid >= dummyITekst.id_int) {
 
                         if (!iFundet && tekstid == dummyITekst.id_int) {

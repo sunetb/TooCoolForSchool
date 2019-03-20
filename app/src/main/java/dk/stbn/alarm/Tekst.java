@@ -22,15 +22,44 @@ public class Tekst implements Serializable {
 	}
 
 	public Tekst(String over, String brød, String katg, DateTime d) {
-		if (katg.equalsIgnoreCase("h")) dato = d.minusDays(7);
+		if (katg.equalsIgnoreCase("h")) dato = d.minusDays(7); //H-teksters dato sættes 7 dage tilbage. TODO: Er det ikke M-Tekster der skal det?
 		else dato = d;
 		kategori = katg;
 		overskrift =over;
 		brødtekst=brød;
 		lavId();
 	}
+	/**
+	 * Er denne teksts dato FØR den dato vi sammenligner med?
+	 * Tidspunkt på dagen ignoreres
+	 */
+	boolean før (DateTime a){
+		return a.toLocalDate().isBefore(dato.toLocalDate());
+	}
 
+	/**
+	 * Er denne teksts dato EFTER den dato vi sammenligner med?
+	 * Tidspunkt på dagen ignoreres
+	 */
+	boolean efter (DateTime a){
+		return a.toLocalDate().isAfter(dato.toLocalDate());
+	}
 
+	/**
+	 * Er denne teksts dato FØR den tekst vi sammenligner meds dato?
+	 * Tidspunkt på dagen ignoreres
+	 */
+	boolean før (Tekst a){
+		return a.dato.toLocalDate().isBefore(dato.toLocalDate());
+	}
+
+	/**
+	 * Er denne teksts dato FØR den tekst vi sammenligner meds dato?
+	 * Tidspunkt på dagen ignoreres
+	 */
+	boolean efter (Tekst a){
+		return a.dato.toLocalDate().isAfter(dato.toLocalDate());
+	}
 
 	int datokode() {
 		if (kategori.equals("h")) return 0;
