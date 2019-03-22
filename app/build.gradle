@@ -11,6 +11,8 @@ buildscript {
     }
 }
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.appspector.sdk'
 apply plugin: 'io.fabric'
 
@@ -19,6 +21,7 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://maven.google.com" }
     maven { url "https://maven.appspector.com/artifactory/android-sdk"}
+    mavenCentral()
 }
 
 
@@ -60,6 +63,7 @@ dependencies {
         transitive = true
     }
     implementation "com.appspector:android-sdk:1.+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 apply plugin: 'com.google.gms.google-services'

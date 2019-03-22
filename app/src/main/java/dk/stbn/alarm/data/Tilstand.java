@@ -8,6 +8,8 @@ import dk.stbn.alarm.diverse.K;
 
 public class Tilstand {
 
+//TODO    Skal den laves om til ViewModel?
+
     public DateTime masterDato;
     public int modenhed;
     SharedPreferences pref;
