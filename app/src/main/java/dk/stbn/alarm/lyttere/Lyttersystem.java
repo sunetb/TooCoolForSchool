@@ -3,6 +3,7 @@ package dk.stbn.alarm.lyttere;
 import java.util.ArrayList;
 
 import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.K;
 
@@ -12,6 +13,8 @@ import dk.stbn.alarm.diverse.K;
 public class Lyttersystem {
 
     private static Lyttersystem instans;
+    private Tilstand tilstand;
+
 
     public static Lyttersystem getInstance(){
         if (instans == null) return new Lyttersystem();
@@ -44,26 +47,21 @@ public class Lyttersystem {
     }
 
     // -- Må KUN kaldes fra hovedtråden
-    public void givBesked(int hændelse, String besked, int id) {
-        p("1: givebesked MODTOG: : "+besked+ " hændelse: "+K.hændelsestekst(hændelse)+ " id: "+id);
+    public void givBesked(int hændelse, String besked) {
+        p("1: givebesked MODTOG: : "+besked+ " hændelse: "+K.hændelsestekst(hændelse));
         //senesteHændelse =hændelse;
         setSenesteHændelse(hændelse);
 
-        if (hændelse == K.HTEKSTER_OPDATERET) A.hteksterKlar= true;
+        if (hændelse == K.HTEKSTER_OPDATERET)
+            A.hteksterKlar= true;
 
-     //   new Handler(Looper.getMainLooper()).postDelayed(new Runnable() { //-- Sikrer at den køres i hovedtråden
-       //     @Override
-         //   public void run() {
-           //     tæller = 0;
+
                 for (Observatør o: observatører) {
                     o.opdater(hændelse);
-             //       tæller++;
                 }
                 p("2: givBesked() SENDTE "+getSenesteHændelse() + ": "+ K.hændelsestekst(getSenesteHændelse())+" " + " tråd: "+Thread.currentThread().getName());
-                //senesteHændelse= 0;
-         //   }
-       // },0);
-        p("3: Hændelse: "+hændelse + " VS. senesteHændelse: "+getSenesteHændelse()+ " id: "+id);
+
+        p("3: Hændelse: "+hændelse + " VS. senesteHændelse: "+getSenesteHændelse());
         Util.baglog("Lyttersystem.givBesked(): Modenhed = "+ K.hændelsestekst(hændelse), A.a);
     }
 

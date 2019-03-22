@@ -32,6 +32,7 @@ import java.util.Locale;
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
@@ -51,6 +52,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     boolean datoÆndret = false;
     ArrayAdapter hListeadapter = null;
     public BroadcastReceiver mLangReceiver = null;
+    Tilstand tilstand;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +63,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
         a = A.a;
-        p(" idag er: "+ A.masterDato.getDayOfMonth() + ": " + A.masterDato.getMonthOfYear() + " - "+ A.masterDato.getYear());
+        tilstand = Tilstand.getInstance(this);
+        p(" idag er: "+ tilstand.masterDato.getDayOfMonth() + ": " + tilstand.masterDato.getMonthOfYear() + " - "+ tilstand.masterDato.getYear());
         setupLangReceiver();
 
         prefs = a.pref;
@@ -218,7 +221,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         kontakt.setImageResource(R.drawable.ic_send_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
                         IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        if (a.getModenhed() == K.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
+                        if (tilstand.modenhed == K.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
                     }
                     return true;
                 }
@@ -239,7 +242,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         del.setImageResource(R.drawable.ic_share_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
                         IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        if (a.getModenhed() == K.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
+                        if (tilstand.modenhed == K.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
                     }
                     return true;
                 }
@@ -371,8 +374,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }
         else if (a.sidstKendteVindueshøjde == vindueshøjdetmp) return false;
         else a.sidstKendteVindueshøjde = vindueshøjdetmp;
-        a.skærmVendt++;
-        p("Skærm vendt "+a.skærmVendt + " gange");
+        tilstand.skærmVendt++;
+        p("Skærm vendt "+tilstand.skærmVendt + " gange");
         return true;
     }
 
@@ -582,7 +585,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                         if (!a.synligeTekster.contains(valgtHTekst)) {
                             a.synligeTekster.add(valgtHTekst);
-                            a.lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog", a.hændelsesId++);
+                            a.lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog");
                             pa.notifyDataSetChanged();
                             vp.setCurrentItem(a.synligeTekster.size()-1);
                         }

@@ -92,7 +92,7 @@ public class Util {
         alarmIntent = PendingIntent.getBroadcast(c, t.id_int, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
         p("Util.startAlarm()      Dato: "+t.dato.toString());
-        p("Util.startAlarm() Dags Dato: "+A.masterDato);
+       // p("Util.startAlarm() Dags Dato: "+A.tilstand.masterDato);
 
         alarmMgr.set(AlarmManager.RTC, t.dato.getMillis(), alarmIntent);
     }
@@ -210,29 +210,29 @@ public class Util {
     }
 
 
-    static boolean visMtekst(DateTime mTid){
+    static boolean visMtekst(DateTime mTid, DateTime masterDato){
         String logbesked = "Util.visMtekst() "+ mTid.getDayOfMonth()+ "/"+mTid.getMonthOfYear();
         //-- Eks: 11 september     ///Vises                    5, 6, 7, 8, 9, 10, 11
                                    ///Vises ikke: 1, 2, 3. 4.                         12, 13, 14, sept
 
         //-- Tjek om  m-dato er idag
-        if (erSammeDato(mTid)) return true;
+        if (erSammeDato(mTid, masterDato)) return true;
 
 
         //-- Tjek om idag er 12 sept eller efter.
-        if (mTid.isBefore(A.masterDato)) return false;
+        if (mTid.isBefore(masterDato)) return false;
 
         //-- Tjek om idag er 4. sept eller tidligere
         DateTime syvFør = mTid.minusDays(7);
-        p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!syvFør.isAfter(A.masterDato));
+        p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!syvFør.isAfter(masterDato));
 
-        return !syvFør.isAfter(A.masterDato);
+        return !syvFør.isAfter(masterDato);
     }
 
-    static boolean erSammeDato(DateTime tid){
+    static boolean erSammeDato(DateTime tid, DateTime masterDato){
         //-- Sammenligner en DateTime med dags dato men ignorerer klokkelæt (og årstal)
         int dag = tid.getDayOfMonth();
-        DateTime nu = A.masterDato;
+        DateTime nu = masterDato;
         int idagD = nu.getDayOfMonth();
 
         if (dag != idagD) return false;
@@ -243,6 +243,12 @@ public class Util {
         return mrd == idagMrd;
     }
 
+    /**
+     * Ikke kompatibel med testmetoden rul(int)
+     * @param xml
+     * @param kaldtFra
+     * @return
+     */
     static ArrayList[] parseXML (String xml, String kaldtFra) {
         p("Util.parseXML kaldt fra "+kaldtFra);
 
@@ -250,7 +256,7 @@ public class Util {
         ArrayList<Tekst> teksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> mteksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> hteksterTmp = new ArrayList<Tekst>();
-        DateTime idag = A.masterDato;
+        //DateTime idag = A.masterDato;
         try {
 
             XmlPullParser parser;
@@ -341,6 +347,7 @@ public class Util {
                                     }
 
                                     //vi regner selv ud hvilket år vi skal skrive, så vi kan spare opdatering af datafilen
+                                    DateTime idag = new DateTime();
                                     int år = idag.getYear();
                                     int måneddd = idag.getMonthOfYear();
                                     boolean andetHalvår = måneddd > 6 ;

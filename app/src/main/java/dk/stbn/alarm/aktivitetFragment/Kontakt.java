@@ -94,13 +94,6 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         //a.testTekster ();
         //-- Skriver baggrunds-lytter-log
         Util.skrivBaglog(this);
-        p("Tester isbefore: "+A.masterDato.withTimeAtStartOfDay().isBefore(new DateTime().withTimeAtStartOfDay()));
-        p("Tester isAfter: "+new DateTime().withTimeAtStartOfDay().isAfter(A.masterDato.withTimeAtStartOfDay()));
-        p("Igen med  toLocalDate()");
-        p("Tester isbefore: "+A.masterDato.toLocalDate().isBefore(new DateTime().toLocalDate()));
-        p("Tester isAfter: "+new DateTime().toLocalDate().isAfter(A.masterDato.toLocalDate()));
-
-
 
     }
 

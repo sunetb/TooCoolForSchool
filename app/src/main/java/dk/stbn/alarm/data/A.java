@@ -76,11 +76,11 @@ public class A extends Application implements Observatør {
 	
 //////////---------- APP TILSTAND ----------//////////
 
+    public Tilstand tilstand;
 
-
-    public static DateTime masterDato; //TODO: lav non-static
-    private int modenhed = 0;
-    boolean tredjeDagFørsteGang = false;
+    //public static DateTime masterDato; //TODO: lav non-static ?
+    //private int modenhed = 0;
+    //boolean tredjeDagFørsteGang = false;
 
 
 //////////-------------------------//////////
@@ -107,8 +107,6 @@ public class A extends Application implements Observatør {
     public static boolean testtilstand = false;
     public static boolean testtilstand_2 = false;
     public String henteurltest = "http://www.lightspeople.net/sune/skole/tekstertest.xml";
-    public int hændelsesId = 0;
-    public int skærmVendt = 0;
     public int nyPageradapter = 0;
 
 //////////-------------------------//////////
@@ -187,6 +185,7 @@ public class A extends Application implements Observatør {
         a= this;
         ctx=this;
         lytter = Lyttersystem.getInstance();
+        tilstand = Tilstand.getInstance(this);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
 
@@ -206,12 +205,12 @@ public class A extends Application implements Observatør {
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
 
-        masterDato = new DateTime();
+        //masterDato = new DateTime();
 
 
 
-        p("Modenhed global før tjekModenhed(): "+modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
-        modenhed = tjekModenhed();
+        p("Modenhed global før tjekModenhed(): "+tilstand.modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
+        //modenhed = tjekModenhed();
 //Slet dette:
 
         String sprog = Locale.getDefault().getLanguage();
@@ -225,13 +224,13 @@ public class A extends Application implements Observatør {
 
         //myRef.setValue("Hello, World!");
         overgangTilLazyLoadingAfAlarmer();
-        p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ modenhed);
+        p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ tilstand.modenhed);
 
     }//Oncreate færdig
 
     private void overgangTilLazyLoadingAfAlarmer() {
 
-        if (pref.getBoolean("sletAlarmer", true) && modenhed > K.MODENHED_ANDEN_DAG){
+        if (pref.getBoolean("sletAlarmer", true) && tilstand.modenhed > K.MODENHED_ANDEN_DAG){
 
             Util.rensUdIAlarmer(ctx);
 
@@ -248,7 +247,7 @@ public class A extends Application implements Observatør {
         DateTime sidstGemteDato = (DateTime) IO.læsObj("gamleDato", ctx);
 
 
-        IO.gemObj(masterDato, "gamleDato", ctx);
+        IO.gemObj(tilstand.masterDato, "gamleDato", ctx);
 
         if (sidstGemteDato == null) return;
         else {//har vi passeret sommereferien?
@@ -257,7 +256,7 @@ public class A extends Application implements Observatør {
 
         }
 //        Er der gået 5 dage siden sidste start? Så opdater kalenderpunkter i Alarmmanageren
-        if (sidstGemteDato.plusDays(6).isBefore(masterDato)) {
+        if (sidstGemteDato.plusDays(6).isBefore(tilstand.masterDato)) {
             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] objects) {
@@ -293,6 +292,7 @@ public class A extends Application implements Observatør {
     }
 
     private void tjekOpstart() {
+        int modenhed = tilstand.modenhed;
         //-- Tjek om der er opdateringer til tekstene
         tjekTekstversion("tjekOpstart()");
         if (modenhed == K.SOMMERFERIE) {
@@ -310,7 +310,7 @@ public class A extends Application implements Observatør {
         }
         if (modenhed > K.MODENHED_HELT_FRISK) {
 
-            if (tredjeDagFørsteGang){
+            if (tilstand.tredjeDagFørsteGang){
                 p("tredje dag første gang!! ");
                 //-- Viewpageren nulstilles (og viser sidste element i listen når det starter)
                 pref.edit().putInt("senesteposition", -1).commit();
@@ -329,7 +329,7 @@ public class A extends Application implements Observatør {
                     }
                 });
 
-                tredjeDagFørsteGang = false;
+                tilstand.tredjeDagFørsteGang = false;
             }
             else {
                 synligeTekster = hentsynligeTekster();
@@ -412,7 +412,7 @@ public class A extends Application implements Observatør {
                 else {
 
                     //-- Denne kode burde egentlig stå i tjekModenhed() men er flyttet hertil så appen kun kan modnes hvis den får data første gang.
-                        int idag = Util.lavDato(masterDato);
+                        int idag = Util.lavDato(tilstand.masterDato);
 
                         pref.edit()
                                 .putInt("modenhed", K.MODENHED_FØRSTE_DAG)
@@ -428,7 +428,7 @@ public class A extends Application implements Observatør {
                         p("Så er der O-tekst i array!");
 
                         if (aktivitetenVises)
-                            lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                            lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: "+Thread.currentThread().getName());
                         else
                             p("Aktiviteten blev klar EFTER at data blev klar");
 
@@ -509,7 +509,7 @@ public class A extends Application implements Observatør {
             protected void onProgressUpdate(Object... values) {
                 super.onProgressUpdate(values);
                 p("Lyttersystem kaldes fra onProgress i initallerførstegang");
-                lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: "+Thread.currentThread().getName());
 
             }
 
@@ -579,7 +579,7 @@ public class A extends Application implements Observatør {
             @Override
             protected Object doInBackground(Object[] params) {
 
-                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", masterDato);
+                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", tilstand.masterDato);
                 dummyITekst.lavId();
                 ArrayList<Integer> datoliste = new ArrayList();
 
@@ -591,7 +591,7 @@ public class A extends Application implements Observatør {
 
 
                 ArrayList<Tekst> tempSynlige = new ArrayList<>();
-                if (modenhed != K.MODENHED_MODEN){
+                if (tilstand.modenhed != K.MODENHED_MODEN){
 
                     tempSynlige.add((Tekst) alleTekster[0].get(0));//IO.læsObj("otekst1", ctx));
                     tempSynlige.add((Tekst) alleTekster[0].get(1));//IO.læsObj("otekst2", ctx));
@@ -631,7 +631,7 @@ public class A extends Application implements Observatør {
                     }
                 }
 
-                Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", masterDato);
+                Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", tilstand.masterDato);
                 dummyMTekst.lavId();
                 p("Tjek M dummytekst id: "+dummyMTekst.id_int);
 
@@ -680,7 +680,7 @@ public class A extends Application implements Observatør {
                                 p("Eksakt match Mtekst");
                                 tempSynlige.add(mtekst);
 
-                            } else if (Util.visMtekst(mtekst.dato) ){
+                            } else if (Util.visMtekst(mtekst.dato, tilstand.masterDato) ){
                                 tempSynlige.add(mtekst);
                                 p("Mtekst ineksakt match --");
                             }
@@ -732,13 +732,13 @@ public class A extends Application implements Observatør {
                 int hændelse = (int) values[0];
                 p("gemAlleNye..().Async.onprogress..()  modtog "+hændelse + " = "+ K.hændelsestekst(hændelse));
 
-                lytter.givBesked(hændelse, "gemallenye, Htekster OG Synlige, forgrund: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                lytter.givBesked(hændelse, "gemallenye, Htekster OG Synlige, forgrund: "+Thread.currentThread().getName());
             }
 
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                if (modenhed == K.MODENHED_MODEN)
+                if (tilstand.modenhed == K.MODENHED_MODEN)
                     skalTekstlistenOpdateres("a.gemAlleNyeTekster()onPost"); ///KÆDE
                     gemAlleTeksterTilDisk();
                     p("gemAlleNyeTekster() slut");
@@ -767,7 +767,7 @@ public class A extends Application implements Observatør {
     public boolean skalTekstlistenOpdateres(String kaldtfra) {
         p("skalTekstlistenOpdateres("+kaldtfra+") start________");
 
-        if (modenhed == K.SOMMERFERIE) return false;
+        if (tilstand.modenhed == K.SOMMERFERIE) return false;
 
         new AsyncTask() {
             @Override
@@ -795,14 +795,14 @@ public class A extends Application implements Observatør {
                     return false;
                 }
 
-                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", masterDato);
+                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", tilstand.masterDato);
                 dummyITekst.lavId();
                 int idag = dummyITekst.id_int;
                 p("Tjek I dummytekst id: "+dummyITekst.id_int);
 
 				boolean iFundet = false;
 
-                Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", masterDato);
+                Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", tilstand.masterDato);
                 dummyMTekst.lavId();
                 int mIdag = dummyMTekst.id_int;
                 p("Tjek M dummytekst id: "+dummyMTekst.id_int);
@@ -849,7 +849,7 @@ public class A extends Application implements Observatør {
                         //Todo: bør skrives om til at bruge tekst id i stedet for at hente alle tekster
                         Tekst t = (Tekst) IO.læsObj(""+datoliste.get(i), ctx);
 
-                        if (Util.visMtekst(t.dato)) {
+                        if (Util.visMtekst(t.dato, tilstand.masterDato)) {
                             synligeDatoer.add(datoliste.get(i));
                             break; //Tillader ikke to m-tekster. KAN konflikte med notifikationer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     	}
@@ -914,7 +914,7 @@ public class A extends Application implements Observatør {
                         synligeTekster.add( (Tekst) IO.læsObj(""+i,ctx));
 
                     }
-                    lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "skaltekstlistenopdaetere() synlige UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                    lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "skaltekstlistenopdaetere() synlige UI-tråd: "+Thread.currentThread().getName());
                     gemSynligeTekster();
                     IO.gemObj(synligeDatoer, "synligeDatoer", ctx);
 
@@ -977,7 +977,7 @@ public class A extends Application implements Observatør {
 		return Util.parseXML(input, "hentTeksterOnline");
 
     }
-
+/*
     private int tjekModenhed() {
 
         DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
@@ -1033,7 +1033,7 @@ public class A extends Application implements Observatør {
         p("tjekModenhed() slut ");
         return K.MODENHED_MODEN;
     }
-
+*/
     // -- 100% baggrund
     private void tjekTekstversion(String kaldtFra) {
         p("tjekTekstversion() kaldt fra "+ kaldtFra);
@@ -1084,7 +1084,7 @@ public class A extends Application implements Observatør {
                 p("gemt tekstversion: "+gemtTekstversion);
 
                 if (gemtTekstversion<version){//(modenhed == MODENHED_MODEN && gemtTekstversion<version) {
-                    lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstverion, nye online, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                    lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstverion, nye online, UI-tråd: "+Thread.currentThread().getName());
                     pref.edit().putInt("tekstversion", version).commit();
                 }
             }
@@ -1104,12 +1104,15 @@ public class A extends Application implements Observatør {
 
     }
 
-    // - - Til test
+    /**
+     * debugging: Tving ny app-dato
+     * @param antaldage
+     */
     public void rul(int antaldage) {
         p("rul() kaldt");
 
-        masterDato = masterDato.plusDays(antaldage);
-        if (testtilstand_2) masterDato = new DateTime();
+        tilstand.masterDato = tilstand.masterDato.plusDays(antaldage);
+        if (testtilstand_2) tilstand.masterDato = new DateTime();
 //        t("Idag er "+ masterDato.getDayOfMonth() + " / " + masterDato.getMonthOfYear() + " - " + masterDato.getYear());
 
         synligeTekster = new ArrayList();  //brugeas af pageradapteren
@@ -1118,13 +1121,13 @@ public class A extends Application implements Observatør {
         hteksterOverskrifter = new ArrayList();
         sidstKendteVindueshøjde = 0;
 
-        modenhed = 0;
-        tredjeDagFørsteGang = false;
+        tilstand.modenhed = 0;
+        tilstand.tredjeDagFørsteGang = false;
 
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
 
-        modenhed = tjekModenhed();
+
         tjekOpstart();
         p("rul() sover 1½ sek");
         try {
@@ -1142,7 +1145,7 @@ public class A extends Application implements Observatør {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "rul, synlige, UI-tråd? : "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "rul, synlige, UI-tråd? : "+Thread.currentThread().getName());
             }
         }, 10);
     }
@@ -1162,7 +1165,7 @@ public class A extends Application implements Observatør {
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                lytter.givBesked(K.HTEKSTER_OPDATERET, "tjekOpstart, htekster, UI-tråd: "+Thread.currentThread().getName()+ "id = ", hændelsesId++);
+                lytter.givBesked(K.HTEKSTER_OPDATERET, "tjekOpstart, htekster, UI-tråd: "+Thread.currentThread().getName());
             }
         }.execute();
 
@@ -1199,7 +1202,7 @@ public class A extends Application implements Observatør {
     public void opdater(int hændelse) {
 
         if (hændelse == K.NYE_TEKSTER_ONLINE) {
-            if (modenhed == K.MODENHED_MODEN || modenhed == K.SOMMERFERIE) hentNyeTekster();
+            if (tilstand.modenhed == K.MODENHED_MODEN || tilstand.modenhed == K.SOMMERFERIE) hentNyeTekster();
         }
 
     }
@@ -1212,7 +1215,7 @@ public class A extends Application implements Observatør {
         sletData();
         synligeTekster.clear();
         synligeTekster.add((Tekst) IO.læsObj("otekst1", ctx));
-        lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET,"fuld frisk start", 1000);
+        lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET,"fuld frisk start");
 
 
         pref.edit().putInt("modenhed", 0).commit();
@@ -1224,7 +1227,7 @@ public class A extends Application implements Observatør {
         p("Slet data blev kaldt");
         pref.edit().clear().commit();
 
-        pref.edit().putInt("modenhed", modenhed).commit();
+        pref.edit().putInt("modenhed", tilstand.modenhed).commit();
 
         ArrayList tomTekst = new ArrayList<Tekst>();
         IO.gemObj(tomTekst, "tempsynligeTekster", this);
@@ -1236,10 +1239,6 @@ public class A extends Application implements Observatør {
     }
 
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GETTERS-SETTERS
-    public int getModenhed() {
-        return modenhed;
-    }
 
 
 
