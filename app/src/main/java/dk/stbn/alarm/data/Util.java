@@ -123,7 +123,7 @@ public class Util {
                 }
                 if (t.id_int <300000000){  //Hvis I-tekst
 
-                    if (t.dato.isBeforeNow())
+                    if (fortid(t.dato))
                         gamle.add(t.id_int);
 
                     else{
@@ -132,7 +132,7 @@ public class Util {
                     }
                 }
                 else{ //-- Hvis m-tekst
-                    if(t.dato.isBeforeNow())
+                    if(fortid(t.dato))
                         gamle.add(t.id_int);
                     else {
                         //-- M-tekster har både notifikation på dagen ...
@@ -220,13 +220,13 @@ public class Util {
 
 
         //-- Tjek om idag er 12 sept eller efter.
-        if (mTid.isBefore(masterDato)) return false;
+        if (før(mTid,masterDato)) return false;
 
         //-- Tjek om idag er 4. sept eller tidligere
         DateTime syvFør = mTid.minusDays(7);
-        p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!syvFør.isAfter(masterDato));
+        p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!efter(syvFør,masterDato));
 
-        return !syvFør.isAfter(masterDato);
+        return !efter(syvFør,masterDato);
     }
 
     static boolean erSammeDato(DateTime tid, DateTime masterDato){
@@ -242,6 +242,26 @@ public class Util {
 
         return mrd == idagMrd;
     }
+
+
+    static boolean før (DateTime a, DateTime b){
+
+        return a.toLocalDate().isBefore(b.toLocalDate());
+    }
+
+    static boolean efter (DateTime a, DateTime b){
+
+        return a.toLocalDate().isAfter(b.toLocalDate());
+    }
+
+    static boolean fortid (DateTime d){
+
+        return d.toLocalDate().isBefore(new DateTime().toLocalDate());
+    }
+
+
+
+
 
     /**
      * Ikke kompatibel med testmetoden rul(int)

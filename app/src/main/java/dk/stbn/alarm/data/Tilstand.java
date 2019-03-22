@@ -39,7 +39,7 @@ public class Tilstand {
         p(sommerferie_slut);
 
 
-        if (masterDato.isAfter(sommerferie_start) && masterDato.isBefore(sommerferie_slut)) {
+        if (Util.efter(masterDato, sommerferie_start) && Util.før(masterDato, sommerferie_slut)) {
             p("Tjekmodenhed siger SOMMERFERIE");
             p("SOMMER-prefs ");
             pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK)

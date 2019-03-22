@@ -250,13 +250,13 @@ public class A extends Application implements Observatør {
         IO.gemObj(tilstand.masterDato, "gamleDato", ctx);
 
         if (sidstGemteDato == null) return;
-        else {//har vi passeret sommereferien?
+        else {//har vi passeret sommerferien?
             DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
-            if (sidstGemteDato.isBefore(sommerferie_start)) sletAlt();
+            if (Util.før(sidstGemteDato,sommerferie_start)) sletAlt();
 
         }
 //        Er der gået 5 dage siden sidste start? Så opdater kalenderpunkter i Alarmmanageren
-        if (sidstGemteDato.plusDays(6).isBefore(tilstand.masterDato)) {
+        if (Util.før(sidstGemteDato.plusDays(6),tilstand.masterDato)) {
             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] objects) {
@@ -853,7 +853,7 @@ public class A extends Application implements Observatør {
                             synligeDatoer.add(datoliste.get(i));
                             break; //Tillader ikke to m-tekster. KAN konflikte med notifikationer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     	}
-                        else if (t.dato.isBeforeNow())
+                        else if (Util.fortid(t.dato))
                             slettes.add(datoliste.get(i));
 
 					}
