@@ -5,8 +5,10 @@ public class K {
     public static final int MODENHED_HELT_FRISK  = 0;
     public static final int MODENHED_FØRSTE_DAG  = 1;
     public static final int MODENHED_ANDEN_DAG   = 2;
-    public static final int MODENHED_MODEN       = 3;
-    public static final int SOMMERFERIE          = 4;
+    public static final int MODENHED_TREDJE_DAG  = 3;
+    public static final int MODENHED_FJERDE_DAG  = 4;
+    public static final int MODENHED_MODEN       = 5;
+    public static final int SOMMERFERIE          = 6;
 
     public static final int SYNLIGETEKSTER_OPDATERET = 1;
     public static final String ET = "SYNLIGETEKSTER_OPDATERET";
