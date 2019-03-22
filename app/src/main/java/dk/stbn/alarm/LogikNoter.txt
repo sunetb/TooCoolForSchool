@@ -1,0 +1,39 @@
+
+Hvilke tekster vises hvornår. Og hvilke system for notifikationer. (H-tekster skal altid vises i deres eget vindue og er ikke afhængige af tilstand)
+
+Hvis det er sommerferie (modenhed 6):
+O-tekst3
+(Kun den eller plus de senseste 3 I-tekster?)
+
+Hvis ikke sommerferie:
+
+Når appen er nyinstalleret (modenhed 0) og hele første dag (modenhed 1):
+O-tekst1
+M-tekster ignoreres
+Ingen notifikationer
+
+Når appen er mellem 1 og 2 døgn gammel (modenhed 2):
+O-tekst1
+O-tekst2
+M-tekster ignoreres?
+Notifikation for O-tekst2
+
+Når appen er mellem 2 og 3 døgn gammel (modenhed 3):
+O-tekst1
+O-tekst2
+Nyeste I-tekst
+Evt M-tekst
+Notifikation: appen er låst op + evt M-tekst
+
+Når appen er mellem 3 og 4 døgn gammel (modenhed 4):
+O-tekst2
+Nyeste to I-tekster
+Evt M-tekst
+Notifikation for nyeste I-tekst + evt M-tekst
+
+Når appen er over 4 døgn gammel (modenhed 5):
+Nyeste tre I-tekster
+Evt M-tekst
+Notifikation for nyeste I-tekst + evt M-tekst
+
+

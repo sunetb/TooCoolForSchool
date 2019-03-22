@@ -366,7 +366,7 @@ public class A extends Application implements Observatør {
 
         else if (modenhed == K.MODENHED_HELT_FRISK) {
             p("oncreate() Modenhed: Helt frisk");
-            initAllerFørsteGang();
+            allerførsteGangInitOTekst();
             IO.gemObj(new DateTime(), "masterdato", this);
         }
 
@@ -390,9 +390,9 @@ public class A extends Application implements Observatør {
         //singletonKlar = true;
     }
 
-    private void initAllerFørsteGang(){
+    private void allerførsteGangInitOTekst(){
 
-        tjekTekstversion("initAllerFørsteGang"); //køres for at få gemt versionsnummer i prefs første gang
+        tjekTekstversion("allerførsteGangInitOTekst"); //køres for at få gemt versionsnummer i prefs første gang
         // må ikke kaldes fra baggrundstråd?
 
         new AsyncTask() {
@@ -400,7 +400,7 @@ public class A extends Application implements Observatør {
             @Override
             protected Object doInBackground(Object[] params) {
 
-                alleTekster = hentTeksterOnline("initAllerFørsteGang()");
+                alleTekster = hentTeksterOnline("allerførsteGangInitOTekst()");
 
                 return null;
             }
@@ -434,7 +434,7 @@ public class A extends Application implements Observatør {
 
                         IO.gemObj(o1, "otekst1", ctx);
 
-                        initAllerFørsteGang_2();// async-kæde: ting der også kan gøres i baggrunden, men som er afhængige af værdier herfra
+                        allerførsteGangInitHtekster();// async-kæde: ting der også kan gøres i baggrunden, men som er afhængige af værdier herfra
                     }
             }
         }.execute();
@@ -448,16 +448,16 @@ public class A extends Application implements Observatør {
             @Override
             public void run() {
                 p("Prøvigen() kaldt "+Thread.currentThread().getName());
-                initAllerFørsteGang();
+                allerførsteGangInitOTekst();
 
             }
         }, 5000);
 
     }
 
-    private void initAllerFørsteGang_2() {
+    private void allerførsteGangInitHtekster() {
 
-        p("initAllerFørsteGang_2() kaldt");
+        p("allerførsteGangInitHtekster() kaldt");
 
         new AsyncTask() {
 
@@ -883,6 +883,7 @@ public class A extends Application implements Observatør {
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
+
 				boolean ny = false;
 
 
@@ -1004,7 +1005,7 @@ public class A extends Application implements Observatør {
 		int idag = Util.lavDato(masterDato);
 
         if (moden == K.MODENHED_HELT_FRISK) {
-           //koden herfra er flyttet til initAllerFørsteGang() for at den ikke bliver kørt med mindre appen får hentet sine data
+           //koden herfra er flyttet til allerførsteGangInitOTekst() for at den ikke bliver kørt med mindre appen får hentet sine data
 
             return K.MODENHED_HELT_FRISK;
         }
@@ -1217,7 +1218,7 @@ public class A extends Application implements Observatør {
         pref.edit().putInt("modenhed", 0).commit();
         //rul(0);
 
-        //initAllerFørsteGang();
+        //allerførsteGangInitOTekst();
     }
     void sletData(){
         p("Slet data blev kaldt");
