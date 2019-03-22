@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.diverse.IO;
+import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Alarm_Lytter;
 import dk.stbn.alarm.lyttere.Boot_Lytter;
 
@@ -123,7 +124,7 @@ public class Util {
                 }
                 if (t.id_int <300000000){  //Hvis I-tekst
 
-                    if (fortid(t.dato))
+                    if (Tid.fortid(t.dato))
                         gamle.add(t.id_int);
 
                     else{
@@ -132,7 +133,7 @@ public class Util {
                     }
                 }
                 else{ //-- Hvis m-tekst
-                    if(fortid(t.dato))
+                    if(Tid.fortid(t.dato))
                         gamle.add(t.id_int);
                     else {
                         //-- M-tekster har både notifikation på dagen ...
@@ -216,48 +217,19 @@ public class Util {
                                    ///Vises ikke: 1, 2, 3. 4.                         12, 13, 14, sept
 
         //-- Tjek om  m-dato er idag
-        if (erSammeDato(mTid, masterDato)) return true;
+        if (Tid.erSammeDato(mTid, masterDato)) return true;
 
 
         //-- Tjek om idag er 12 sept eller efter.
-        if (før(mTid,masterDato)) return false;
+        if (Tid.før(mTid,masterDato)) return false;
 
         //-- Tjek om idag er 4. sept eller tidligere
         DateTime syvFør = mTid.minusDays(7);
-        p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!efter(syvFør,masterDato));
+        p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!Tid.efter(syvFør,masterDato));
 
-        return !efter(syvFør,masterDato);
+        return !Tid.efter(syvFør,masterDato);
     }
 
-    static boolean erSammeDato(DateTime tid, DateTime masterDato){
-        //-- Sammenligner en DateTime med dags dato men ignorerer klokkelæt (og årstal)
-        int dag = tid.getDayOfMonth();
-        DateTime nu = masterDato;
-        int idagD = nu.getDayOfMonth();
-
-        if (dag != idagD) return false;
-
-        int mrd = tid.getMonthOfYear();
-        int idagMrd = nu.getMonthOfYear();
-
-        return mrd == idagMrd;
-    }
-
-
-    static boolean før (DateTime a, DateTime b){
-
-        return a.toLocalDate().isBefore(b.toLocalDate());
-    }
-
-    static boolean efter (DateTime a, DateTime b){
-
-        return a.toLocalDate().isAfter(b.toLocalDate());
-    }
-
-    static boolean fortid (DateTime d){
-
-        return d.toLocalDate().isBefore(new DateTime().toLocalDate());
-    }
 
 
 

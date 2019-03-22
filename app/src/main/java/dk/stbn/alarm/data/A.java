@@ -34,6 +34,7 @@ import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.aktivitetFragment.Forside_akt;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
+import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
@@ -47,18 +48,16 @@ public class A extends Application implements Observatør {
 	public SharedPreferences pref;
     public Context ctx;
     public Lyttersystem lytter;
-    static AlarmManager alm;
+    static AlarmManager alm; //TVM
 
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
-    public ArrayList<Tekst> synligeTekster = new ArrayList();  //bruges af pageradapteren
+    public ArrayList<Tekst> synligeTekster = new ArrayList();  //bruges af pageradapteren //TVM
 
-    public ArrayList<Tekst> htekster = new ArrayList();
-    public ArrayList<String> hteksterOverskrifter = new ArrayList();
+    public ArrayList<Tekst> htekster = new ArrayList();  //TVM
+    public ArrayList<String> hteksterOverskrifter = new ArrayList(); //TVM
 
-    public String henteurlDK = "http://www.lightspeople.net/sune/skole/tekster.xml";
-    public String henteurlDE = "http://www.lightspeople.net/sune/skole/tekster_de.xml";
-    public String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
+
 
     public int sidstKendteVindueshøjde = 0;
 
@@ -252,11 +251,11 @@ public class A extends Application implements Observatør {
         if (sidstGemteDato == null) return;
         else {//har vi passeret sommerferien?
             DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
-            if (Util.før(sidstGemteDato,sommerferie_start)) sletAlt();
+            if (Tid.før(sidstGemteDato,sommerferie_start)) sletAlt();
 
         }
 //        Er der gået 5 dage siden sidste start? Så opdater kalenderpunkter i Alarmmanageren
-        if (Util.før(sidstGemteDato.plusDays(6),tilstand.masterDato)) {
+        if (Tid.før(sidstGemteDato.plusDays(6),tilstand.masterDato)) {
             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] objects) {
@@ -853,7 +852,7 @@ public class A extends Application implements Observatør {
                             synligeDatoer.add(datoliste.get(i));
                             break; //Tillader ikke to m-tekster. KAN konflikte med notifikationer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     	}
-                        else if (Util.fortid(t.dato))
+                        else if (Tid.fortid(t.dato))
                             slettes.add(datoliste.get(i));
 
 					}
@@ -956,8 +955,8 @@ public class A extends Application implements Observatør {
             String sprog = Locale.getDefault().getLanguage();
             pref.edit().putString("sprog", sprog).commit();
             p("henter nye tekster på sprog: "+ sprog);
-            URL u = new URL(henteurlDK);
-            if (sprog.equalsIgnoreCase("de")) u = new URL(henteurlDE);
+            URL u = new URL(K.henteurlDK);
+            if (sprog.equalsIgnoreCase("de")) u = new URL(K.henteurlDE);
             InputStream is = u.openStream();
             is = new BufferedInputStream(is);
             is.mark(1);
@@ -1049,7 +1048,7 @@ public class A extends Application implements Observatør {
                 String versionStreng = "";
 
                 try {
-                    URL url = new URL(versionUrl);
+                    URL url = new URL(K.versionUrl);
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
 
@@ -1194,7 +1193,7 @@ public class A extends Application implements Observatør {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
     void p(Object o){
-        String kl = "Singleton.";
+        String kl = "A.";
         Util.p(kl+o);
     }
 

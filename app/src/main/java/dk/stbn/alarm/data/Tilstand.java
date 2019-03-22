@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import org.joda.time.DateTime;
 import dk.stbn.alarm.diverse.K;
+import dk.stbn.alarm.diverse.Tid;
 
 public class Tilstand {
 
@@ -39,7 +40,7 @@ public class Tilstand {
         p(sommerferie_slut);
 
 
-        if (Util.efter(masterDato, sommerferie_start) && Util.før(masterDato, sommerferie_slut)) {
+        if (Tid.efter(masterDato, sommerferie_start) && Tid.før(masterDato, sommerferie_slut)) {
             p("Tjekmodenhed siger SOMMERFERIE");
             p("SOMMER-prefs ");
             pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK)

@@ -29,37 +29,6 @@ public class Tekst implements Serializable {
 		brødtekst=brød;
 		lavId();
 	}
-	/**
-	 * Er denne teksts dato FØR den dato vi sammenligner med?
-	 * Tidspunkt på dagen ignoreres
-	 */
-	boolean før (DateTime a){
-		return a.toLocalDate().isBefore(dato.toLocalDate());
-	}
-
-	/**
-	 * Er denne teksts dato EFTER den dato vi sammenligner med?
-	 * Tidspunkt på dagen ignoreres
-	 */
-	boolean efter (DateTime a){
-		return a.toLocalDate().isAfter(dato.toLocalDate());
-	}
-
-	/**
-	 * Er denne teksts dato FØR den tekst vi sammenligner meds dato?
-	 * Tidspunkt på dagen ignoreres
-	 */
-	boolean før (Tekst a){
-		return a.dato.toLocalDate().isBefore(dato.toLocalDate());
-	}
-
-	/**
-	 * Er denne teksts dato FØR den tekst vi sammenligner meds dato?
-	 * Tidspunkt på dagen ignoreres
-	 */
-	boolean efter (Tekst a){
-		return a.dato.toLocalDate().isAfter(dato.toLocalDate());
-	}
 
 	int datokode() {
 		if (kategori.equals("h")) return 0;

@@ -29,4 +29,8 @@ public class K {
         return "FEJL: Ukendt eventtype";
     }
 
+    public static final String henteurlDK = "http://www.lightspeople.net/sune/skole/tekster.xml";
+    public static final String henteurlDE = "http://www.lightspeople.net/sune/skole/tekster_de.xml";
+    public static final String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
+
 }
