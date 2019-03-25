@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.aktivitetFragment.Forside_akt;
+import dk.stbn.alarm.data.AlarmLogik;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.IO;
 
@@ -43,8 +44,11 @@ public class Alarm_Lytter extends BroadcastReceiver {
             bygNotifikation(context, overskrift, id, id_int);
 
         Util.baglog("Alarm_Lytter.onRecieve(): "+ id + " " +overskrift, context);
-        Util.opdaterKalender(context, "Alarm_Lytter.onrecieve");
+        AlarmLogik.getInstance().opdaterKalender(context, "Alarm_Lytter.onrecieve");
+
+
     }
+
 
     public static void bygNotifikation (Context context, String overskrift, String id, int id_int) {
         //opdateret i henhold til https://stackoverflow.com/questions/44489657/android-o-reporting-notification-not-posted-to-channel-but-it-is

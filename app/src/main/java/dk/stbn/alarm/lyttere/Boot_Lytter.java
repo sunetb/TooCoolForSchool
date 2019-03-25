@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import dk.stbn.alarm.data.AlarmLogik;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.K;
 
@@ -15,20 +16,17 @@ import dk.stbn.alarm.diverse.K;
  * Opdaterer alarmer. Alarmer slettes når telefonen slukkes. Derfor skal de sættes igen ved opstart
  */
 public class Boot_Lytter extends BroadcastReceiver  {
-        Context c;
-        SharedPreferences pref;
+
 
        @Override
         public void onReceive(Context context, Intent intent) {
 
-            c = context;
-            pref = PreferenceManager.getDefaultSharedPreferences(c);
+
+           SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
             if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
             {
-
-
-                //if (A.debugging) Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
+               //if (A.debugging) Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
 
                 int modenhed = pref.getInt("modenhed", -1);
 
@@ -36,7 +34,7 @@ public class Boot_Lytter extends BroadcastReceiver  {
                     AsyncTask.execute(new Runnable() {
                         @Override
                         public void run() {
-                            Util.opdaterKalender(c, "boot-lytter");
+                            AlarmLogik.getInstance().opdaterKalender(context, "boot-lytter");
                         }
                     });
 /*

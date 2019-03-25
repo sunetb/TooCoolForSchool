@@ -49,6 +49,7 @@ public class A extends Application implements Observatør {
     public Context ctx;
     public Lyttersystem lytter;
     static AlarmManager alm; //TVM
+    AlarmLogik alarmlogik;
 
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
@@ -185,6 +186,7 @@ public class A extends Application implements Observatør {
         ctx=this;
         lytter = Lyttersystem.getInstance();
         tilstand = Tilstand.getInstance(this);
+        alarmlogik = AlarmLogik.getInstance();
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
 
@@ -231,7 +233,7 @@ public class A extends Application implements Observatør {
 
         if (pref.getBoolean("sletAlarmer", true) && tilstand.modenhed > K.MODENHED_ANDEN_DAG){
 
-            Util.rensUdIAlarmer(ctx);
+            alarmlogik.rensUdIAlarmer(ctx);
 
             pref.edit().putBoolean("sletAlarmer", false).commit();
 
@@ -259,7 +261,7 @@ public class A extends Application implements Observatør {
             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] objects) {
-                    Util.opdaterKalender(a, "A.onCreate()");
+                    alarmlogik.opdaterKalender(a, "A.onCreate()");
                     return null;
                 }
             }.execute();
@@ -323,7 +325,7 @@ public class A extends Application implements Observatør {
                         for (Tekst t : synligeTekster)
                             IO.føjTilGamle(t.id_int, ctx);
 
-                        Util.opdaterKalender(ctx, "Application singleton");  //-- Kaldes ellers kun fra BootLytter
+                        alarmlogik.opdaterKalender(ctx, "Application singleton");  //-- Kaldes ellers kun fra BootLytter
                         gemSynligeTekster();
                     }
                 });
@@ -595,7 +597,7 @@ public class A extends Application implements Observatør {
                 }
 
                 boolean iFundet = false;
-                fejlen med visning af tekster er her omkring
+    //            fejlen med visning af tekster er her omkring
                 for (int i = 0; i < itekster.size(); i++) {
                     Tekst itekst = itekster.get(i);
                     int tekstid = itekst.id_int;
@@ -677,7 +679,7 @@ public class A extends Application implements Observatør {
                                 p("Eksakt match Mtekst");
                                 tempSynlige.add(mtekst);
 
-                            } else if (Util.visMtekst(mtekst.dato, tilstand.masterDato) ){
+                            } else if (alarmlogik.visMtekst(mtekst.dato, tilstand.masterDato) ){
                                 tempSynlige.add(mtekst);
                                 p("Mtekst ineksakt match --");
                             }
@@ -846,7 +848,7 @@ public class A extends Application implements Observatør {
                         //Todo: bør skrives om til at bruge tekst id i stedet for at hente alle tekster
                         Tekst t = (Tekst) IO.læsObj(""+datoliste.get(i), ctx);
 
-                        if (Util.visMtekst(t.dato, tilstand.masterDato)) {
+                        if (alarmlogik.visMtekst(t.dato, tilstand.masterDato)) {
                             synligeDatoer.add(datoliste.get(i));
                             break; //Tillader ikke to m-tekster. KAN konflikte med notifikationer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     	}
@@ -915,7 +917,7 @@ public class A extends Application implements Observatør {
                     gemSynligeTekster();
                     IO.gemObj(synligeDatoer, "synligeDatoer", ctx);
 
-                    Util.rensUdIAlarmer(ctx);
+                    alarmlogik.rensUdIAlarmer(ctx);
                 }
                 else p("skalTekstlistenOpdateres Ingen ny synlige");
                 p("skalTekstlistenOpdateres() slut");

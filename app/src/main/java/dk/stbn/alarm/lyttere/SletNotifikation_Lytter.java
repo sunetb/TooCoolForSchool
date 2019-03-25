@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import dk.stbn.alarm.data.AlarmLogik;
 import dk.stbn.alarm.data.Util;
 
 /**
@@ -22,7 +23,7 @@ public class SletNotifikation_Lytter extends BroadcastReceiver {
             //if (A.debugging) Toast.makeText(context, "Notifikation "+id+" slettet", Toast.LENGTH_LONG).show();
             p("Notifikation "+id+" slettet");
 
-            Util.notiBrugt(context, intent);
+            AlarmLogik.getInstance().notiBrugt(context, intent);
             Util.baglog("SletNotifikation_Lytter.onRecieve(): Modenhed = "+ id, context);
 
         }
