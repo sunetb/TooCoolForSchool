@@ -5,9 +5,9 @@ import org.joda.time.DateTime;
 public class Tid {
 
 
-    public static boolean erSammeDato(DateTime tid, DateTime masterDato){
+    public static boolean erSammeDato(DateTime a, DateTime b){
 
-        return tid.toLocalDate().isEqual(masterDato.toLocalDate());
+        return a.toLocalDate().isEqual(b.toLocalDate());
     }
 
 

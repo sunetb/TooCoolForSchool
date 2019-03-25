@@ -21,11 +21,8 @@ import dk.stbn.alarm.data.Util;
  */
 public class IO {
 
-    //TODO Lav typetjek
-
-    public static Object læsObj(String filename, Context c) {
-        p("hentet: "+filename);
-        ObjectInputStream input = null;
+     public static Object læsObj(String filename, Context c) {
+         ObjectInputStream input = null;
         Object mitObj = null;
         File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
 
@@ -45,6 +42,7 @@ public class IO {
                 e.printStackTrace();
             }
         }
+        p("hentet: "+filename);
 
         return mitObj;
     }

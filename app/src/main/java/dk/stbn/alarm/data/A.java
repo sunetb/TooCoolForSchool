@@ -223,7 +223,7 @@ public class A extends Application implements Observatør {
 
         //myRef.setValue("Hello, World!");
         overgangTilLazyLoadingAfAlarmer();
-        p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden, 3=moden) "+ tilstand.modenhed);
+        p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden) "+ tilstand.modenhed);
 
     }//Oncreate færdig
 
@@ -334,8 +334,6 @@ public class A extends Application implements Observatør {
                 synligeTekster = hentsynligeTekster();
 
             }
-
-            tjekVisOtekst();//todo: ikke færdig
 
             if (synligeTekster == null) synligeTekster = new ArrayList(); //har oplevet at den der blev hentet på disk var null i forbindelse med opdatering
             else {
@@ -597,7 +595,7 @@ public class A extends Application implements Observatør {
                 }
 
                 boolean iFundet = false;
-
+                fejlen med visning af tekster er her omkring
                 for (int i = 0; i < itekster.size(); i++) {
                     Tekst itekst = itekster.get(i);
                     int tekstid = itekst.id_int;
@@ -976,64 +974,11 @@ public class A extends Application implements Observatør {
 		return Util.parseXML(input, "hentTeksterOnline");
 
     }
-/*
-    private int tjekModenhed() {
 
-        DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
-        p(sommerferie_start);
-        DateTime sommerferie_slut =  new DateTime().withDayOfMonth(20).withMonthOfYear(8);
-        p(sommerferie_slut);
-
-
-         if (masterDato.isAfter(sommerferie_start) && masterDato.isBefore(sommerferie_slut)) {
-            p("Tjekmodenhed siger SOMMERFERIE");
-            p("SOMMER-prefs ");
-            pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK)
-                    .putInt("senesteposition", -1)
-                    .commit();
-
-            return K.SOMMERFERIE;
-        }
-
-
-        int moden = pref.getInt("modenhed", K.MODENHED_HELT_FRISK);
-        p("Modenhed i tjekModenhed() er "+moden);
-
-		if (moden == K.MODENHED_MODEN) return K.MODENHED_MODEN;
-		
-		int idag = Util.lavDato(masterDato);
-
-        if (moden == K.MODENHED_HELT_FRISK) {
-           //koden herfra er flyttet til allerførsteGangInitOTekst() for at den ikke bliver kørt med mindre appen får hentet sine data
-
-            return K.MODENHED_HELT_FRISK;
-        }
-        else if (moden == K.MODENHED_FØRSTE_DAG){
-			int instDato  = pref.getInt("installationsdato", 0);
-			if (idag == instDato) return K.MODENHED_FØRSTE_DAG;
-			else {
-                pref.edit()
-                .putInt("modenhed", K.MODENHED_ANDEN_DAG)
-                .putInt("installationsdato2", idag)
-                .commit();
-				return K.MODENHED_ANDEN_DAG;
-			}
-		}
-        else if (moden == K.MODENHED_ANDEN_DAG){
-            int instDatoPlusEn = pref.getInt("installationsdato2", 0);
-            if (idag == instDatoPlusEn) return K.MODENHED_ANDEN_DAG;
-            else {
-                pref.edit().putInt("modenhed", K.MODENHED_MODEN).commit();
-                tredjeDagFørsteGang = true;
-                p("tjekModenhed() Tredje dag første gang sat til true");
-            }
-            //return MODENHED_MODEN;
-        }
-        p("tjekModenhed() slut ");
-        return K.MODENHED_MODEN;
-    }
-*/
-    // -- 100% baggrund
+    /**
+     * Gemmer tekst-versionsnummer i prefs og fyrer en event hvis der er ny version
+     * @param kaldtFra
+     */
     private void tjekTekstversion(String kaldtFra) {
         p("tjekTekstversion() kaldt fra "+ kaldtFra);
 
@@ -1071,10 +1016,10 @@ public class A extends Application implements Observatør {
             @Override
             protected void onPostExecute(Object tekst) {
                 super.onPostExecute(tekst);
+                String versionstekst = (String) tekst;
 
-
-                if(!"".equals(tekst) && (tekst!=null))
-                    version=Util.tryParseInt((String) tekst);
+                if(!"".equals(versionstekst) && (versionstekst!=null))
+                    version=Util.tryParseInt(versionstekst);
                 else
                     p("Fejl: Hentet tekstversion null eller tom");
 
@@ -1082,8 +1027,8 @@ public class A extends Application implements Observatør {
                 int gemtTekstversion = pref.getInt("tekstversion", 0);
                 p("gemt tekstversion: "+gemtTekstversion);
 
-                if (gemtTekstversion<version){//(modenhed == MODENHED_MODEN && gemtTekstversion<version) {
-                    lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstverion, nye online, UI-tråd: "+Thread.currentThread().getName());
+                if (gemtTekstversion<version){
+                    lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstversion, nye online");
                     pref.edit().putInt("tekstversion", version).commit();
                 }
             }
@@ -1120,7 +1065,7 @@ public class A extends Application implements Observatør {
         hteksterOverskrifter = new ArrayList();
         sidstKendteVindueshøjde = 0;
 
-        tilstand.modenhed = 0;
+        tilstand.modenhed = K.MODENHED_HELT_FRISK;
         tilstand.tredjeDagFørsteGang = false;
 
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
@@ -1178,7 +1123,7 @@ public class A extends Application implements Observatør {
         return -1;
     }
 
-    //-- Htekster har samme id_int
+    //-- Alle Htekster har samme id_int
     public int findTekstnr(String overskrift) {
         for (int i = 0; i < synligeTekster.size(); i++)
             if (overskrift.equals(synligeTekster.get(i).overskrift)) return i;
@@ -1217,7 +1162,7 @@ public class A extends Application implements Observatør {
         lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET,"fuld frisk start");
 
 
-        pref.edit().putInt("modenhed", 0).commit();
+        pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK).commit();
         //rul(0);
 
         //allerførsteGangInitOTekst();

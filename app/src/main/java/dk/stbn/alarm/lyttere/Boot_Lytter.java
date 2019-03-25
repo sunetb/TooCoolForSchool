@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
 import dk.stbn.alarm.data.Util;
+import dk.stbn.alarm.diverse.K;
 
 /**
  * Created by sune on 6/6/16.
@@ -31,7 +32,7 @@ public class Boot_Lytter extends BroadcastReceiver  {
 
                 int modenhed = pref.getInt("modenhed", -1);
 
-                if (modenhed == 3) {
+                if (modenhed == K.MODENHED_MODEN) {
                     AsyncTask.execute(new Runnable() {
                         @Override
                         public void run() {
