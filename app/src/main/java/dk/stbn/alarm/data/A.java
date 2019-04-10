@@ -253,7 +253,7 @@ public class A extends Application implements Observatør {
         if (sidstGemteDato == null) return;
         else {//har vi passeret sommerferien?
             DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
-            if (Tid.før(sidstGemteDato,sommerferie_start)) sletAlt();
+            if (Tid.efter(sidstGemteDato,sommerferie_start)) sletAlt();
 
         }
 //        Er der gået 5 dage siden sidste start? Så opdater kalenderpunkter i Alarmmanageren
@@ -608,9 +608,9 @@ public class A extends Application implements Observatør {
                     IO.gemObj(itekst, "" + tekstid, ctx);
 
                     //Tjek om teksten skal vises
-                    if (tekstid >= dummyITekst.id_int) {
+                    if (!iFundet && tekstid >= dummyITekst.id_int) {
 
-                        if (!iFundet && tekstid == dummyITekst.id_int) {
+                        if (tekstid == dummyITekst.id_int) {
                             p("Itekst eksakt match");
                             iFundet = true;
 
@@ -619,7 +619,7 @@ public class A extends Application implements Observatør {
                             tempSynlige.add(itekster.get(i));
 
 
-                        } else if (!iFundet) {
+                        } else {
                             p("I ineksakt match");
                             iFundet = true;
                             if (i>2) tempSynlige.add(itekster.get(i - 3));
@@ -709,6 +709,23 @@ public class A extends Application implements Observatør {
                     publishProgress(K.HTEKSTER_OPDATERET);
 
                     synligeTekster.clear();
+                    if (tilstand.modenhed == K.MODENHED_HELT_FRISK || tilstand.modenhed == K.MODENHED_FØRSTE_DAG) synligeTekster.add(tempSynlige.get(0));
+                    else if (tilstand.modenhed == K.MODENHED_ANDEN_DAG) {
+                            synligeTekster.add(tempSynlige.get(0));
+                            synligeTekster.add(tempSynlige.get(1));
+                        }
+                    else if (tilstand.modenhed == K.MODENHED_TREDJE_DAG) {
+                        synligeTekster.add(tempSynlige.get(0));
+                        synligeTekster.add(tempSynlige.get(1));
+                        synligeTekster.add(tempSynlige.get(2));
+                    }
+                    else if (tilstand.modenhed == K.MODENHED_FJERDE_DAG) {
+                        synligeTekster.add(tempSynlige.get(1));
+                        synligeTekster.add(tempSynlige.get(2));
+                        synligeTekster.add(tempSynlige.get(3));
+
+                    }
+                    else
                     synligeTekster = tempSynlige;
 
                     //-- Fyrer argument til event
