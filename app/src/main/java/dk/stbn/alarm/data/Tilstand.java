@@ -3,6 +3,8 @@ package dk.stbn.alarm.data;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+
 import org.joda.time.DateTime;
 import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.diverse.Tid;
@@ -42,28 +44,26 @@ public class Tilstand {
 
         if (Tid.efter(masterDato, sommerferie_start) && Tid.før(masterDato, sommerferie_slut)) {
             p("Tjekmodenhed siger SOMMERFERIE");
-            p("SOMMER-prefs ");
             pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK)
                     .putInt("senesteposition", -1)
                     .commit();
-
             return K.SOMMERFERIE;
         }
 
 
-        int moden = pref.getInt("modenhed", K.MODENHED_HELT_FRISK);
-        p("Modenhed i tjekModenhed() er "+moden);
+        int modning = pref.getInt("modenhed", K.MODENHED_HELT_FRISK);
+        p("Modenhed i prefs er "+modning);
 
-        if (moden == K.MODENHED_MODEN) return K.MODENHED_MODEN;
+        if (modning == K.MODENHED_MODEN) return K.MODENHED_MODEN;
 
         int idag = Util.lavDato(masterDato);
 
-        if (moden == K.MODENHED_HELT_FRISK) {
-            //koden herfra er flyttet til A.allerførsteGangInitOTekst() for at den ikke bliver kørt med mindre appen får hentet sine data
+        if (modning == K.MODENHED_HELT_FRISK) {
+            //koden herfra, hvor modning sættes til FØRSTE_DAG, er flyttet til A.allerførsteGangInitOTekst() for at den ikke bliver kørt med mindre appen får hentet sine data
 
             return K.MODENHED_HELT_FRISK;
         }
-        else if (moden == K.MODENHED_FØRSTE_DAG){
+        else if (modning == K.MODENHED_FØRSTE_DAG){
             int instDato  = pref.getInt("installationsdato", 0);
             if (idag == instDato) return K.MODENHED_FØRSTE_DAG;
             else {
@@ -74,17 +74,31 @@ public class Tilstand {
                 return K.MODENHED_ANDEN_DAG;
             }
         }
-        else if (moden == K.MODENHED_ANDEN_DAG){
+        else if (modning == K.MODENHED_ANDEN_DAG){
             int instDatoPlusEn = pref.getInt("installationsdato2", 0);
             if (idag == instDatoPlusEn) return K.MODENHED_ANDEN_DAG;
             else {
-                pref.edit().putInt("modenhed", K.MODENHED_MODEN).commit();
+                pref.edit()
+                        .putInt("modenhed", K.MODENHED_TREDJE_DAG)
+                        .putInt("installationsdato3", idag)
+                        .commit();
                 tredjeDagFørsteGang = true;
                 p("tjekModenhed() Tredje dag første gang sat til true");
+                return K.MODENHED_TREDJE_DAG;
             }
-            //return MODENHED_MODEN;
         }
-        p("tjekModenhed() slut ");
+
+        else if (modning == K.MODENHED_TREDJE_DAG){
+            int instDatoPlusTo = pref.getInt("installationsdato3", 0);
+            if (idag == instDatoPlusTo) return K.MODENHED_TREDJE_DAG;
+            else {
+                pref.edit()
+                        .putInt("modenhed", K.MODENHED_MODEN)
+                        .commit();
+                p("Modenhed sat til MODEN første gang");
+            }
+        }
+
         return K.MODENHED_MODEN;
     }
 
@@ -103,9 +117,17 @@ public class Tilstand {
     }
 
     void p(Object o){
-        String kl = "Singleton.";
+        String kl = "Tilstand.";
         Util.p(kl+o);
     }
 
-
+    @NonNull
+    @Override
+    public String toString() {
+        String s = "Masterdato: "+masterDato + "\n"+
+        "Modenhed: " + modenhed  + "\n"+
+        "Tredje dag, første gang?: " + tredjeDagFørsteGang + "\n"+
+        "Skærm vendt=? " +skærmVendt + "\n";
+        return s;
+    }
 }

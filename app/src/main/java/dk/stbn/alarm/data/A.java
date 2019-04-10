@@ -694,48 +694,39 @@ public class A extends Application implements Observatør {
 
               //  if(modenhed == MODENHED_MODEN) {  /// Kun når appen er moden og der derfor allerede er indlæst et sæt tekster.
 
-                    ArrayList<Tekst> tempHTekster = Util.erstatAfsnit(alleTekster[3]);
-                    ArrayList<String> tempHOverskrifter = new ArrayList<String>();
-                    for (Tekst t : tempHTekster)
-                        tempHOverskrifter.add(t.overskrift.toUpperCase());
+                ArrayList<Tekst> tempHTekster = Util.erstatAfsnit(alleTekster[3]);
+                ArrayList<String> tempHOverskrifter = new ArrayList<String>();
+                for (Tekst t : tempHTekster)
+                    tempHOverskrifter.add(t.overskrift.toUpperCase());
 
 
-                    htekster.clear();
-                    htekster = tempHTekster;
-                    hteksterOverskrifter.clear();
-                    hteksterOverskrifter = tempHOverskrifter;
+                htekster.clear();
+                htekster = tempHTekster;
+                hteksterOverskrifter.clear();
+                hteksterOverskrifter = tempHOverskrifter;
 
-                    //-- Fyrer argument til event
-                    publishProgress(K.HTEKSTER_OPDATERET);
+                //-- Fyrer argument til event
+                publishProgress(K.HTEKSTER_OPDATERET);
 
-                    synligeTekster.clear();
-                    if (tilstand.modenhed == K.MODENHED_HELT_FRISK || tilstand.modenhed == K.MODENHED_FØRSTE_DAG) synligeTekster.add(tempSynlige.get(0));
-                    else if (tilstand.modenhed == K.MODENHED_ANDEN_DAG) {
-                            synligeTekster.add(tempSynlige.get(0));
-                            synligeTekster.add(tempSynlige.get(1));
-                        }
-                    else if (tilstand.modenhed == K.MODENHED_TREDJE_DAG) {
+                synligeTekster.clear();
+                if (tilstand.modenhed == K.MODENHED_HELT_FRISK || tilstand.modenhed == K.MODENHED_FØRSTE_DAG) synligeTekster.add(tempSynlige.get(0));
+                else if (tilstand.modenhed == K.MODENHED_ANDEN_DAG) {
                         synligeTekster.add(tempSynlige.get(0));
                         synligeTekster.add(tempSynlige.get(1));
-                        synligeTekster.add(tempSynlige.get(2));
                     }
-                    else if (tilstand.modenhed == K.MODENHED_FJERDE_DAG) {
-                        synligeTekster.add(tempSynlige.get(1));
-                        synligeTekster.add(tempSynlige.get(2));
-                        synligeTekster.add(tempSynlige.get(3));
+                else if (tilstand.modenhed == K.MODENHED_TREDJE_DAG) {
+                    synligeTekster.add(tempSynlige.get(0));
+                    synligeTekster.add(tempSynlige.get(1));
+                    synligeTekster.add(tempSynlige.get(2));
+                }
+                else
+                synligeTekster = tempSynlige;
 
-                    }
-                    else
-                    synligeTekster = tempSynlige;
+                //-- Fyrer argument til event
+                publishProgress(K.SYNLIGETEKSTER_OPDATERET);
+                p("tjek synligetekster efter init: længde: "+synligeTekster.size());
+                for (Tekst t : synligeTekster) p(t.toString());
 
-                    //-- Fyrer argument til event
-                    publishProgress(K.SYNLIGETEKSTER_OPDATERET);
-                    p("tjek synligetekster efter init: længde: "+synligeTekster.size());
-                    for (Tekst t : synligeTekster) p(t.toString());
-
-
-                //}
-               // else IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
                 gemSynligeTekster();
 
