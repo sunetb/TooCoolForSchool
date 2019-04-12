@@ -54,34 +54,16 @@ public class A extends Application implements Observatør {
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
     public ArrayList<Tekst> synligeTekster = new ArrayList();  //bruges af pageradapteren //TVM
-
     public ArrayList<Tekst> htekster = new ArrayList();  //TVM
     public ArrayList<String> hteksterOverskrifter = new ArrayList(); //TVM
 
 
-
-    public int sidstKendteVindueshøjde = 0;
-
-//////////-------------------------//////////
-	
-
-//////////---------- UI TILSTAND / Lytterstystem ----------//////////
-    public static boolean hteksterKlar = false;
-    public boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
-
-
 //////////-------------------------//////////
 
 
-	
 //////////---------- APP TILSTAND ----------//////////
 
     public Tilstand tilstand;
-
-    //public static DateTime masterDato; //TODO: lav non-static ?
-    //private int modenhed = 0;
-    //boolean femteDagFørsteGang = false;
-
 
 //////////-------------------------//////////
 	
@@ -107,7 +89,7 @@ public class A extends Application implements Observatør {
     public static boolean testtilstand = false;
     public static boolean testtilstand_2 = false;
     public String henteurltest = "http://www.lightspeople.net/sune/skole/tekstertest.xml";
-    public int nyPageradapter = 0;
+
 
 //////////-------------------------//////////
 
@@ -202,7 +184,6 @@ public class A extends Application implements Observatør {
 
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-        p("Modenhed global før tjekModenhed(): "+tilstand.modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
 
 
         String sprog = Locale.getDefault().getLanguage();
@@ -217,6 +198,7 @@ public class A extends Application implements Observatør {
         //myRef.setValue("Hello, World!");
         overgangTilLazyLoadingAfAlarmer();
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) "+ tilstand.modenhed);
+        p("Gemt modenhed: "+ pref.getInt("modenhed", -1));
 
     }//Oncreate færdig
 
@@ -390,7 +372,7 @@ public class A extends Application implements Observatør {
                         synligeTekster.add(o1);
                         p("Så er der O-tekst i array!");
 
-                        if (aktivitetenVises)
+                        if (tilstand.aktivitetenVises)
                             lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: "+Thread.currentThread().getName());
                         else
                             p("Aktiviteten blev klar EFTER at data blev klar");
@@ -703,13 +685,13 @@ public class A extends Application implements Observatør {
                 int hændelse = (int) values[0];
                 p("gemAlleNye..().Async.onprogress..()  modtog "+hændelse + " = "+ K.hændelsestekst(hændelse));
 
-                lytter.givBesked(hændelse, "gemallenye, Htekster OG Synlige, forgrund: "+Thread.currentThread().getName());
+                lytter.givBesked(hændelse, "gemallenye, Htekster OG Synlige");
             }
 
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                if (tilstand.modenhed == K.MODENHED_MODEN)
+                if (tilstand.modenhed == K.MODENHED_MODEN )// TODO: plus || HELT_FRISK ??
                     skalTekstlistenOpdateres("a.gemAlleNyeTekster()onPost"); ///KÆDE
                     gemAlleTeksterTilDisk();
                     p("gemAlleNyeTekster() slut");
@@ -1037,7 +1019,7 @@ public class A extends Application implements Observatør {
         htekster = new ArrayList();
         synligeDatoer = null;
         hteksterOverskrifter = new ArrayList();
-        sidstKendteVindueshøjde = 0;
+        tilstand.sidstKendteVindueshøjde = 0;
 
         tilstand.modenhed = K.MODENHED_HELT_FRISK;
         tilstand.femteDagFørsteGang = false;
@@ -1120,8 +1102,12 @@ public class A extends Application implements Observatør {
     public void opdater(int hændelse) {
 
         if (hændelse == K.NYE_TEKSTER_ONLINE) {
-            if (tilstand.modenhed == K.MODENHED_MODEN || tilstand.modenhed == K.SOMMERFERIE) hentNyeTekster();
+            //if (tilstand.modenhed == K.MODENHED_MODEN || tilstand.modenhed == K.SOMMERFERIE)
+                hentNyeTekster();
         }
+        else if (hændelse == K.HTEKSTER_OPDATERET)
+            tilstand.hteksterKlar= true;
+
 
     }
 

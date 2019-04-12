@@ -19,8 +19,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public PagerAdapter(FragmentManager fm) {
         super(fm);
         a= A.a;
-        a.nyPageradapter++;
-        p("Pageradapter constructor kaldt "+a.nyPageradapter + "gange");
     }
 
     @Override

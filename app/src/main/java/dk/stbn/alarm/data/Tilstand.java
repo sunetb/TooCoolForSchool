@@ -14,23 +14,29 @@ import dk.stbn.alarm.lyttere.Lyttersystem;
 
 public class Tilstand {
 
+
 //TODO Skal den laves om til ViewModel?
 
     public DateTime masterDato;
     public int modenhed;
-    SharedPreferences pref;
     boolean femteDagFørsteGang;
     public int skærmVendt;
+    public boolean hteksterKlar = false;
+    public boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
+    public int sidstKendteVindueshøjde = 0;
+
+    SharedPreferences pref;
     A a;
+
+
+    private final String MODENHED = "modenhed";
 
     private static Tilstand instans;
 
     public static Tilstand getInstance(Context c, A a){
-        if (instans == null) {
+        if (instans == null)
             instans = new Tilstand(c, a);
-            return instans;
-        }
-        else return instans;
+        return instans;
     }
 
 
@@ -39,30 +45,30 @@ public class Tilstand {
         masterDato = new DateTime();
         pref = PreferenceManager.getDefaultSharedPreferences(c);
         modenhed = opdaterModenhed(c);
-        p("opdaterModenhed() returnerede: "+modenhed);
+        p("Global modenhed efter opdaterModenhed: "+modenhed);
+        p("Modenhed i prefs: " + pref.getInt(MODENHED, -1));
     }
 
 
     private int opdaterModenhed(Context c) {
 
-        int modning = pref.getInt("modenhed", K.MODENHED_HELT_FRISK);
-        p("Gemt modenhed er: "+modning);
+        int tempModenhed = pref.getInt(MODENHED, K.MODENHED_HELT_FRISK);
+        p("Gemt modenhed er: "+tempModenhed);
 
-        if (Tid.efter(masterDato, K.sommerferie_slut) && modenhed == K.SOMMERFERIE)
-            pref.edit().putBoolean("harPasseretSommerferie", true).commit();
-
-        boolean harPasseretSommerferie = pref.getBoolean("harPasseretSommerferie", false);
-
+        //Har vi netop passeret sommerferien? Så nulstil appens data
+        boolean harPasseretSommerferie = Tid.efter(masterDato, K.SOMMERFERIE_SLUT) && tempModenhed == K.SOMMERFERIE;
         if (harPasseretSommerferie) {
             sletAlt(c);//nulstiller bla. prefs og derfor også harPasseretSommer..
+            tempModenhed = 0;
+            gemModenhed(K.MODENHED_FØRSTE_DAG);
         }
 
-        else{
-            boolean sommerferie = Tid.efter(masterDato, K.sommerferie_start) && Tid.før(masterDato, K.sommerferie_slut);
+        else{//Er det sommerferie?
+            boolean sommerferie = Tid.efter(masterDato, K.SOMMERFERIE_START) && Tid.før(masterDato, K.SOMMERFERIE_SLUT);
 
             if (sommerferie) {
+                gemModenhed(K.SOMMERFERIE);
                 pref.edit()
-                        .putInt("modenhed", K.SOMMERFERIE)
                         .putInt("senesteposition", -1)
                         .commit();
                 return K.SOMMERFERIE;
@@ -70,22 +76,22 @@ public class Tilstand {
         }
 
 
-        if (modning == K.MODENHED_MODEN) return K.MODENHED_MODEN;
+        if (tempModenhed == K.MODENHED_MODEN) return K.MODENHED_MODEN;
 
         int idag = Util.lavDato(masterDato);
 
-        if (modning == K.MODENHED_HELT_FRISK) {
-            //koden herfra, hvor modning sættes til FØRSTE_DAG, er flyttet til A.allerførsteGangInitOTekst() for at den ikke bliver kørt med mindre appen får hentet sine data
+        if (tempModenhed == K.MODENHED_HELT_FRISK) {
+            //koden herfra, hvor tempModenhed sættes til FØRSTE_DAG, er flyttet til A.allerførsteGangInitOTekst() for at den ikke bliver kørt med mindre appen får hentet sine data
 
             return K.MODENHED_HELT_FRISK;
         }
 
-        else if (modning == K.MODENHED_FØRSTE_DAG){
+        else if (tempModenhed == K.MODENHED_FØRSTE_DAG){
             int instDato  = pref.getInt("installationsdato", 0);
             if (idag == instDato) return K.MODENHED_FØRSTE_DAG;
             else {
+                gemModenhed(K.MODENHED_ANDEN_DAG);
                 pref.edit()
-                        .putInt("modenhed", K.MODENHED_ANDEN_DAG)
                         .putInt("tjekInst", idag)
                         .commit();
                 p("Modenhed sat til MODENHED_ANDEN_DAG første gang");
@@ -93,12 +99,12 @@ public class Tilstand {
             }
         }
 
-        else if (modning == K.MODENHED_ANDEN_DAG){
+        else if (tempModenhed == K.MODENHED_ANDEN_DAG){
             int instDatoPlusEn = pref.getInt("tjekInst", 0);
             if (idag == instDatoPlusEn) return K.MODENHED_ANDEN_DAG;
             else {
+                gemModenhed(K.MODENHED_TREDJE_DAG);
                 pref.edit()
-                        .putInt("modenhed", K.MODENHED_TREDJE_DAG)
                         .putInt("tjekInst", idag)
                         .commit();
                 p("Modenhed sat til MODENHED_TREDJE_DAG første gang");
@@ -106,25 +112,23 @@ public class Tilstand {
             }
         }
 
-        else if (modning == K.MODENHED_TREDJE_DAG){
+        else if (tempModenhed == K.MODENHED_TREDJE_DAG){
             int instDatoPlusTo = pref.getInt("tjekInst", 0);
             if (idag == instDatoPlusTo) return K.MODENHED_TREDJE_DAG;
             else {
+                gemModenhed(K.MODENHED_FJERDE_DAG);
                 pref.edit()
-                        .putInt("modenhed", K.MODENHED_FJERDE_DAG)
                         .putInt("tjekInst", idag)
                         .commit();
                 p("Modenhed sat til MODENHED_FJERDE_DAG første gang");
                 return K.MODENHED_FJERDE_DAG;
             }
         }
-        else if (modning == K.MODENHED_FJERDE_DAG){
+        else if (tempModenhed == K.MODENHED_FJERDE_DAG){
             int instDatoPlusTre = pref.getInt("tjekInst", 0);
             if (idag == instDatoPlusTre) return K.MODENHED_FJERDE_DAG;
             else {
-                pref.edit()
-                        .putInt("modenhed", K.MODENHED_MODEN)
-                        .commit();
+                gemModenhed(K.MODENHED_MODEN);
                 femteDagFørsteGang = true;
                 p("Modenhed sat til MODEN første gang");
             }
@@ -133,20 +137,25 @@ public class Tilstand {
         return K.MODENHED_MODEN;
     }
 
+    void gemModenhed(int værdi){
+        pref.edit().putInt(MODENHED,værdi).commit();
+        p("gemModenhed() kaldt med vædi: "+værdi);
+    }
 
 
 
-    //-- Kaldes når appen er kørt igennnem og skal starte forfra med tekst1
+    //-- Kaldes når appen har kørt alle tekster igennnem og skal starte forfra med tekst1
     private void sletAlt(Context c) {
         nulstil();
         p("sletAlt kaldt");
         sletDiskData(c);
         a.synligeTekster.clear();
         a.synligeTekster.add((Tekst) IO.læsObj("otekst1", c));
-        Lyttersystem.getInstance().givBesked(K.SYNLIGETEKSTER_OPDATERET,"nulstillet");
-        pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK).commit();
-        a.allerførsteGangInitOTekst();
+        Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE,"nulstillet");
+        gemModenhed(K.MODENHED_HELT_FRISK);
+        a.allerførsteGangInitOTekst(); //her sættes pref modenhed til 1 = FØRSTE DAG
     }
+
     void sletDiskData(Context c){
         p("sletDiskData() blev kaldt");
         pref.edit().clear().commit();

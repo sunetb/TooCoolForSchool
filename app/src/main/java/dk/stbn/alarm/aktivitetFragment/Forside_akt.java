@@ -36,7 +36,6 @@ import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
-import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import dk.stbn.alarm.lyttere.SletNotifikation_Lytter;
 
@@ -69,7 +68,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         prefs = a.pref;
         initUI();
-        a.aktivitetenVises = true;
+        tilstand.aktivitetenVises = true;
         tjekOpstartstype(savedInstanceState);
 
         if (A.testtilstand){
@@ -163,7 +162,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         pa = new PagerAdapter(getSupportFragmentManager());//getChildFragmentManager());//
         vp.setAdapter(pa);
-        p("adapteren sat på viewpageren");
         tilbage = (ImageButton) findViewById(R.id.tilbage);
         tilbage.setOnClickListener(this);
         frem = (ImageButton) findViewById(R.id.frem);
@@ -174,18 +172,15 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         kontakt.setOnClickListener(this);
 
 
-        if (A.debugging) {
+        if (a.debugging) {
 
         }
-
-
-        //if (A.debugging) del.setImageResource(R.mipmap.ic_launcher);
         extras = (ImageButton) findViewById(R.id.extras);
         extras.setOnClickListener(this);
-        if (A.debugging) {
+        if (a.debugging) {
 
         }
-        if (!A.hteksterKlar) {
+        if (!tilstand.hteksterKlar) {
             extras.setEnabled(false);
             extras.getBackground().setAlpha(100);
         }
@@ -304,7 +299,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         super.onStop();
         a.lytter.afregistrer(this);
         vp.removeOnPageChangeListener(sideLytter);
-        a.aktivitetenVises = false;
+        tilstand.aktivitetenVises = false;
         prefs.edit().putInt("senesteposition", vp.getCurrentItem()).commit();
 
     }
@@ -331,12 +326,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             tilbage.setEnabled(true);
             tilbage.getBackground().setAlpha(255);
         }
-        if (A.debugging){
-            if (A.testtilstand){
+        if (a.debugging){
+            if (a.testtilstand){
                 del.setImageResource(R.drawable.en);
                 kontakt.setImageResource(R.drawable.seks);
             }
-            else if (A.testtilstand_2){
+            else if (a.testtilstand_2){
                 del.setImageResource(R.drawable.cool_nobkgr_50x50_rund);
             }
         }
@@ -368,12 +363,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         int vindueshøjdetmp = Resources.getSystem().getDisplayMetrics().heightPixels;
 
-        if (a.sidstKendteVindueshøjde==0) {
-            a.sidstKendteVindueshøjde = vindueshøjdetmp;
+        if (tilstand.sidstKendteVindueshøjde==0) {
+            tilstand.sidstKendteVindueshøjde = vindueshøjdetmp;
             return false;
         }
-        else if (a.sidstKendteVindueshøjde == vindueshøjdetmp) return false;
-        else a.sidstKendteVindueshøjde = vindueshøjdetmp;
+        else if (tilstand.sidstKendteVindueshøjde == vindueshøjdetmp) return false;
+        else tilstand.sidstKendteVindueshøjde = vindueshøjdetmp;
         tilstand.skærmVendt++;
         p("Skærm vendt "+tilstand.skærmVendt + " gange");
         return true;

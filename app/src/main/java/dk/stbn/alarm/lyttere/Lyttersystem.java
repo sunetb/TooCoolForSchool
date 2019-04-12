@@ -13,19 +13,19 @@ import dk.stbn.alarm.diverse.K;
 public class Lyttersystem {
 
     private static Lyttersystem instans;
-    private Tilstand tilstand;
+
 
 
     public static Lyttersystem getInstance(){
-        if (instans == null) return new Lyttersystem();
-        else return instans;
+        if (instans == null){
+            instans = new Lyttersystem();
+        }
+        return instans;
     }
 
     ArrayList<Observatør> observatører = new ArrayList<>();
 
     int senesteHændelse = 0;
-
-    int tæller= 0;
 
     public void lyt(Observatør o) {
         if (!observatører.contains(o)) observatører.add(o);
@@ -49,17 +49,13 @@ public class Lyttersystem {
     // -- Må KUN kaldes fra hovedtråden
     public void givBesked(int hændelse, String besked) {
         p("1: givebesked MODTOG: : "+besked+ " hændelse: "+K.hændelsestekst(hændelse));
-        //senesteHændelse =hændelse;
+
         setSenesteHændelse(hændelse);
 
-        if (hændelse == K.HTEKSTER_OPDATERET)
-            A.hteksterKlar= true;
-
-
-                for (Observatør o: observatører) {
-                    o.opdater(hændelse);
-                }
-                p("2: givBesked() SENDTE "+getSenesteHændelse() + ": "+ K.hændelsestekst(getSenesteHændelse())+" " + " tråd: "+Thread.currentThread().getName());
+        for (Observatør o: observatører) {
+            o.opdater(hændelse);
+        }
+        p("2: givBesked() SENDTE "+getSenesteHændelse() + ": "+ K.hændelsestekst(getSenesteHændelse())+" " + " tråd: "+Thread.currentThread().getName());
 
         p("3: Hændelse: "+hændelse + " VS. senesteHændelse: "+getSenesteHændelse());
         Util.baglog("Lyttersystem.givBesked(): Modenhed = "+ K.hændelsestekst(hændelse), A.a);
