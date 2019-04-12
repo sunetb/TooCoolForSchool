@@ -3,11 +3,10 @@ package dk.stbn.alarm.diverse;
 public class K {
 
     public static final int MODENHED_HELT_FRISK  = 0;   //Otekst 1
-    public static final int MODENHED_FØRSTE_DAG  = 1;   //Otekst 1 + 2
-    public static final int MODENHED_ANDEN_DAG   = 2;   //Otekst 1 + 2 + Itekst 1
-    public static final int MODENHED_TREDJE_DAG  = 3;   //Otekst 2 + Itekst 1 + 2
-    //public static final int MODENHED_FJERDE_DAG  = 4;
-
+    public static final int MODENHED_FØRSTE_DAG  = 1;   //Otekst 1
+    public static final int MODENHED_ANDEN_DAG   = 2;   //Otekst 1 + 2
+    public static final int MODENHED_TREDJE_DAG  = 3;   //Otekst 1 + 2 + Itekst 1
+    public static final int MODENHED_FJERDE_DAG  = 4;   //Otekst 2 + Itekst 1 + 2
     public static final int MODENHED_MODEN       = 5;
     public static final int SOMMERFERIE          = 6;
 

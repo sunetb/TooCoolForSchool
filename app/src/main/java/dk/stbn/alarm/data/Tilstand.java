@@ -11,12 +11,12 @@ import dk.stbn.alarm.diverse.Tid;
 
 public class Tilstand {
 
-//TODO    Skal den laves om til ViewModel?
+//TODO Skal den laves om til ViewModel?
 
     public DateTime masterDato;
     public int modenhed;
     SharedPreferences pref;
-    boolean tredjeDagFørsteGang;
+    boolean femteDagFørsteGang;
     public int skærmVendt;
 
     private static Tilstand instans;
@@ -30,11 +30,11 @@ public class Tilstand {
     Tilstand (Context c) {
         masterDato = new DateTime();
         pref = PreferenceManager.getDefaultSharedPreferences(c);
-        modenhed = tjekModenhed(c);
+        modenhed = opdaterModenhed(c);
     }
 
 
-    private int tjekModenhed(Context c) {
+    private int opdaterModenhed(Context c) {
 
         DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
         p(sommerferie_start);
@@ -44,7 +44,8 @@ public class Tilstand {
 
         if (Tid.efter(masterDato, sommerferie_start) && Tid.før(masterDato, sommerferie_slut)) {
             p("Tjekmodenhed siger SOMMERFERIE");
-            pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK)
+            pref.edit()
+                    .putInt("modenhed", K.MODENHED_HELT_FRISK)
                     .putInt("senesteposition", -1)
                     .commit();
             return K.SOMMERFERIE;
@@ -71,6 +72,7 @@ public class Tilstand {
                         .putInt("modenhed", K.MODENHED_ANDEN_DAG)
                         .putInt("installationsdato2", idag)
                         .commit();
+                p("Modenhed sat til MODENHED_ANDEN_DAG første gang");
                 return K.MODENHED_ANDEN_DAG;
             }
         }
@@ -82,8 +84,7 @@ public class Tilstand {
                         .putInt("modenhed", K.MODENHED_TREDJE_DAG)
                         .putInt("installationsdato3", idag)
                         .commit();
-                tredjeDagFørsteGang = true;
-                p("tjekModenhed() Tredje dag første gang sat til true");
+                p("Modenhed sat til MODENHED_TREDJE_DAG første gang");
                 return K.MODENHED_TREDJE_DAG;
             }
         }
@@ -93,8 +94,21 @@ public class Tilstand {
             if (idag == instDatoPlusTo) return K.MODENHED_TREDJE_DAG;
             else {
                 pref.edit()
+                        .putInt("modenhed", K.MODENHED_FJERDE_DAG)
+                        .putInt("installationsdato4", idag)
+                        .commit();
+                p("Modenhed sat til MODENHED_FJERDE_DAG første gang");
+            }
+        }
+
+        else if (modning == K.MODENHED_FJERDE_DAG){
+            int instDatoPlusTre = pref.getInt("installationsdato4", 0);
+            if (idag == instDatoPlusTre) return K.MODENHED_FJERDE_DAG;
+            else {
+                pref.edit()
                         .putInt("modenhed", K.MODENHED_MODEN)
                         .commit();
+                femteDagFørsteGang = true;
                 p("Modenhed sat til MODEN første gang");
             }
         }
@@ -126,7 +140,7 @@ public class Tilstand {
     public String toString() {
         String s = "Masterdato: "+masterDato + "\n"+
         "Modenhed: " + modenhed  + "\n"+
-        "Tredje dag, første gang?: " + tredjeDagFørsteGang + "\n"+
+        "Tredje dag, første gang?: " + femteDagFørsteGang + "\n"+
         "Skærm vendt=? " +skærmVendt + "\n";
         return s;
     }

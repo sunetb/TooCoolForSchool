@@ -80,7 +80,7 @@ public class A extends Application implements Observatør {
 
     //public static DateTime masterDato; //TODO: lav non-static ?
     //private int modenhed = 0;
-    //boolean tredjeDagFørsteGang = false;
+    //boolean femteDagFørsteGang = false;
 
 
 //////////-------------------------//////////
@@ -204,15 +204,9 @@ public class A extends Application implements Observatør {
 
 
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        else p("alarmManager eksisterer");
-
-        //masterDato = new DateTime();
-
-
 
         p("Modenhed global før tjekModenhed(): "+tilstand.modenhed + " Prefs: "+pref.getInt("modenhed", 1000));
-        //modenhed = tjekModenhed();
-//Slet dette:
+
 
         String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
@@ -256,6 +250,8 @@ public class A extends Application implements Observatør {
             if (Tid.efter(sidstGemteDato,sommerferie_start)) sletAlt();
 
         }
+
+
 //        Er der gået 5 dage siden sidste start? Så opdater kalenderpunkter i Alarmmanageren
         if (Tid.før(sidstGemteDato.plusDays(6),tilstand.masterDato)) {
             new AsyncTask() {
@@ -311,7 +307,7 @@ public class A extends Application implements Observatør {
         }
         if (modenhed > K.MODENHED_HELT_FRISK) {
 
-            if (tilstand.tredjeDagFørsteGang){
+            if (tilstand.femteDagFørsteGang){
                 p("tredje dag første gang!! ");
                 //-- Viewpageren nulstilles (og viser sidste element i listen når det starter)
                 pref.edit().putInt("senesteposition", -1).commit();
@@ -330,7 +326,7 @@ public class A extends Application implements Observatør {
                     }
                 });
 
-                tilstand.tredjeDagFørsteGang = false;
+                tilstand.femteDagFørsteGang = false;
             }
             else {
                 synligeTekster = hentsynligeTekster();
@@ -1076,7 +1072,7 @@ public class A extends Application implements Observatør {
         sidstKendteVindueshøjde = 0;
 
         tilstand.modenhed = K.MODENHED_HELT_FRISK;
-        tilstand.tredjeDagFørsteGang = false;
+        tilstand.femteDagFørsteGang = false;
 
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         else p("alarmManager eksisterer");
