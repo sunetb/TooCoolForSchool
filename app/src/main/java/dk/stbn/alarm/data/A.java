@@ -183,72 +183,131 @@ public class A extends Application implements Observatør {
         pref.edit().putString("sprog", sprog).commit();
         p("SPROG "+ sprog);
 
-        tjekOpstart();
-        //FirebaseDatabase database = FirebaseDatabase.getInstance();
-        //DatabaseReference myRef = database.getReference("message");
+        //Init
+        tjekTekstversion("A.onCreate()");
+        indlæsHtekster();
+        udvælgTekster();
 
-        //myRef.setValue("Hello, World!");
-        //overgangTilLazyLoadingAfAlarmer();
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) "+ tilstand.modenhed);
         p("Gemt modenhed: "+ pref.getInt("modenhed", -1));
 
     }//Oncreate færdig
 
-    private void overgangTilLazyLoadingAfAlarmer() {
-
-        if (pref.getBoolean("sletAlarmer", true) && tilstand.modenhed > K.MODENHED_ANDEN_DAG){
-
-            alarmlogik.rensUdIAlarmer(ctx);
-
-            pref.edit().putBoolean("sletAlarmer", false).commit();
-
-
-        }
+    void visCachedeTekster(){
+        synligeTekster = (ArrayList<Tekst>) IO.læsObj("synligeTekster", this);
     }
 
-
-
-    //** Debugging
-    public void testTekster(){
-        itekster = (ArrayList<Tekst>) IO.læsObj("itekster", this);
-        p("___Tester i-tekster fra disk");
-        if (itekster != null) for (Tekst it: itekster) p(it);
-        else p("Fejl: ingen itekster på disk");
-
-        mtekster = (ArrayList<Tekst>) IO.læsObj("mtekster", this);
-        p("___Tester m-tekster fra disk");
-        if (mtekster != null) for (Tekst mt: mtekster) p(mt);
-        else p("Fejl: ingen mtekster på disk");
-
-        ArrayList<Tekst> gemteSynlige = (ArrayList<Tekst>) IO.læsObj("synligeTekster", this);
-        p("Tester synlge tekster fra disk");
-        for (Tekst st: gemteSynlige) p(st);
-
-        p("Tester synlge tekster fra ram");
-        for (Tekst str: synligeTekster) p(str);
-
-
-    }
-
-    private void tjekOpstart() {
+    /**
+     * Udvælger tekster på baggrund af modenhed
+     */
+    private void udvælgTekster() {
         int modenhed = tilstand.modenhed;
-        //-- Tjek om der er opdateringer til tekstene
-        tjekTekstversion("tjekOpstart()");
+
+        if (modenhed > K.MODENHED_HELT_FRISK)
+            // ikke testet: visCachedeTekster();
+
         if (modenhed == K.SOMMERFERIE) {
             p("sommerferie!!!");
+            synligeTekster.clear();
             synligeTekster.add((Tekst) IO.læsObj("otekst1", this));
             synligeTekster.add((Tekst) IO.læsObj("otekst2", this));
             synligeTekster.add((Tekst) IO.læsObj("otekst3", this));
-            indlæsHtekster();
 
+            //der skal være noget i synligeDatoer, ellers kaldes sletAlt()
             synligeDatoer = new ArrayList<>();
-            synligeDatoer.add(1000);//der skal være noget i synligeDatoer, ellers kaldes sletAlt()
-            //for (Tekst t : synligeTekster) p(t);
-
+            synligeDatoer.add(1000);
             return;
         }
-        if (modenhed > K.MODENHED_HELT_FRISK) {
+        else if (modenhed == K.MODENHED_HELT_FRISK){
+            p("udvælgTekster() Modenhed: Helt frisk");
+            allerførsteGangInitOTekst();
+            IO.gemObj(new DateTime(), "masterdato", this);
+        }
 
+        else if (modenhed == K.MODENHED_FØRSTE_DAG) {
+            synligeTekster.clear();
+            synligeTekster.add((Tekst) IO.læsObj("otekst1", this));
+            gemSynligeTekster();
+            p("Dag 1, ikke første gang");
+            return;
+        }
+
+        else if (modenhed == K.MODENHED_ANDEN_DAG) {
+            p("Dag 2 ");
+            synligeTekster.clear();
+            Tekst oTekst1 = (Tekst) IO.læsObj("otekst1", ctx);
+            Tekst oTekst2 = (Tekst) IO.læsObj("otekst2", ctx);
+            synligeTekster.add(oTekst1);
+            synligeTekster.add(oTekst2);
+            gemSynligeTekster();
+            pref.edit().putInt("senesteposition", -1).commit();
+
+            }
+        else if (modenhed == K.MODENHED_TREDJE_DAG) {
+            p("Dag 3 ");
+            synligeTekster.clear();
+            Tekst oTekst1 = (Tekst) IO.læsObj("otekst1", ctx);
+            Tekst oTekst2 = (Tekst) IO.læsObj("otekst2", ctx);
+            synligeTekster.add(oTekst1);
+            synligeTekster.add(oTekst2);
+
+            ArrayList<Tekst> tekster = findItekster();
+            synligeTekster.add(tekster.get(0));
+
+            gemSynligeTekster();
+            pref.edit().putInt("senesteposition", -1).commit();
+
+        }
+
+
+        else if (modenhed == K.MODENHED_FJERDE_DAG) {
+            p("Dag 4 ");
+
+            synligeTekster.clear();
+            Tekst oTekst2 = (Tekst) IO.læsObj("otekst2", ctx);
+            synligeTekster.add(oTekst2);
+
+            ArrayList<Tekst> tekster = findItekster();
+            synligeTekster.add(tekster.get(0));
+            synligeTekster.add(tekster.get(1));
+
+            gemSynligeTekster();
+            pref.edit().putInt("senesteposition", -1).commit();
+
+        }
+
+
+        else if (modenhed == K.MODENHED_MODEN) {
+
+            synligeTekster.clear();
+            ArrayList<Tekst> itekster = findItekster();
+            synligeTekster.addAll(itekster);
+            ArrayList<Tekst> mtekster = findMtekster();
+            synligeTekster.addAll(mtekster);
+
+            gemSynligeTekster();
+            pref.edit().putInt("senesteposition", -1).commit();
+
+
+        if (skalTekstlistenOpdateres("a")) {
+            pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
+        }
+        if (modenhed == K.MODENHED_MODEN) {
+
+
+            if (skalTekstlistenOpdateres("a")) {
+                pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
+            }
+
+
+
+        }
+
+
+        //if (modenhed > K.MODENHED_HELT_FRISK) {
+
+
+            /*
             if (tilstand.femteDagFørsteGang){
                 p("femte dag første gang!! ");
                 //-- Viewpageren nulstilles (og viser sidste element i listen når det starter)
@@ -277,56 +336,115 @@ HER FRA
 
             if (synligeTekster == null) synligeTekster = new ArrayList(); //har oplevet at den der blev hentet på disk var null i forbindelse med opdatering
             else {
-                //-- Hvis nu nogle h-tekster skulle være gemt
-               /* int før = synligeTekster.size();
-                p("synligetekster size: "+før);
-                if  (før != 0) for (Tekst t : synligeTekster) if (t.kategori.equals("h")) synligeTekster.remove(t);
-                int efter = synligeTekster.size();
-                if (før != efter) pref.edit().putInt("senesteposition", -1).commit();7
-                */
+
+
             }
             synligeDatoer = (ArrayList<Integer>) IO.læsObj("synligeDatoer", ctx);
+            */
             indlæsHtekster();
 
         }
 
-        if (modenhed == K.MODENHED_MODEN) {
 
-
-            if (skalTekstlistenOpdateres("a")) {
-                pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
-            }
-
-
-
-        }
 
         else if (modenhed == K.MODENHED_HELT_FRISK) {
-            p("oncreate() Modenhed: Helt frisk");
-            allerførsteGangInitOTekst();
-            IO.gemObj(new DateTime(), "masterdato", this);
+
         }
 
-        else if (modenhed == K.MODENHED_FØRSTE_DAG) {
-            p("Dag 1, ikke første gang");
-        }
 
-        else if (modenhed == K.MODENHED_ANDEN_DAG) {
-            p("Dag 2 ");
-            if (pref.getBoolean("andenDagFørsteGang", true)) {
-                p("Dag 2 første gang");
-                Tekst t = (Tekst) IO.læsObj("otekst2", ctx);
-                synligeTekster.add(t);
-                gemSynligeTekster();
-                pref.edit().putInt("senesteposition", -1).commit();
-                pref.edit().putBoolean("andenDagFørsteGang", false).commit();
-            }
-        }
-        p("tjekOpstart() færdig");
 
-        //singletonKlar = true;
+
+        p("udvælgTekster() færdig");
     }
 
+    private ArrayList<Tekst> findMtekster() {
+        ArrayList<Tekst> r = new ArrayList<>();
+        ArrayList<Tekst> mtekster = (ArrayList<Tekst>) IO.læsObj("mtekster", this);
+
+
+        Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", tilstand.masterDato);
+        dummyMTekst.lavId();
+        p("Tjek M dummytekst id: "+dummyMTekst.id_int);
+
+        boolean mFundet = false;
+
+        //ArrayList<Tekst> mtekster = Util.sorterStigende(alleTekster[2]);
+
+        p("Mtekster længde: "+mtekster.size());
+
+        for (int i = 0; i < mtekster.size(); i++) {
+            Tekst mtekst = mtekster.get(i);
+            p("tjek mtekster: " + mtekst.id_int);
+            p("IdTekst: "+mtekst.id);
+            //datoliste.add(mtekst.id_int);
+            //IO.gemObj(mtekst, "" + mtekst.id_int, ctx);
+            if (mtekst.id_int >= dummyMTekst.id_int) {
+
+                if (!mFundet) {
+
+                    if (mtekst.id_int == dummyMTekst.id_int) {
+                        p("Eksakt match Mtekst");
+                        r.add(mtekst);
+
+                    } else if (alarmlogik.visMtekst(mtekst.dato, tilstand.masterDato) ){
+                        r.add(mtekst);
+                        p("Mtekst ineksakt match --");
+                    }
+                    mFundet = true;
+                }
+            }
+        }
+        return r;
+
+    }
+
+    private ArrayList<Tekst> findItekster() {
+        ArrayList<Tekst> r = new ArrayList<>();
+        ArrayList<Tekst> itekster = (ArrayList<Tekst>) IO.læsObj("itekster", this);
+
+        Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", tilstand.masterDato);
+        dummyITekst.lavId();
+
+        p("Tjek dummytekst id: "+dummyITekst.id_int);
+        p("itekster længde: "+ itekster.size());
+
+        boolean iFundet = false;
+        //            fejlen med visning af tekster er her omkring
+        for (int i = 0; i < itekster.size(); i++) {
+            Tekst itekst = itekster.get(i);
+            int tekstid = itekst.id_int;
+            p("Tjek Itekster: " + tekstid);
+            p("IdTekst: "+itekst.id);
+
+            //datoliste.add(itekst.id_int);
+            //IO.gemObj(itekst, "" + tekstid, ctx);
+
+            //Tjek om teksten skal vises
+            if (!iFundet && tekstid >= dummyITekst.id_int) {
+
+                if (tekstid == dummyITekst.id_int) {
+                    p("Itekst eksakt match");
+                    iFundet = true;
+
+                    if (i>1)r.add(itekster.get(i - 2));
+                    if (i>0) r.add(itekster.get(i - 1));
+                    r.add(itekster.get(i));
+
+
+                } else {
+                    p("I ineksakt match");
+                    iFundet = true;
+                    if (i>2) r.add(itekster.get(i - 3));
+                    if (i>1)r.add(itekster.get(i - 2));
+                    if (i>0) r.add(itekster.get(i - 1));
+                    else r.add(itekster.get(i));
+                }
+            }
+        }
+        return r;
+
+
+    }
 
 
     void allerførsteGangInitOTekst(){
@@ -505,6 +623,8 @@ HER FRA
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
                 p("formaterLister () tekstlister fik erstattet afsnit");
+
+
                 gemAlleNyeTekster();
             }
         }.execute();
@@ -518,61 +638,6 @@ HER FRA
             @Override
             protected Object doInBackground(Object[] params) {
 
-                Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", tilstand.masterDato);
-                dummyITekst.lavId();
-                ArrayList<Integer> datoliste = new ArrayList();
-
-                p("Tjek dummytekst id: "+dummyITekst.id_int);
-
-                //itekster = Util.sorterStigende(alleTekster[1]);
-
-                p("itekster længde: "+ itekster.size());
-
-
-                ArrayList<Tekst> tempSynlige = new ArrayList<>();
-                if (tilstand.modenhed != K.MODENHED_MODEN){
-
-                    tempSynlige.add((Tekst) alleTekster[0].get(0));//IO.læsObj("otekst1", ctx));
-                    tempSynlige.add((Tekst) alleTekster[0].get(1));//IO.læsObj("otekst2", ctx));
-                }
-
-                boolean iFundet = false;
-    //            fejlen med visning af tekster er her omkring
-                for (int i = 0; i < itekster.size(); i++) {
-                    Tekst itekst = itekster.get(i);
-                    int tekstid = itekst.id_int;
-                    p("Tjek Itekster: " + tekstid);
-                    p("IdTekst: "+itekst.id);
-
-                    datoliste.add(itekst.id_int);
-                    IO.gemObj(itekst, "" + tekstid, ctx);
-
-                    //Tjek om teksten skal vises
-                    if (!iFundet && tekstid >= dummyITekst.id_int) {
-
-                        if (tekstid == dummyITekst.id_int) {
-                            p("Itekst eksakt match");
-                            iFundet = true;
-
-                            if (i>1)tempSynlige.add(itekster.get(i - 2));
-                            if (i>0) tempSynlige.add(itekster.get(i - 1));
-                            tempSynlige.add(itekster.get(i));
-
-
-                        } else {
-                            p("I ineksakt match");
-                            iFundet = true;
-                            if (i>2) tempSynlige.add(itekster.get(i - 3));
-                            if (i>1)tempSynlige.add(itekster.get(i - 2));
-                            if (i>0) tempSynlige.add(itekster.get(i - 1));
-                            else tempSynlige.add(itekster.get(i));
-                        }
-                    }
-                }
-
-                Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", tilstand.masterDato);
-                dummyMTekst.lavId();
-                p("Tjek M dummytekst id: "+dummyMTekst.id_int);
 
 
                 //Gem o-tekster enkeltvis
@@ -598,39 +663,15 @@ HER FRA
                 IO.gemObj(o3, "otekst3", ctx);
 
 
-                //Søg i M-tekster
-                boolean mFundet = false;
 
-                //ArrayList<Tekst> mtekster = Util.sorterStigende(alleTekster[2]);
-
-                p("Mtekster længde: "+mtekster.size());
-
-                for (int i = 0; i < mtekster.size(); i++) {
-                    Tekst mtekst = mtekster.get(i);
-                    p("tjek mtekster: " + mtekst.id_int);
-                    p("IdTekst: "+mtekst.id);
-                    datoliste.add(mtekst.id_int);
-                    IO.gemObj(mtekst, "" + mtekst.id_int, ctx);
-                    if (mtekst.id_int >= dummyMTekst.id_int) {
-
-                        if (!mFundet) {
-
-                            if (mtekst.id_int == dummyMTekst.id_int) {
-                                p("Eksakt match Mtekst");
-                                tempSynlige.add(mtekst);
-
-                            } else if (alarmlogik.visMtekst(mtekst.dato, tilstand.masterDato) ){
-                                tempSynlige.add(mtekst);
-                                p("Mtekst ineksakt match --");
-                            }
-                            mFundet = true;
-                        }
-                    }
-                }
-
+                ArrayList<Integer> datoliste = new ArrayList();
+                for (Tekst t: itekster)
+                    datoliste.add(t.id_int);
                 IO.gemObj(datoliste, "datoliste", ctx);
 
-                IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
+
+
+               // IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
 
               //  if(modenhed == MODENHED_MODEN) {  /// Kun når appen er moden og der derfor allerede er indlæst et sæt tekster.
 
@@ -1012,7 +1053,7 @@ HER FRA
         else p("alarmManager eksisterer");
 
 
-        tjekOpstart();
+        udvælgTekster();
         p("rul() sover 1½ sek");
         try {
             Thread.sleep(1500);
@@ -1049,7 +1090,7 @@ HER FRA
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                lytter.givBesked(K.HTEKSTER_OPDATERET, "tjekOpstart, htekster, UI-tråd: "+Thread.currentThread().getName());
+                lytter.givBesked(K.HTEKSTER_OPDATERET, "udvælgTekster, htekster, UI-tråd: "+Thread.currentThread().getName());
             }
         }.execute();
 
