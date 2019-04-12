@@ -171,14 +171,6 @@ public class A extends Application implements Observatør {
         alarmlogik = AlarmLogik.getInstance();
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
-
-  //      myRef = database.getReference("navn");
-   //     myRef.setValue("sune");
-
-
-        //til test
-        //pref.edit().putInt("tekstversion",1).commit();
-        //hertil
         lytter.nulstil();
         lytter.lyt(this);
 
@@ -196,7 +188,7 @@ public class A extends Application implements Observatør {
         //DatabaseReference myRef = database.getReference("message");
 
         //myRef.setValue("Hello, World!");
-        overgangTilLazyLoadingAfAlarmer();
+        //overgangTilLazyLoadingAfAlarmer();
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) "+ tilstand.modenhed);
         p("Gemt modenhed: "+ pref.getInt("modenhed", -1));
 
@@ -258,7 +250,7 @@ public class A extends Application implements Observatør {
         if (modenhed > K.MODENHED_HELT_FRISK) {
 
             if (tilstand.femteDagFørsteGang){
-                p("tredje dag første gang!! ");
+                p("femte dag første gang!! ");
                 //-- Viewpageren nulstilles (og viser sidste element i listen når det starter)
                 pref.edit().putInt("senesteposition", -1).commit();
 
@@ -270,7 +262,7 @@ public class A extends Application implements Observatør {
                         //-- Sørger for at der ikke vises notifikationer for helt nye tekster
                         for (Tekst t : synligeTekster)
                             IO.føjTilGamle(t.id_int, ctx);
-
+HER FRA
                         alarmlogik.opdaterKalender(ctx, "Application singleton");  //-- Kaldes ellers kun fra BootLytter
                         gemSynligeTekster();
                     }
@@ -334,6 +326,8 @@ public class A extends Application implements Observatør {
 
         //singletonKlar = true;
     }
+
+
 
     void allerførsteGangInitOTekst(){
 
@@ -932,7 +926,7 @@ public class A extends Application implements Observatør {
     }
 
     /**
-     * Gemmer tekst-versionsnummer i prefs og fyrer en event hvis der er ny version
+     * Tjekker om der er ny version af tekster på nettet og fyrer en event hvis der er ny version
      * @param kaldtFra
      */
     private void tjekTekstversion(String kaldtFra) {
@@ -992,17 +986,7 @@ public class A extends Application implements Observatør {
 
     }
 
-    void tjekVisOtekst(){ //TODO ikke færdig
-        //int synligeLængde = synligeTekster.size();
 
-        //if (synligeLængde == 3) return;
-        //else if (synligeLængde == 2){
-            //tjek om der er en m-tekst
-       // }
-
-
-
-    }
 
     /**
      * debugging: Tving ny app-dato

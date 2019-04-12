@@ -251,7 +251,7 @@ public class Util {
             return new Integer(text);
         } catch (NumberFormatException e) {
 
-            return null;
+            return -1;
         }
     }
 
