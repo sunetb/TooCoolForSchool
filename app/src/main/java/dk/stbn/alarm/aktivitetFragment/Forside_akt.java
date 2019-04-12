@@ -63,7 +63,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
         a = A.a;
-        tilstand = Tilstand.getInstance(this);
+        tilstand = Tilstand.getInstance(this, a);
         p(" idag er: "+ tilstand.masterDato.getDayOfMonth() + ": " + tilstand.masterDato.getMonthOfYear() + " - "+ tilstand.masterDato.getYear());
         setupLangReceiver();
 

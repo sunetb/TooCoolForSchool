@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-
 import org.joda.time.DateTime;
+import java.util.ArrayList;
+import dk.stbn.alarm.Tekst;
+import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.diverse.Tid;
+import dk.stbn.alarm.lyttere.Lyttersystem;
 
 public class Tilstand {
 
@@ -18,42 +21,54 @@ public class Tilstand {
     SharedPreferences pref;
     boolean femteDagFørsteGang;
     public int skærmVendt;
+    A a;
 
     private static Tilstand instans;
 
-    public static Tilstand getInstance(Context c){
-        if (instans == null) return new Tilstand(c);
+    public static Tilstand getInstance(Context c, A a){
+        if (instans == null) {
+            instans = new Tilstand(c, a);
+            return instans;
+        }
         else return instans;
     }
 
 
-    Tilstand (Context c) {
+    Tilstand (Context c, A a) {
+        this.a = a;
         masterDato = new DateTime();
         pref = PreferenceManager.getDefaultSharedPreferences(c);
         modenhed = opdaterModenhed(c);
+        p("opdaterModenhed() returnerede: "+modenhed);
     }
 
 
     private int opdaterModenhed(Context c) {
 
-        DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
-        p(sommerferie_start);
-        DateTime sommerferie_slut =  new DateTime().withDayOfMonth(20).withMonthOfYear(8);
-        p(sommerferie_slut);
+        int modning = pref.getInt("modenhed", K.MODENHED_HELT_FRISK);
+        p("Gemt modenhed er: "+modning);
 
+        if (Tid.efter(masterDato, K.sommerferie_slut) && modenhed == K.SOMMERFERIE)
+            pref.edit().putBoolean("harPasseretSommerferie", true).commit();
 
-        if (Tid.efter(masterDato, sommerferie_start) && Tid.før(masterDato, sommerferie_slut)) {
-            p("Tjekmodenhed siger SOMMERFERIE");
-            pref.edit()
-                    .putInt("modenhed", K.MODENHED_HELT_FRISK)
-                    .putInt("senesteposition", -1)
-                    .commit();
-            return K.SOMMERFERIE;
+        boolean harPasseretSommerferie = pref.getBoolean("harPasseretSommerferie", false);
+
+        if (harPasseretSommerferie) {
+            sletAlt(c);//nulstiller bla. prefs og derfor også harPasseretSommer..
         }
 
+        else{
+            boolean sommerferie = Tid.efter(masterDato, K.sommerferie_start) && Tid.før(masterDato, K.sommerferie_slut);
 
-        int modning = pref.getInt("modenhed", K.MODENHED_HELT_FRISK);
-        p("Modenhed i prefs er "+modning);
+            if (sommerferie) {
+                pref.edit()
+                        .putInt("modenhed", K.SOMMERFERIE)
+                        .putInt("senesteposition", -1)
+                        .commit();
+                return K.SOMMERFERIE;
+            }
+        }
+
 
         if (modning == K.MODENHED_MODEN) return K.MODENHED_MODEN;
 
@@ -64,25 +79,27 @@ public class Tilstand {
 
             return K.MODENHED_HELT_FRISK;
         }
+
         else if (modning == K.MODENHED_FØRSTE_DAG){
             int instDato  = pref.getInt("installationsdato", 0);
             if (idag == instDato) return K.MODENHED_FØRSTE_DAG;
             else {
                 pref.edit()
                         .putInt("modenhed", K.MODENHED_ANDEN_DAG)
-                        .putInt("installationsdato2", idag)
+                        .putInt("tjekInst", idag)
                         .commit();
                 p("Modenhed sat til MODENHED_ANDEN_DAG første gang");
                 return K.MODENHED_ANDEN_DAG;
             }
         }
+
         else if (modning == K.MODENHED_ANDEN_DAG){
-            int instDatoPlusEn = pref.getInt("installationsdato2", 0);
+            int instDatoPlusEn = pref.getInt("tjekInst", 0);
             if (idag == instDatoPlusEn) return K.MODENHED_ANDEN_DAG;
             else {
                 pref.edit()
                         .putInt("modenhed", K.MODENHED_TREDJE_DAG)
-                        .putInt("installationsdato3", idag)
+                        .putInt("tjekInst", idag)
                         .commit();
                 p("Modenhed sat til MODENHED_TREDJE_DAG første gang");
                 return K.MODENHED_TREDJE_DAG;
@@ -90,19 +107,19 @@ public class Tilstand {
         }
 
         else if (modning == K.MODENHED_TREDJE_DAG){
-            int instDatoPlusTo = pref.getInt("installationsdato3", 0);
+            int instDatoPlusTo = pref.getInt("tjekInst", 0);
             if (idag == instDatoPlusTo) return K.MODENHED_TREDJE_DAG;
             else {
                 pref.edit()
                         .putInt("modenhed", K.MODENHED_FJERDE_DAG)
-                        .putInt("installationsdato4", idag)
+                        .putInt("tjekInst", idag)
                         .commit();
                 p("Modenhed sat til MODENHED_FJERDE_DAG første gang");
+                return K.MODENHED_FJERDE_DAG;
             }
         }
-
         else if (modning == K.MODENHED_FJERDE_DAG){
-            int instDatoPlusTre = pref.getInt("installationsdato4", 0);
+            int instDatoPlusTre = pref.getInt("tjekInst", 0);
             if (idag == instDatoPlusTre) return K.MODENHED_FJERDE_DAG;
             else {
                 pref.edit()
@@ -116,11 +133,39 @@ public class Tilstand {
         return K.MODENHED_MODEN;
     }
 
+
+
+
+    //-- Kaldes når appen er kørt igennnem og skal starte forfra med tekst1
+    private void sletAlt(Context c) {
+        nulstil();
+        p("sletAlt kaldt");
+        sletDiskData(c);
+        a.synligeTekster.clear();
+        a.synligeTekster.add((Tekst) IO.læsObj("otekst1", c));
+        Lyttersystem.getInstance().givBesked(K.SYNLIGETEKSTER_OPDATERET,"nulstillet");
+        pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK).commit();
+        a.allerførsteGangInitOTekst();
+    }
+    void sletDiskData(Context c){
+        p("sletDiskData() blev kaldt");
+        pref.edit().clear().commit();
+
+        ArrayList tomTekst = new ArrayList<Tekst>();
+        IO.gemObj(tomTekst, "tempsynligeTekster", c);
+        IO.gemObj(tomTekst, "htekster", c);
+        ArrayList<Integer> tomTal = new ArrayList<>();
+        IO.gemObj(tomTal, "synligeDatoer", c);
+        IO.gemObj(tomTal, "gamle", c);
+
+    }
     /**
      * Debugging
      */
     public void nulstil(){
-        //TODO
+        modenhed = 0;
+        boolean femteDagFørsteGang = false;
+        skærmVendt = -1;
     }
 
     /**
@@ -135,13 +180,16 @@ public class Tilstand {
         Util.p(kl+o);
     }
 
+
     @NonNull
     @Override
     public String toString() {
         String s = "Masterdato: "+masterDato + "\n"+
         "Modenhed: " + modenhed  + "\n"+
-        "Tredje dag, første gang?: " + femteDagFørsteGang + "\n"+
+        "Femte dag, første gang?: " + femteDagFørsteGang + "\n"+
         "Skærm vendt=? " +skærmVendt + "\n";
         return s;
     }
 }
+
+

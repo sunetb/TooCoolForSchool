@@ -185,7 +185,7 @@ public class A extends Application implements Observatør {
         a= this;
         ctx=this;
         lytter = Lyttersystem.getInstance();
-        tilstand = Tilstand.getInstance(this);
+        tilstand = Tilstand.getInstance(this, a);
         alarmlogik = AlarmLogik.getInstance();
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -199,9 +199,6 @@ public class A extends Application implements Observatør {
         //hertil
         lytter.nulstil();
         lytter.lyt(this);
-
-        erDerGået5dageOgHarViPasseretSommerferie();
-
 
         if (alm == null)  alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
@@ -219,7 +216,7 @@ public class A extends Application implements Observatør {
 
         //myRef.setValue("Hello, World!");
         overgangTilLazyLoadingAfAlarmer();
-        p("oncreate() færdig. Modenhed: (0=frisk, 1=første, 2=anden) "+ tilstand.modenhed);
+        p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) "+ tilstand.modenhed);
 
     }//Oncreate færdig
 
@@ -235,36 +232,7 @@ public class A extends Application implements Observatør {
         }
     }
 
-    private void erDerGået5dageOgHarViPasseretSommerferie() {
 
-        //Hvis appen sidst var startet for mere end 6 dage siden, skal Alarmmanageren opdateres
-
-        DateTime sidstGemteDato = (DateTime) IO.læsObj("gamleDato", ctx);
-
-
-        IO.gemObj(tilstand.masterDato, "gamleDato", ctx);
-
-        if (sidstGemteDato == null) return;
-        else {//har vi passeret sommerferien?
-            DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
-            if (Tid.efter(sidstGemteDato,sommerferie_start)) sletAlt();
-
-        }
-
-
-//        Er der gået 5 dage siden sidste start? Så opdater kalenderpunkter i Alarmmanageren
-        if (Tid.før(sidstGemteDato.plusDays(6),tilstand.masterDato)) {
-            new AsyncTask() {
-                @Override
-                protected Object doInBackground(Object[] objects) {
-                    alarmlogik.opdaterKalender(a, "A.onCreate()");
-                    return null;
-                }
-            }.execute();
-        }
-
-
-    }
 
     //** Debugging
     public void testTekster(){
@@ -385,7 +353,7 @@ public class A extends Application implements Observatør {
         //singletonKlar = true;
     }
 
-    private void allerførsteGangInitOTekst(){
+    void allerførsteGangInitOTekst(){
 
         tjekTekstversion("allerførsteGangInitOTekst"); //køres for at få gemt versionsnummer i prefs første gang
         // må ikke kaldes fra baggrundstråd?
@@ -1158,35 +1126,7 @@ public class A extends Application implements Observatør {
     }
 
 
-    //-- Kaldes når appen er kørt igennnem og skal starte forfra med tekst1
-    private void sletAlt() {
-        p("sletAlt kaldt");
 
-        sletData();
-        synligeTekster.clear();
-        synligeTekster.add((Tekst) IO.læsObj("otekst1", ctx));
-        lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET,"fuld frisk start");
-
-
-        pref.edit().putInt("modenhed", K.MODENHED_HELT_FRISK).commit();
-        //rul(0);
-
-        //allerførsteGangInitOTekst();
-    }
-    void sletData(){
-        p("Slet data blev kaldt");
-        pref.edit().clear().commit();
-
-        pref.edit().putInt("modenhed", tilstand.modenhed).commit();
-
-        ArrayList tomTekst = new ArrayList<Tekst>();
-        IO.gemObj(tomTekst, "tempsynligeTekster", this);
-        IO.gemObj(tomTekst, "htekster", this);
-        ArrayList<Integer> tomTal = new ArrayList<>();
-        IO.gemObj(tomTal, "synligeDatoer", this);
-        IO.gemObj(tomTal, "gamle", this);
-
-    }
 
 
 

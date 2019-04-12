@@ -1,5 +1,7 @@
 package dk.stbn.alarm.diverse;
 
+import org.joda.time.DateTime;
+
 public class K {
 
     public static final int MODENHED_HELT_FRISK  = 0;   //Otekst 1
@@ -32,5 +34,8 @@ public class K {
     public static final String henteurlDK = "http://www.lightspeople.net/sune/skole/tekster.xml";
     public static final String henteurlDE = "http://www.lightspeople.net/sune/skole/tekster_de.xml";
     public static final String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
+
+    public static final DateTime sommerferie_start = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
+    public static final DateTime sommerferie_slut =  new DateTime().withDayOfMonth(20).withMonthOfYear(8);
 
 }
