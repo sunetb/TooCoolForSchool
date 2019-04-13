@@ -81,7 +81,7 @@ public class Tilstand {
         int idag = Util.lavDato(masterDato);
 
         if (tempModenhed == K.MODENHED_HELT_FRISK) {
-            //koden herfra, hvor tempModenhed sættes til FØRSTE_DAG, er flyttet til A.allerførsteGangInitOTekst() for at den ikke bliver kørt med mindre appen får hentet sine data
+            //koden herfra, hvor tempModenhed sættes til FØRSTE_DAG, er flyttet til A.allerFørsteGang() for at den ikke bliver kørt med mindre appen får hentet sine data
 
             return K.MODENHED_HELT_FRISK;
         }
@@ -153,7 +153,7 @@ public class Tilstand {
         a.synligeTekster.add((Tekst) IO.læsObj("otekst1", c));
         Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE,"nulstillet");
         gemModenhed(K.MODENHED_HELT_FRISK);
-        a.allerførsteGangInitOTekst(); //her sættes pref modenhed til 1 = FØRSTE DAG
+        a.allerFørsteGang(); //her sættes pref modenhed til 1 = FØRSTE DAG
     }
 
     void sletDiskData(Context c){

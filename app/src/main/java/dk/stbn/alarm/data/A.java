@@ -216,11 +216,11 @@ public class A extends Application implements Observatør {
             //der skal være noget i synligeDatoer, ellers kaldes sletAlt()
             synligeDatoer = new ArrayList<>();
             synligeDatoer.add(1000);
-            return;
+
         }
         else if (modenhed == K.MODENHED_HELT_FRISK){
             p("udvælgTekster() Modenhed: Helt frisk");
-            allerførsteGangInitOTekst();
+            allerFørsteGang();
             IO.gemObj(new DateTime(), "masterdato", this);
         }
 
@@ -347,13 +347,6 @@ HER FRA
 
 
 
-        else if (modenhed == K.MODENHED_HELT_FRISK) {
-
-        }
-
-
-
-
         p("udvælgTekster() færdig");
     }
 
@@ -447,9 +440,9 @@ HER FRA
     }
 
 
-    void allerførsteGangInitOTekst(){
+    void allerFørsteGang(){
 
-        tjekTekstversion("allerførsteGangInitOTekst"); //køres for at få gemt versionsnummer i prefs første gang
+        tjekTekstversion("allerFørsteGang"); //køres for at få gemt versionsnummer i prefs første gang
         // må ikke kaldes fra baggrundstråd?
 
         new AsyncTask() {
@@ -457,85 +450,40 @@ HER FRA
             @Override
             protected Object doInBackground(Object[] params) {
 
-                alleTekster = hentTeksterOnline("allerførsteGangInitOTekst()");
+                alleTekster = hentTeksterOnline("allerFørsteGang()");
 
-                return null;
-            }
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
+                //-- Denne kode burde egentlig stå i tjekModenhed() men er flyttet hertil så appen kun kan modnes hvis den får data første gang.
+                int idag = Util.lavDato(tilstand.masterDato);
 
-                if (alleTekster[0].size() == 0) prøvIgen();
-                else {
+                pref.edit()
+                        .putInt("modenhed", K.MODENHED_FØRSTE_DAG)
+                        .putInt("installationsdato", idag)
+                        .commit();
+                //-- hertil
 
-                    //-- Denne kode burde egentlig stå i tjekModenhed() men er flyttet hertil så appen kun kan modnes hvis den får data første gang.
-                        int idag = Util.lavDato(tilstand.masterDato);
+                ArrayList<Tekst> otekster = alleTekster[0];
+                Tekst o1 = otekster.get(0);
+                String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
+                o1.brødtekst = nyBrødtekst;
+                synligeTekster.add(o1);
+                p("Så er der O-tekst i array!");
 
-                        pref.edit()
-                                .putInt("modenhed", K.MODENHED_FØRSTE_DAG)
-                                .putInt("installationsdato", idag)
-                                .commit();
-                    //-- hertil
+                if (tilstand.aktivitetenVises)
+                    publishProgress(1);
+                else
+                    p("Aktiviteten blev klar EFTER at data blev klar");
 
-                        ArrayList<Tekst> otekster = alleTekster[0];
-                        Tekst o1 = otekster.get(0);
-                        String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
-                        o1.brødtekst = nyBrødtekst;
-                        synligeTekster.add(o1);
-                        p("Så er der O-tekst i array!");
-
-                        if (tilstand.aktivitetenVises)
-                            lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: "+Thread.currentThread().getName());
-                        else
-                            p("Aktiviteten blev klar EFTER at data blev klar");
-
-                        IO.gemObj(o1, "otekst1", ctx);
-
-                        allerførsteGangInitHtekster();// async-kæde: ting der også kan gøres i baggrunden, men som er afhængige af værdier herfra
-                    }
-            }
-        }.execute();
-    }
-
-    private void prøvIgen(){
-
-        t("Fejl ved hentning af data. Prøver igen...\nTjek evt. om der er netforbindelse");
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                p("Prøvigen() kaldt "+Thread.currentThread().getName());
-                allerførsteGangInitOTekst();
-
-            }
-        }, 5000);
-
-    }
-
-    private void allerførsteGangInitHtekster() {
-
-        p("allerførsteGangInitHtekster() kaldt");
-
-        new AsyncTask() {
-
-            @Override
-            protected Object doInBackground(Object[] params) {
-
-
-                //-- gemmer h-tekster
-
+                IO.gemObj(o1, "otekst1", ctx);
                 htekster = Util.erstatAfsnit(alleTekster[3]);
 
                 for (Tekst t : htekster)
                     hteksterOverskrifter.add(t.overskrift.toUpperCase());
-
-                publishProgress(1);
-
+                publishProgress(2);
                 IO.gemObj(htekster,"htekster",ctx);
 
                 //-- Gemmer O-tekst nr 2 til næste gang
 
-                ArrayList<Tekst> otekster = alleTekster[0];
+                otekster = alleTekster[0];
                 Tekst o2 = otekster.get(1);
                 String nyBrødtekst2 = o2.brødtekst.replaceAll("\n", " ");
 
@@ -559,16 +507,62 @@ HER FRA
 
 
 
+
                 return null;
+            }
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+
+                if (alleTekster[0].size() == 0) {
+                    prøvIgen();
+                    return;
+                }
+
             }
 
             @Override
             protected void onProgressUpdate(Object... values) {
                 super.onProgressUpdate(values);
-                p("Lyttersystem kaldes fra onProgress i initallerførstegang");
-                lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: "+Thread.currentThread().getName());
+                int i = (int) values[0];
+                if (i==1) lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: "+Thread.currentThread().getName());
+                else if (i == 2)  lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: "+Thread.currentThread().getName());
 
             }
+        }.execute();
+    }
+
+    private void prøvIgen(){
+
+        t("Fejl ved hentning af data. Prøver igen...\nTjek evt. om der er netforbindelse");
+
+        new Handler().postDelayed(() -> {
+            p("Prøvigen() kaldt "+Thread.currentThread().getName());
+            allerFørsteGang();
+
+        }, 5000);
+
+    }
+
+    private void allerførsteGangInitHtekster() {
+
+        p("allerførsteGangInitHtekster() kaldt");
+
+        new AsyncTask() {
+
+            @Override
+            protected Object doInBackground(Object[] params) {
+
+
+                //-- gemmer h-tekster
+
+
+
+
+                return null;
+            }
+
+
 
             @Override
             protected void onPostExecute(Object o) {
