@@ -151,9 +151,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             }
         }
         knapstatus (vp.getCurrentItem(), "onClick()");
-
-
-
     }
 
     private void initUI() {
@@ -341,21 +338,21 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     public void opdater(int event) {
         if (event == K.SYNLIGETEKSTER_OPDATERET){
-             new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    pa.notifyDataSetChanged();
-                    vp.setCurrentItem(a.synligeTekster.size()-1);
-                    knapstatus(a.synligeTekster.size()-1, " opdater()");
-                }
-            }, 50);
+             new Handler().postDelayed(() -> {
+                 pa.notifyDataSetChanged();
+                 vp.setCurrentItem(a.synligeTekster.size()-1);
+                 knapstatus(a.synligeTekster.size()-1, " opdater()");
+             }, 50);
 
         }
         else if (event == K.HTEKSTER_OPDATERET){
             if (hListeadapter != null) hListeadapter.notifyDataSetChanged();
             extras.setEnabled(true);
             extras.getBackground().setAlpha(255);
-
+        }
+        else if (event == K.NYE_HTEKSTER_PÅ_VEJ){
+            extras.setEnabled(false);
+            extras.getBackground().setAlpha(100);
         }
     }
 
@@ -540,7 +537,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     p("Sprog ændret til: "+ Locale.getDefault().getLanguage());
-                    a.hentNyeTekster();
+                    a.hentOgGemNyeTekster();
                 }
 
             };

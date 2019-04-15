@@ -23,6 +23,8 @@ public class Tilstand {
     public boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
     public int sidstKendteVindueshøjde = 0;
 
+    public boolean nyeTekstversion = false;
+
     SharedPreferences pref;
     A a;
 

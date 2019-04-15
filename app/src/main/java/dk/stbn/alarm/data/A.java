@@ -106,40 +106,36 @@ public class A extends Application implements Observatør {
 
     * NeedToHave:
      *
-     * Hvis der går lang tid mellem at appen er åben, når appen forbi de noti som er 'bestilt'
-    * Lazy loading !!!
+     * Væk appen i baggrunden hver dag og tjek om der er nye tekster.
+     Hvis der er, så pop en noti. Tjek først for ny tekstversion i på nettet
     *
-    * Lad O-tekster blive indtil de "skubbes ud"
+   *
+    * Mulighed for at loade en test-tekstfil som skal testes, INDEN den udgives:
+    Ny akt med langt klik plus kode
+    Knap med Vis samtlige tekster fra disk.
+    Knap med Hent test-udgave af tekster.
+
+
     *
-    * Mulighed for at loade en test-tekstfil som skal testes, INDEN den udgives
-    *
-    * FEJL Nogle gange forsvinder brødtekster.
+    * FEJL Nogle gange forsvinder brødtekster. Problemet er noget med viewpagereren eller dens adapter der vist cacher et eller andet..
     * Teori: Noget med genbrug.
-    * Men: det har vist noget med skærmvending at gøre..
+    * Har det noget med skærmvending at gøre?
     * FAKTA: Webview er nogle gange null i onSaveInstancestate
     * LOG FRAGMENTET
     *
     *
     *
     * NiceToHave
+
+
     *
-    * Bedre struktur
-    * en metode svarende til gemAlleNyeTekster i Util. Kaldes i service/baggundstråd  når alarmMODTAGEREN kaldes.
-    * Gemmer en ny synligeTekster Arraylist under samme navn, så den altid henter en rigtig liste ved opstart
-    * Smart fordi det er det tidligste tidspunkt vi kan vide det.
     * MEn hvvordan gør den hvis appen allerede er åben og der alarmmodtageren kaldes?
     * Kan muligivs løses med lyttersystem..
     *
+    Refactoring
+    *Filnavne i KONSTANTER
     *
     *
-    *
-    * Let anync
-    AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
     * */
 
 
@@ -183,25 +179,28 @@ public class A extends Application implements Observatør {
 
         //Init
         tjekTekstversion("A.onCreate()");
-        indlæsHtekster();
+        indlæsHtekster((ArrayList<Tekst>) IO.læsObj());
+        visCachedeTekster();
         udvælgTekster();
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
         p("Gemt modenhed: " + pref.getInt("modenhed", -1));
+    }
 
-    }//Oncreate færdig
-
+    /**
+     * Henter gemte synlige tekster fra sidst
+     */
     void visCachedeTekster() {
         synligeTekster = (ArrayList<Tekst>) IO.læsObj("synligeTekster", this);
         lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "visCachedeTekster()");
     }
 
     /**
-     * Udvælger tekster på baggrund af modenhed
+     * Udvælger tekster på baggrund af modenhed og om der er ny version på nettet
      */
     private void udvælgTekster() {
         int modenhed = tilstand.modenhed;
-        visCachedeTekster();
+
         ArrayList<Tekst> tempSynlige = new ArrayList<>();
 
         if (modenhed == K.SOMMERFERIE) {
@@ -446,7 +445,7 @@ public class A extends Application implements Observatør {
                 p("Event til aktiviteten om at H-tekster er klar");
 
                 publishProgress(2);
-                IO.gemObj(htekster, "htekster", ctx);
+                IO.gemObj(htekster, K.HTEKSTER, ctx);
 
                 //-- Gemmer O-tekst nr 2 og 3 til næste gang
                 otekster = alleTekster[0];
@@ -525,8 +524,8 @@ public class A extends Application implements Observatør {
 
     int hentNyeTeksterTæller = 1;
 
-    public void hentNyeTekster() {
-        p("hentNyeTekster() kaldt. Gang nr " + hentNyeTeksterTæller);
+    public void hentOgGemNyeTekster() {
+        p("hentOgGemNyeTekster() kaldt. Gang nr " + hentNyeTeksterTæller);
         hentNyeTeksterTæller++;
 
         new AsyncTask() {
@@ -535,16 +534,29 @@ public class A extends Application implements Observatør {
             protected Object doInBackground(Object[] params) {
                 p("...ny tekstversion tilgængelig, kalder hentTeksterOnline()");
 
-                alleTekster = hentTeksterOnline("hentNyeTekster");
+                ArrayList[] alleTekster = hentTeksterOnline("hentOgGemNyeTekster");
 
-                //nyt versionsnr gemmes i tjektekstversion
-
+                //nyt versionsnr tjekkes og gemmes ikker her men i tjektekstversion()
+                itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
+                mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Object... values) {
+                super.onProgressUpdate(values);
+                int i = (int) values[0];
+                if (i == 1)
+                    lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: " + Thread.currentThread().getName());
+                else if (i == 2)
+                    lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: " + Thread.currentThread().getName());
+
             }
 
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
+                udvælgTekster();
 
                 formaterLister(); //Kæde: metoden gemAlle..() kører i baggrunden
             }
@@ -552,129 +564,7 @@ public class A extends Application implements Observatør {
 
     }
 
-    void formaterLister() {
-        p("formaterLister () start");
-        new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-
-                itekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[1]));
-                mtekster = Util.sorterStigende(Util.erstatAfsnit(alleTekster[2]));
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-                p("formaterLister () tekstlister fik erstattet afsnit");
-
-
-                gemAlleNyeTekster();
-            }
-        }.execute();
-    }
-
-
-    private void gemAlleNyeTekster() {
-        p("gemAlleNyeTekster() start");
-        new AsyncTask() {
-
-            @Override
-            protected Object doInBackground(Object[] params) {
-
-
-                //Gem o-tekster enkeltvis
-
-                ArrayList<Tekst> otekster = alleTekster[0];
-                Tekst o1 = otekster.get(0);
-                String nyBrødtekst = o1.brødtekst.replaceAll("\n", " ");
-                o1.brødtekst = nyBrødtekst;
-                IO.gemObj(o1, "otekst1", ctx);
-
-                Tekst o2 = otekster.get(1);
-                String nyBrødtekst2 = o2.brødtekst.replaceAll("\n", " ");
-
-                o2.brødtekst = nyBrødtekst2;
-
-                IO.gemObj(o2, "otekst2", ctx);
-
-                Tekst o3 = otekster.get(2);
-                String nyBrødtekst3 = o3.brødtekst.replaceAll("\n", " ");
-
-                o3.brødtekst = nyBrødtekst3;
-
-                IO.gemObj(o3, "otekst3", ctx);
-
-
-                ArrayList<Integer> datoliste = new ArrayList();
-                for (Tekst t : itekster)
-                    datoliste.add(t.id_int);
-                IO.gemObj(datoliste, "datoliste", ctx);
-
-
-                // IO.gemObj(tempSynlige,"tempsynligeTekster", ctx);
-
-                //  if(modenhed == MODENHED_MODEN) {  /// Kun når appen er moden og der derfor allerede er indlæst et sæt tekster.
-
-                ArrayList<Tekst> tempHTekster = Util.erstatAfsnit(alleTekster[3]);
-                ArrayList<String> tempHOverskrifter = new ArrayList<String>();
-                for (Tekst t : tempHTekster)
-                    tempHOverskrifter.add(t.overskrift.toUpperCase());
-
-
-                htekster.clear();
-                htekster = tempHTekster;
-                hteksterOverskrifter.clear();
-                hteksterOverskrifter = tempHOverskrifter;
-
-                //-- Fyrer argument til event
-                publishProgress(K.HTEKSTER_OPDATERET);
-
-                synligeTekster.clear();
-                if (tilstand.modenhed == K.MODENHED_HELT_FRISK || tilstand.modenhed == K.MODENHED_FØRSTE_DAG)
-                    synligeTekster.add(tempSynlige.get(0));
-                else if (tilstand.modenhed == K.MODENHED_ANDEN_DAG) {
-                    synligeTekster.add(tempSynlige.get(0));
-                    synligeTekster.add(tempSynlige.get(1));
-                } else if (tilstand.modenhed == K.MODENHED_TREDJE_DAG) {
-                    synligeTekster.add(tempSynlige.get(0));
-                    synligeTekster.add(tempSynlige.get(1));
-                    synligeTekster.add(tempSynlige.get(2));
-                } else
-                    synligeTekster = tempSynlige;
-
-                //-- Fyrer argument til event
-                publishProgress(K.SYNLIGETEKSTER_OPDATERET);
-                p("tjek synligetekster efter init: længde: " + synligeTekster.size());
-                for (Tekst t : synligeTekster) p(t.toString());
-
-
-                gemSynligeTekster();
-
-                return null;
-            }
-
-            @Override //-- Modtager argument til event og fyrer det af
-            protected void onProgressUpdate(Object... values) {
-                super.onProgressUpdate(values);
-                int hændelse = (int) values[0];
-                p("gemAlleNye..().Async.onprogress..()  modtog " + hændelse + " = " + K.hændelsestekst(hændelse));
-
-                lytter.givBesked(hændelse, "gemallenye, Htekster OG Synlige");
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-                if (tilstand.modenhed == K.MODENHED_MODEN)// TODO: plus || HELT_FRISK ??
-                    skalTekstlistenOpdateres("a.gemAlleNyeTekster()onPost"); ///KÆDE
-                gemAlleTeksterTilDisk();
-                p("gemAlleNyeTekster() slut");
-
-            }
-        }.execute();
-    }
-
+      //Burde være overflødig efter Den Store Tur
     private void gemAlleTeksterTilDisk() {
         if (itekster.size() > 0)
             new AsyncTask() {
@@ -691,7 +581,7 @@ public class A extends Application implements Observatør {
                 }
             }.execute();
     }
-
+    //Burde være overflødig efter Den Store Tur
     public boolean skalTekstlistenOpdateres(String kaldtfra) {
         p("skalTekstlistenOpdateres(" + kaldtfra + ") start________");
 
@@ -855,15 +745,16 @@ public class A extends Application implements Observatør {
         return pref.getBoolean("nyTekst", false);
     }
 
-
-
-
     public void gemSynligeTekster() {
         //new async ?
         IO.gemObj(synligeTekster, "synligeTekster", this);
     }
 
-    //kaldes kun fra baggrundstråd
+    /**
+     * Kaldes KUN fra baggrundtråd
+     * @param kaldtFra
+     * @return
+     */
     private ArrayList[] hentTeksterOnline(String kaldtFra) {
         p("hentTeksterOnline() kaldt fra " + kaldtFra);
         String input = "";
@@ -904,9 +795,6 @@ public class A extends Application implements Observatør {
         p("tjekTekstversion() kaldt fra " + kaldtFra);
 
         new AsyncTask() {
-
-
-
 
             @Override
             protected Object doInBackground(Object... tekst) {
@@ -950,10 +838,12 @@ public class A extends Application implements Observatør {
                 p("gemt tekstversion: " + gemtTekstversion);
 
                 if (gemtTekstversion < netversion) {
+                    //Måske giver det ikke rigtig mening med event længere efter Den Store Revidering
                     if (tilstand.modenhed > K.MODENHED_HELT_FRISK)
                         lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstversion, nye online");
                     pref.edit().putInt("tekstversion", netversion).commit();
                 }
+
             }
         }.execute();
 
@@ -961,11 +851,11 @@ public class A extends Application implements Observatør {
 
 
     /**
-     * debugging: Tving ny app-dato
+     * debugging: Tving ny app-dato. GAMMEL
      *
      * @param antaldage
      */
-    public void rul(int antaldage) {
+    /*public void rul(int antaldage) {
         p("rul() kaldt");
 
         tilstand.masterDato = tilstand.masterDato.plusDays(antaldage);
@@ -1006,27 +896,29 @@ public class A extends Application implements Observatør {
             }
         }, 10);
     }
+*/
+    void indlæsHtekster(final ArrayList<Tekst> hTekster) {
+        lytter.givBesked(K.NYE_HTEKSTER_PÅ_VEJ, "indlæsHtekster()"); //Så brugeren ikke trykker netop mens den opdateres
 
-    //-- 100% baggrund
-    void indlæsHtekster() {
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
-
-                htekster = (ArrayList<Tekst>) IO.læsObj("htekster", ctx);
-                for (Tekst t : htekster) hteksterOverskrifter.add(t.overskrift.toUpperCase());
-
+                ArrayList<String> temp = new ArrayList<>();
+                for (Tekst t : hTekster) temp.add(t.overskrift.toUpperCase());
+                hteksterOverskrifter = temp;
                 return null;
             }
 
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                lytter.givBesked(K.HTEKSTER_OPDATERET, "udvælgTekster, htekster, UI-tråd: " + Thread.currentThread().getName());
+                lytter.givBesked(K.HTEKSTER_OPDATERET, "indlæsHtekster()");
             }
         }.execute();
 
     }
+
+
 
     //-- Kaldes når appen har kørt alle tekster igennnem og skal starte forfra med tekst1
     static void sletAlt() {
@@ -1086,7 +978,7 @@ public class A extends Application implements Observatør {
 
         if (hændelse == K.NYE_TEKSTER_ONLINE) {
             //if (tilstand.modenhed == K.MODENHED_MODEN || tilstand.modenhed == K.SOMMERFERIE)
-            hentNyeTekster();
+            hentOgGemNyeTekster();
         } else if (hændelse == K.HTEKSTER_OPDATERET)
             tilstand.hteksterKlar = true;
 
