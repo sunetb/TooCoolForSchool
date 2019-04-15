@@ -17,9 +17,7 @@ public class Lyttersystem {
 
 
     public static Lyttersystem getInstance(){
-        if (instans == null){
-            instans = new Lyttersystem();
-        }
+        if (instans == null) instans = new Lyttersystem();
         return instans;
     }
 

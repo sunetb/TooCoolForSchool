@@ -14,7 +14,6 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
-import dk.stbn.alarm.Tekst;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Alarm_Lytter;

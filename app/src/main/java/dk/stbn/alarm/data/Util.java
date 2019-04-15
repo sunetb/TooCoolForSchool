@@ -17,8 +17,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 
-import dk.stbn.alarm.Tekst;
-
 /**
  * Created by sune on 6/3/16.
  */
@@ -255,7 +253,7 @@ public class Util {
         }
     }
 
-    static ArrayList<Tekst> erstatAfsnit(ArrayList<Tekst>  input){
+    /*static ArrayList<Tekst> erstatAfsnit(ArrayList<Tekst>  input){
         ArrayList<Tekst> temp = new ArrayList<Tekst>();
 
         for (Tekst t : input) {
@@ -266,7 +264,7 @@ public class Util {
         }
 
         return temp;
-    }
+    }*/
 
     public static void t(Context c, String s){
         Toast.makeText(c, s, Toast.LENGTH_LONG).show();

@@ -1,4 +1,4 @@
-package dk.stbn.alarm;
+package dk.stbn.alarm.data;
 
 import org.joda.time.DateTime;
 
@@ -28,6 +28,10 @@ public class Tekst implements Serializable {
 		overskrift =over;
 		brødtekst=brød;
 		lavId();
+	}
+
+	public void formaterTekst(){
+		brødtekst = brødtekst.replaceAll("\n", " ");
 	}
 
 	int datokode() {

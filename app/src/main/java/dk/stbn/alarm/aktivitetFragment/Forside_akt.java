@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import dk.stbn.alarm.R;
-import dk.stbn.alarm.Tekst;
+import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
