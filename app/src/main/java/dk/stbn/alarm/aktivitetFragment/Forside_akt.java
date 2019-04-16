@@ -62,11 +62,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
         a = A.a;
-        tilstand = Tilstand.getInstance(this, a);
+        prefs = a.pref;
+        tilstand = Tilstand.getInstance(prefs);
         p(" idag er: "+ tilstand.masterDato.getDayOfMonth() + ": " + tilstand.masterDato.getMonthOfYear() + " - "+ tilstand.masterDato.getYear());
         setupLangReceiver();
-
-        prefs = a.pref;
         initUI();
         tilstand.aktivitetenVises = true;
         tjekOpstartstype(savedInstanceState);
@@ -109,7 +108,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            a.rul(1);
+                            //a.rul(1);
                         }
                     }, 110);
                     finish();
@@ -137,7 +136,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        a.rul(6);
+                        //a.rul(6);
                     }
                 }, 110);
                 t("Spoler 6 dage frem...");
@@ -267,7 +266,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    a.rul(1);
+                    //a.rul(1);
                 }
             }, 110);
             finish();

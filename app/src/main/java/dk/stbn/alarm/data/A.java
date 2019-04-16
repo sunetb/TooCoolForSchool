@@ -45,7 +45,6 @@ public class A extends Application implements Observatør {
 
     public static A a;
     public SharedPreferences pref;
-    public Context ctx;
     public Lyttersystem lytter;
     static AlarmManager alm; //TVM
     AlarmLogik alarmlogik;
@@ -53,7 +52,7 @@ public class A extends Application implements Observatør {
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
     public ArrayList<Tekst> synligeTekster = new ArrayList();  //bruges af pageradapteren //TVM
-   // public ArrayList<Tekst> htekster = new ArrayList();  //TVM
+    public ArrayList<Tekst> htekster = new ArrayList();  //TVM
     public ArrayList<String> hteksterOverskrifter = new ArrayList(); //TVM
 
 
@@ -63,16 +62,6 @@ public class A extends Application implements Observatør {
 //////////---------- APP TILSTAND ----------//////////
 
     public Tilstand tilstand;
-
-//////////-------------------------//////////
-
-
-//////////---------- MIDLERTIDIGE DATA ----------//////////
-
-   // private ArrayList[] alleTekster;
-    //private ArrayList<Tekst> itekster;
-    //private ArrayList<Tekst> mtekster;
-    //ArrayList<Integer> synligeDatoer;
 
 //////////-------------------------//////////
 
@@ -133,7 +122,7 @@ public class A extends Application implements Observatør {
     * Kan muligivs løses med lyttersystem..
     *
     Refactoring
-    *Filnavne i KONSTANTER
+    *
     *
     *
     * */
@@ -145,12 +134,12 @@ public class A extends Application implements Observatør {
         p("oncreate() kaldt");
         boolean EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator");
         if (!EMULATOR) {
-            Fabric.with(this, new Crashlytics());
+            Fabric.with(getApplicationContext(), new Crashlytics());
             Util.baglog = true;
             p("Enhed: " + Build.MODEL + "  " + Build.PRODUCT);
         }
         AppSpector
-                .build(this)
+                .build(getApplicationContext())
                 .withDefaultMonitors()
                 .run("android_ZDdiOWY3YWQtZGVjNy00ZWNiLThkMTAtYTI4YmI2OWIzNDEy");
 //        FirebaseApp.initializeApp(ctx);
@@ -159,39 +148,44 @@ public class A extends Application implements Observatør {
         Util.starttid = System.currentTimeMillis();
 
         a = this;
-        ctx = this;
+        pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         lytter = Lyttersystem.getInstance();
-        lytter.nulstil();
         lytter.lyt(this);
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
         tilstand = Tilstand.getInstance(pref);
         alarmlogik = AlarmLogik.getInstance();
 
+        if (alm == null) alm = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
+        tjekSprog();
 
-        if (alm == null) alm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-
-        String sprog = Locale.getDefault().getLanguage();
-        String gemtSprog = pref.getString("sprog", "ikke sat");
-        pref.edit().putString("sprog", sprog).commit();
-        p("SPROG " + sprog);
-
-        //Init
         tjekTekstversion("A.onCreate()");
-        indlæsHtekster((ArrayList<Tekst>) IO.læsObj());
-        visCachedeTekster();
+
+        if (tilstand.modenhed > K.MODENHED_HELT_FRISK) {
+            indlæsHtekster();
+            visCachedeTekster();
+        }
+        //%%%%%%%%%%%%Tidskritisk: jeg SKAL vide at data er hentet
         udvælgTekster();
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
         p("Gemt modenhed: " + pref.getInt("modenhed", -1));
     }
 
+
+
+    private void tjekSprog() {
+        String sprog = Locale.getDefault().getLanguage();
+        String gemtSprog = pref.getString("sprog", "ikke sat");
+        pref.edit().putString("sprog", sprog).commit();
+        p("SPROG " + sprog);
+    }
+
     /**
      * Henter gemte synlige tekster fra sidst
      */
     void visCachedeTekster() {
-        synligeTekster = (ArrayList<Tekst>) IO.læsObj("synligeTekster", this);
+        synligeTekster = (ArrayList<Tekst>) IO.læsObj(K.SYNLIGETEKSTER, getApplicationContext());
         lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "visCachedeTekster()");
     }
 
@@ -206,33 +200,33 @@ public class A extends Application implements Observatør {
         if (modenhed == K.SOMMERFERIE) {
             p("sommerferie!!!");
 
-            tempSynlige.add((Tekst) IO.læsObj("otekst1", this));
-            tempSynlige.add((Tekst) IO.læsObj("otekst2", this));
-            tempSynlige.add((Tekst) IO.læsObj("otekst3", this));
+            tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
+            tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_2, getApplicationContext()));
+            tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_3, getApplicationContext()));
 
         } else if (modenhed == K.MODENHED_HELT_FRISK) {
             p("udvælgTekster() Modenhed: Helt frisk");
             allerFørsteGang();
-            IO.gemObj(new DateTime(), "masterdato", this);
+            IO.gemObj(new DateTime(), K.MASTERDATO, getApplicationContext());
 
         } else if (modenhed == K.MODENHED_FØRSTE_DAG) {
             p("Dag 1, ikke første gang");
 
-            tempSynlige.add((Tekst) IO.læsObj("otekst1", this));
+            tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
 
         } else if (modenhed == K.MODENHED_ANDEN_DAG) {
             p("Dag 2 ");
 
-            Tekst oTekst1 = (Tekst) IO.læsObj("otekst1", ctx);
-            Tekst oTekst2 = (Tekst) IO.læsObj("otekst2", ctx);
+            Tekst oTekst1 = (Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext());
+            Tekst oTekst2 = (Tekst) IO.læsObj(K.OTEKST_2, getApplicationContext());
             tempSynlige.add(oTekst1);
             tempSynlige.add(oTekst2);
 
         } else if (modenhed == K.MODENHED_TREDJE_DAG) {
             p("Dag 3 ");
 
-            Tekst oTekst1 = (Tekst) IO.læsObj("otekst1", ctx);
-            Tekst oTekst2 = (Tekst) IO.læsObj("otekst2", ctx);
+            Tekst oTekst1 = (Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext());
+            Tekst oTekst2 = (Tekst) IO.læsObj(K.OTEKST_2, getApplicationContext());
             tempSynlige.add(oTekst1);
             tempSynlige.add(oTekst2);
 
@@ -242,7 +236,7 @@ public class A extends Application implements Observatør {
 
         } else if (modenhed == K.MODENHED_FJERDE_DAG) {
             p("Dag 4 ");
-            Tekst oTekst2 = (Tekst) IO.læsObj("otekst2", ctx);
+            Tekst oTekst2 = (Tekst) IO.læsObj(K.OTEKST_2, getApplicationContext());
             tempSynlige.add(oTekst2);
             ArrayList<Tekst> tekster = findItekster();
             if (tekster.size() > 0) tempSynlige.add(tekster.get(0));
@@ -293,7 +287,7 @@ public class A extends Application implements Observatør {
         if (modenhed < K.MODENHED_TREDJE_DAG){
             //sørg for at der ikke vises notifikationer i starten
             for (Tekst t : synligeTekster)
-                IO.føjTilGamle(t.id_int, ctx);
+                IO.føjTilGamle(t.id_int, getApplicationContext());
         }
 
         gemSynligeTekster();
@@ -303,7 +297,7 @@ public class A extends Application implements Observatør {
 
     private ArrayList<Tekst> findMtekster() {
         ArrayList<Tekst> r = new ArrayList<>();
-        ArrayList<Tekst> mtekster = (ArrayList<Tekst>) IO.læsObj("mtekster", this);
+        ArrayList<Tekst> mtekster = (ArrayList<Tekst>) IO.læsObj(K.MTEKSTER, getApplicationContext());
 
 
         Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", tilstand.masterDato);
@@ -319,7 +313,7 @@ public class A extends Application implements Observatør {
             p("tjek mtekster: " + mtekst.id_int);
             p("IdTekst: " + mtekst.id);
             //datoliste.add(mtekst.id_int);
-            //IO.gemObj(mtekst, "" + mtekst.id_int, ctx);
+            //IO.gemObj(mtekst, "" + mtekst.id_int, getApplicationContext());
             if (mtekst.id_int >= dummyMTekst.id_int) {
 
                 if (!mFundet) {
@@ -342,7 +336,7 @@ public class A extends Application implements Observatør {
 
     private ArrayList<Tekst> findItekster() {
         ArrayList<Tekst> r = new ArrayList<>();
-        ArrayList<Tekst> itekster = (ArrayList<Tekst>) IO.læsObj("itekster", this);
+        ArrayList<Tekst> itekster = (ArrayList<Tekst>) IO.læsObj(K.ITEKSTER, getApplicationContext());
 
         Tekst dummyITekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "i", tilstand.masterDato);
         dummyITekst.lavId();
@@ -359,7 +353,7 @@ public class A extends Application implements Observatør {
             p("IdTekst: " + itekst.id);
 
             //datoliste.add(itekst.id_int);
-            //IO.gemObj(itekst, "" + tekstid, ctx);
+            //IO.gemObj(itekst, "" + tekstid, getApplicationContext());
 
             //Tjek om teksten skal vises
             if (!iFundet && tekstid >= dummyITekst.id_int) {
@@ -430,7 +424,7 @@ public class A extends Application implements Observatør {
                     p("Aktiviteten blev klar EFTER at data blev klar");
                 }
 
-                IO.gemObj(o1, "otekst1", ctx);
+                IO.gemObj(o1, K.OTEKST_1, getApplicationContext());
 
 
 
@@ -445,17 +439,17 @@ public class A extends Application implements Observatør {
                 p("Event til aktiviteten om at H-tekster er klar");
 
                 publishProgress(2);
-                IO.gemObj(htekster, K.HTEKSTER, ctx);
+                IO.gemObj(htekster, K.HTEKSTER, getApplicationContext());
 
                 //-- Gemmer O-tekst nr 2 og 3 til næste gang
                 otekster = alleTekster[0];
                 Tekst o2 = otekster.get(1);
                 o2.formaterTekst();
-                IO.gemObj(o2, "otekst2", ctx);
+                IO.gemObj(o2, K.OTEKST_2, getApplicationContext());
 
                 Tekst o3 = otekster.get(2);
                 o3.formaterTekst();
-                IO.gemObj(o3, "otekst3", ctx);
+                IO.gemObj(o3, K.OTEKST_3, getApplicationContext());
 
                 ArrayList<Tekst> itekster = alleTekster[1];
 
@@ -469,9 +463,9 @@ public class A extends Application implements Observatør {
                 Util.sorterStigende(mtekster);
 
 
-                IO.gemObj(new ArrayList<Integer>(), "gamle", ctx);
-                IO.gemObj(new ArrayList<Integer>(), "datoliste", ctx);
-                IO.gemObj(new ArrayList<Integer>(), "synligeDatoer", ctx);
+                IO.gemObj(new ArrayList<Integer>(), K.GAMLE, getApplicationContext());
+                IO.gemObj(new ArrayList<Integer>(), K.DATOLISTE, getApplicationContext());
+                IO.gemObj(new ArrayList<Integer>(), K.SYNLIGEDATOER, getApplicationContext());
 
                 if (!aktivitetKlar && tilstand.aktivitetenVises)
                     publishProgress(1);
@@ -570,9 +564,9 @@ public class A extends Application implements Observatør {
             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] objects) {
-                    IO.gemObj(itekster, "itekster", A.a);
-                    IO.gemObj(mtekster, "mtekster", A.a);
-                    IO.gemObj(htekster, "htekster", A.a);
+                    IO.gemObj(itekster, K.ITEKSTER, A.a);
+                    IO.gemObj(mtekster, K.MTEKSTER, A.a);
+                    IO.gemObj(htekster, K.HTEKSTER, A.a);
 
                     //itekster = null;
                     //mtekster = null;
@@ -601,7 +595,7 @@ public class A extends Application implements Observatør {
 
                 //-- datoliste er listen med alle teksters  id'er
 
-                ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj("datoliste", ctx); //hvis denne gøres global, kan den initalisteres når som helst - dvs igså tidligere.
+                ArrayList<Integer> datoliste = (ArrayList<Integer>) IO.læsObj(K.DATOLISTE, getApplicationContext()); //hvis denne gøres global, kan den initalisteres når som helst - dvs igså tidligere.
 
                 //-- Hvis datolisten er null, er appen helt frisk
                 if (datoliste == null) {
@@ -662,7 +656,7 @@ public class A extends Application implements Observatør {
                         p("Tjek datoliste skalTOpdateres? M: " + tekstid);
 
                         //Todo: bør skrives om til at bruge tekst id i stedet for at hente alle tekster
-                        Tekst t = (Tekst) IO.læsObj("" + datoliste.get(i), ctx);
+                        Tekst t = (Tekst) IO.læsObj("" + datoliste.get(i), getApplicationContext());
 
                         if (alarmlogik.visMtekst(t.dato, tilstand.masterDato)) {
                             synligeDatoer.add(datoliste.get(i));
@@ -678,13 +672,13 @@ public class A extends Application implements Observatør {
                     int ældsteI = synligeDatoer.get(0);
                     for (Integer i : datoliste) if (i < ældsteI) slettes.add(i);
 
-                    for (Integer j : slettes) IO.føjTilGamle(j, ctx);
+                    for (Integer j : slettes) IO.føjTilGamle(j, getApplicationContext());
                 } else //hvis listen er tom, er det fordi appen er et år gammel og der skal nulstilles
                     //sletAlt(); //Ikke længere relevant. Håndteres nu i erDerGået5DageOg...
 
                     for (Integer i : slettes) datoliste.remove(i);
 
-                IO.gemObj(datoliste, "datoliste", ctx);
+                IO.gemObj(datoliste, K.DATOLISTE, getApplicationContext());
 
 
                 p("skalTekstlistenOpdateres() async slut");
@@ -722,14 +716,14 @@ public class A extends Application implements Observatør {
 
                     for (Integer i : synligeDatoer) {
                         p("dato: " + i);
-                        synligeTekster.add((Tekst) IO.læsObj("" + i, ctx));
+                        synligeTekster.add((Tekst) IO.læsObj("" + i, getApplicationContext()));
 
                     }
                     lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "skaltekstlistenopdaetere() synlige UI-tråd: " + Thread.currentThread().getName());
                     gemSynligeTekster();
-                    IO.gemObj(synligeDatoer, "synligeDatoer", ctx);
+                    IO.gemObj(synligeDatoer, K.SYNLIGEDATOER, getApplicationContext());
 
-                    alarmlogik.rensUdIAlarmer(ctx);
+                    alarmlogik.rensUdIAlarmer(getApplicationContext());
                 } else p("skalTekstlistenOpdateres Ingen ny synlige");
                 p("skalTekstlistenOpdateres() slut");
 
@@ -747,7 +741,7 @@ public class A extends Application implements Observatør {
 
     public void gemSynligeTekster() {
         //new async ?
-        IO.gemObj(synligeTekster, "synligeTekster", this);
+        IO.gemObj(synligeTekster, K.SYNLIGETEKSTER, getApplicationContext());
     }
 
     /**
@@ -834,14 +828,13 @@ public class A extends Application implements Observatør {
                     p("Fejl: Hentet tekstversion null eller tom");
 
                 p("netversion: " + netversion);
-                int gemtTekstversion = pref.getInt("tekstversion", 0);
+                int gemtTekstversion = pref.getInt(K.TEKSTVERSION, 0);
                 p("gemt tekstversion: " + gemtTekstversion);
 
                 if (gemtTekstversion < netversion) {
                     //Måske giver det ikke rigtig mening med event længere efter Den Store Revidering
-                    if (tilstand.modenhed > K.MODENHED_HELT_FRISK)
-                        lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstversion, nye online");
-                    pref.edit().putInt("tekstversion", netversion).commit();
+                    lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstversion, nye online");
+                    pref.edit().putInt(K.TEKSTVERSION, netversion).commit();
                 }
 
             }
@@ -897,15 +890,26 @@ public class A extends Application implements Observatør {
         }, 10);
     }
 */
-    void indlæsHtekster(final ArrayList<Tekst> hTekster) {
+
+    /**
+     * Henter gemte Htekster og genererer en liste med overskrifterne
+     */
+    void indlæsHtekster() {
+
         lytter.givBesked(K.NYE_HTEKSTER_PÅ_VEJ, "indlæsHtekster()"); //Så brugeren ikke trykker netop mens den opdateres
 
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
+
+                p("indlæsHtekster() start");
+
+                ArrayList<Tekst> gemteHtekster = (ArrayList<Tekst>) IO.læsObj(K.HTEKSTER, getApplicationContext());
                 ArrayList<String> temp = new ArrayList<>();
-                for (Tekst t : hTekster) temp.add(t.overskrift.toUpperCase());
+                for (Tekst t : gemteHtekster) temp.add(t.overskrift.toUpperCase());
                 hteksterOverskrifter = temp;
+                p("indlæsHtekster() slut");
+
                 return null;
             }
 
@@ -926,7 +930,7 @@ public class A extends Application implements Observatør {
         p("sletAlt kaldt");
         sletDiskData();
         synligeTekster.clear();
-        synligeTekster.add((Tekst) IO.læsObj("otekst1", this));
+        synligeTekster.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
         Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE, "nulstillet");
         tilstand.gemModenhed(K.MODENHED_HELT_FRISK);
         allerFørsteGang(); //her sættes pref modenhed til 1 = FØRSTE DAG
@@ -937,11 +941,13 @@ public class A extends Application implements Observatør {
         pref.edit().clear().commit();
 
         ArrayList tomTekst = new ArrayList<Tekst>();
-        IO.gemObj(tomTekst, "tempsynligeTekster", this);
-        IO.gemObj(tomTekst, "htekster", this);
+        IO.gemObj(tomTekst, K.TEMP_SYNLIGETEKSTER, getApplicationContext());
+        IO.gemObj(tomTekst, K.HTEKSTER, getApplicationContext());
+        IO.gemObj(tomTekst, K.ITEKSTER, getApplicationContext());
+        IO.gemObj(tomTekst, K.MTEKSTER, getApplicationContext());
         ArrayList<Integer> tomTal = new ArrayList<>();
-        IO.gemObj(tomTal, "synligeDatoer", this);
-        IO.gemObj(tomTal, "gamle", this);
+        IO.gemObj(tomTal, K.SYNLIGEDATOER, getApplicationContext());
+        IO.gemObj(tomTal, K.GAMLE, getApplicationContext());
 
     }
 
@@ -965,7 +971,7 @@ public class A extends Application implements Observatør {
 
 
     void t(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
     }
 
     void p(Object o) {

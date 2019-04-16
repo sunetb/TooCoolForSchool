@@ -21,7 +21,7 @@ public class Lyttersystem {
         return instans;
     }
 
-    ArrayList<Observatør> observatører = new ArrayList<>();
+    private ArrayList<Observatør> observatører = new ArrayList<>();
 
     int senesteHændelse = 0;
 
@@ -44,7 +44,9 @@ public class Lyttersystem {
         senesteHændelse = hændelse;
     }
 
-    // -- Må KUN kaldes fra hovedtråden
+    /**
+     * Må KUN kaldes fra hovedtråden
+      */
     public void givBesked(int hændelse, String besked) {
         p("1: givebesked MODTOG: : "+besked+ " hændelse: "+K.hændelsestekst(hændelse));
 
@@ -56,7 +58,7 @@ public class Lyttersystem {
         p("2: givBesked() SENDTE "+getSenesteHændelse() + ": "+ K.hændelsestekst(getSenesteHændelse())+" " + " tråd: "+Thread.currentThread().getName());
 
         p("3: Hændelse: "+hændelse + " VS. senesteHændelse: "+getSenesteHændelse());
-        Util.baglog("Lyttersystem.givBesked(): Modenhed = "+ K.hændelsestekst(hændelse), A.a);
+        //Util.baglog("Lyttersystem.givBesked(): Modenhed = "+ K.hændelsestekst(hændelse), A.a);
     }
 
 

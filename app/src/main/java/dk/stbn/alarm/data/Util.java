@@ -44,7 +44,7 @@ public class Util {
         ArrayList<Tekst> teksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> mteksterTmp = new ArrayList<Tekst>();
         ArrayList<Tekst> hteksterTmp = new ArrayList<Tekst>();
-        //DateTime idag = A.masterDato;
+
         try {
 
             XmlPullParser parser;

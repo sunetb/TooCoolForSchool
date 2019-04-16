@@ -26,6 +26,11 @@ public class K {
     public static final int NYE_HTEKSTER_PÅ_VEJ = 4;
     public static final String FIRE = "NYE_HTEKSTER_PÅ_VEJ";
 
+    public static final int NYE_HTEKSTER_HENTET = 5;
+    public static final String FEM = "NYE_HTEKSTER_HENTET";
+
+
+
     public static String hændelsestekst(int hændelse){
 
         switch (hændelse){
@@ -53,6 +58,14 @@ public class K {
     public static final String ITEKSTER = "itekster";
     public static final String MTEKSTER = "mtekster";
     public static final String HTEKSTER = "htekster";
+    public static final String GAMLE = "gamle";
+    public static final String MASTERDATO = "masterdato";
+    public static final String DATOLISTE = "datoliste";
+    public static final String SYNLIGEDATOER = "synligeDatoer";
+    public static final String SYNLIGETEKSTER = "synligetekster";
+    public static final String TEMP_SYNLIGETEKSTER = "tempsynligeTekster";
+    public static final String TEKSTVERSION = "tekstversion";
+
     //TODO gamle, osv..
 
 }

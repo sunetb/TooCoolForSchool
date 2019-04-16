@@ -1,8 +1,6 @@
 package dk.stbn.alarm.data;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import org.joda.time.DateTime;
@@ -17,18 +15,16 @@ public class Tilstand {
 
     public DateTime masterDato;
     public int modenhed;
-    boolean femteDagFørsteGang;
+    private boolean femteDagFørsteGang;
     public int skærmVendt;
     public boolean hteksterKlar = false;
     public boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
     public int sidstKendteVindueshøjde = 0;
 
-    public boolean nyeTekstversion = false;
+    public boolean nyTekstversion = false;
 
     SharedPreferences pref;
     A a;
-
-
 
     private final String MODENHED = "modenhed";
 
@@ -40,7 +36,7 @@ public class Tilstand {
     }
 
 
-    Tilstand(SharedPreferences s) {
+    private Tilstand(SharedPreferences s) {
         masterDato = new DateTime();
         a = A.a;
         pref = s;
@@ -49,7 +45,10 @@ public class Tilstand {
         p("Modenhed i prefs: " + pref.getInt(MODENHED, -1));
     }
 
-
+    /**
+     * Initialiserer én variabel: Tilstand.modenhed
+     * @return
+     */
     private int opdaterModenhed() {
 
         int tempModenhed = pref.getInt(MODENHED, K.MODENHED_HELT_FRISK);
@@ -61,6 +60,8 @@ public class Tilstand {
             a.sletAlt();//nulstiller bla. prefs og derfor også harPasseretSommer..
             tempModenhed = K.MODENHED_HELT_FRISK;
             gemModenhed(K.MODENHED_FØRSTE_DAG);
+
+
         } else {//Er det sommerferie?
             boolean sommerferie = Tid.efter(masterDato, K.SOMMERFERIE_START) && Tid.før(masterDato, K.SOMMERFERIE_SLUT);
 
@@ -72,15 +73,14 @@ public class Tilstand {
                 return K.SOMMERFERIE;
             }
         }
-
-
         if (tempModenhed == K.MODENHED_MODEN)
             return K.MODENHED_MODEN;
 
         int idag = Util.lavDato(masterDato);
 
         if (tempModenhed == K.MODENHED_HELT_FRISK) {
-            //koden herfra, hvor tempModenhed sættes til FØRSTE_DAG, er flyttet til A.allerFørsteGang() for at den ikke bliver kørt med mindre appen får hentet sine data
+            //koden herfra, hvor tempModenhed sættes til FØRSTE_DAG, er flyttet til A.allerFørsteGang()
+            // for at den ikke bliver modnet med mindre appen får hentet sine data
 
             return K.MODENHED_HELT_FRISK;
         } else if (tempModenhed == K.MODENHED_FØRSTE_DAG) {
