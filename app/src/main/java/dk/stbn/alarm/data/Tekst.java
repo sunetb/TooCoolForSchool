@@ -30,7 +30,7 @@ public class Tekst implements Serializable {
 		lavId();
 	}
 
-	public void formaterTekst(){
+	public void formater(){
 		brødtekst = brødtekst.replaceAll("\n", " ");
 	}
 

@@ -23,11 +23,17 @@ public class K {
     public static final int NYE_TEKSTER_ONLINE = 3;
     public static final String TRE = "NYE_TEKSTER_ONLINE";
 
-    public static final int NYE_HTEKSTER_PÅ_VEJ = 4;
-    public static final String FIRE = "NYE_HTEKSTER_PÅ_VEJ";
+    public static final int INGEN_NYE_TEKSTER_ONLINE = 4;
+    public static final String FIRE = "INGEN_NYE_TEKSTER_ONLINE";
 
-    public static final int NYE_HTEKSTER_HENTET = 5;
-    public static final String FEM = "NYE_HTEKSTER_HENTET";
+    public static final int NYE_HTEKSTER_PÅ_VEJ = 5;
+    public static final String FEM = "NYE_HTEKSTER_PÅ_VEJ";
+
+    public static final int SPROG_ÆNDRET = 6;
+    public static final String SEKS = "SPROG_ÆNDRET";
+
+    public static final int TEKSTBASEN_OPDATERET = 7;
+    public static final String SYV = "TEKSTBASEN_OPDATERET";
 
 
 
@@ -38,8 +44,11 @@ public class K {
             case 2 : return TO;
             case 3 : return TRE;
             case 4 : return FIRE;
+            case 5 : return FEM;
+            case 6 : return SEKS;
+            case 7 : return SYV;
         }
-        return "FEJL: Ukendt eventtype";
+        return "FEJL: Ukendt eventtype: "+hændelse;
     }
 
     //Urler TODO: Obfuskeres

@@ -211,8 +211,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                         del.setImageResource(R.drawable.ic_share_black_24dp);
                         kontakt.setImageResource(R.drawable.ic_send_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
-                        IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        if (tilstand.modenhed == K.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
+                        IO.gemObj(new ArrayList<Integer>(), "gamle", getApplicationContext());
+                        if (tilstand.modenhed == K.MODENHED_MODEN) a.udvælgTekster();
                     }
                     return true;
                 }
@@ -232,8 +232,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     else {
                         del.setImageResource(R.drawable.ic_share_black_24dp);
                         //-- Færdig med at teste, nultil listen over forældede tekster
-                        IO.gemObj(new ArrayList<Integer>(), "gamle", a.ctx);
-                        if (tilstand.modenhed == K.MODENHED_MODEN) a.skalTekstlistenOpdateres("Forside");
+                        IO.gemObj(new ArrayList<Integer>(), "gamle", getApplicationContext());
+                        if (tilstand.modenhed == K.MODENHED_MODEN) a.udvælgTekster();
                     }
                     return true;
                 }
@@ -355,7 +355,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    private boolean skærmvending () {
+  private boolean skærmvending () {
 
         int vindueshøjdetmp = Resources.getSystem().getDisplayMetrics().heightPixels;
 
@@ -416,7 +416,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
 
                 }
-                Util.baglog("Forside.tjekOpstartsType(): Startet fra noti: "+ id + " " +startBundle.getString("overskrift"), this);
+                //Util.baglog("Forside.tjekOpstartsType(): Startet fra noti: "+ id + " " +startBundle.getString("overskrift"), this);
             }
         }
     }
@@ -428,6 +428,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }
+        tilstand.aktivitetenVises = false;
         super.onDestroy();
         p("onDestroy() blev kaldt");
     }
@@ -525,7 +526,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     }
 
-
+//TODO: Flyttes til Application-singleton?
     //Fra https://stackoverflow.com/questions/34285383/android-how-to-detect-language-has-been-changes-on-phone-setting
     public BroadcastReceiver setupLangReceiver(){
 
@@ -536,7 +537,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     p("Sprog ændret til: "+ Locale.getDefault().getLanguage());
-                    a.hentOgGemNyeTekster();
+                    a.lytter.givBesked(K.SPROG_ÆNDRET, "Sproglytter");
                 }
 
             };
