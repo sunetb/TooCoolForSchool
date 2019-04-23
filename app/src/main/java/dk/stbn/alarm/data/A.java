@@ -128,7 +128,7 @@ public class A extends Application implements Observatør {
     @Override
     public void onCreate() {
         super.onCreate();
-        p("oncreate() kaldt");
+        p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
         boolean EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator");
         if (!EMULATOR) {
             Fabric.with(getApplicationContext(), new Crashlytics());
@@ -156,13 +156,15 @@ public class A extends Application implements Observatør {
 
         tjekSprog();
 
-        tjekTekstversion("A.onCreate()"); //Fyrer event og A.opdater() kaldes hvis der er nye tekster på nettet.
 
-        if (tilstand.modenhed > K.MODENHED_HELT_FRISK) {
+        if (tilstand.modenhed == K.MODENHED_HELT_FRISK)
+            udvælgTekster();
+        else {
+            tjekTekstversion("A.onCreate()"); //Fyrer event og A.opdater() kaldes hvis der er nye tekster på nettet.
             indlæsHtekster();
             visCachedeTekster();
-
         }
+
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
         p("Gemt modenhed: " + pref.getInt("modenhed", -1));
@@ -187,6 +189,7 @@ public class A extends Application implements Observatør {
     private void tjekSprog() {
         String sprog = Locale.getDefault().getLanguage();
         String gemtSprog = pref.getString("sprog", "ikke sat");
+        //TODO:
         pref.edit().putString("sprog", sprog).commit();
         p("SPROG " + sprog);
     }
@@ -198,7 +201,7 @@ public class A extends Application implements Observatør {
 
         synligeTekster = (ArrayList<Tekst>) IO.læsObj(K.SYNLIGETEKSTER, getApplicationContext());
 
-        if (synligeTekster.size() > 0 && synligeTekster != null) {
+        if (synligeTekster != null) {
             lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "visCachedeTekster()");
             p("visCachedeTekster() synligeTekster længde: "+synligeTekster.size());
         }
@@ -290,14 +293,14 @@ public class A extends Application implements Observatør {
 
 
         if (skift) {
-            p("Nyt udvalg af tekster");
+            p("Nej. Der er  et nyt udvalg af tekster");
             synligeTekster = tempSynlige;
             pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
             lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "udvælgTekster(), der var et nyt udvalg");
             gemSynligeTekster();
         }
         else
-            p("Vi bruger bare de cachede tekster");
+            p("Ja. Vi bruger de cachede tekster");
 
         if (modenhed < K.MODENHED_TREDJE_DAG){
             //sørg for at der ikke vises notifikationer i starten
@@ -398,8 +401,6 @@ public class A extends Application implements Observatør {
      */
     void allerFørsteGang() {
 
-        tjekTekstversion("allerFørsteGang"); //køres for at få gemt versionsnummer i prefs første gang
-
         new AsyncTask() {
 
             @Override
@@ -436,7 +437,7 @@ public class A extends Application implements Observatør {
                 IO.gemObj(o1, K.OTEKST_1, getApplicationContext());
 
                 p("Formaterer H-tekster...");
-                ArrayList<Tekst> htekster = alleTekster[3];
+                htekster = alleTekster[3];
                 for (Tekst t : htekster)
                     t.formater();
 
@@ -508,6 +509,12 @@ public class A extends Application implements Observatør {
                 if (synligeTekster.size() == 0) {
                     prøvIgen();
                 }
+                else{
+                    gemSynligeTekster();
+
+                    tjekTekstversion("allerFørsteGang()"); //kaldes for at lagre versionsnummeret for tekster på nettet
+
+                }
 
 
             }
@@ -558,7 +565,7 @@ public class A extends Application implements Observatør {
             protected Object doInBackground(Object[] params) {
 
                 p("opdaterTekstbasen() henter alle tekster..");
-                ArrayList[] alleTekster = hentTeksterOnline("allerFørsteGang()");
+                ArrayList[] alleTekster = hentTeksterOnline("opdaterTekstbasen()");
 
                 ArrayList<Tekst> otekster = alleTekster[0];
                 Tekst o1 = otekster.get(0);
@@ -595,6 +602,7 @@ public class A extends Application implements Observatør {
 
                 publishProgress(2);
                 IO.gemObj(htekster, K.HTEKSTER, getApplicationContext());
+
                 gemEnkelteTeksterTilDisk(itekster);
                 gemEnkelteTeksterTilDisk(mtekster);
 
@@ -716,7 +724,8 @@ public class A extends Application implements Observatør {
 
                 if (gemtTekstversion < netversion) {
                     //Måske giver det ikke rigtig mening med event længere efter Den Store Revidering
-                    lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstversion, nye online");
+                    if (tilstand.modenhed > K.MODENHED_HELT_FRISK) //vi skal ikke fyre event første dag, da dse nyeste data allerede er hentet
+                        lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstversion, nye online");
                     pref.edit().putInt(K.TEKSTVERSION, netversion).commit();
                 }
                 else {
@@ -791,18 +800,24 @@ public class A extends Application implements Observatør {
                 p("indlæsHtekster() start");
 
                 ArrayList<Tekst> gemteHtekster = (ArrayList<Tekst>) IO.læsObj(K.HTEKSTER, getApplicationContext());
+                if (gemteHtekster == null) {
+                    p("Fejl! ingen h-tekster på disk");
+                    return false;
+                }
                 ArrayList<String> temp = new ArrayList<>();
                 for (Tekst t : gemteHtekster) temp.add(t.overskrift.toUpperCase());
                 hteksterOverskrifter = temp;
+                htekster = gemteHtekster;
                 p("indlæsHtekster() slut");
 
-                return null;
+                return true;
             }
 
             @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-                lytter.givBesked(K.HTEKSTER_OPDATERET, "indlæsHtekster()");
+            protected void onPostExecute(Object gikOK) {
+                super.onPostExecute(gikOK);
+                if ((boolean) gikOK) lytter.givBesked(K.HTEKSTER_OPDATERET, "indlæsHtekster()");
+
             }
         }.execute();
 

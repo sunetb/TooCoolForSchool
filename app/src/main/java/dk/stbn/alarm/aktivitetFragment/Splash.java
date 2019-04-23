@@ -41,7 +41,7 @@ public class Splash extends AppCompatActivity implements Runnable {
     private void animer (Bundle savedInstanceState){
         sp = PreferenceManager.getDefaultSharedPreferences(this);
 
-        animLængde1 = sp.getInt("animLængde1", 3400);
+        animLængde1 = sp.getInt("animLængde1", 1400);
         animLængde2 = sp.getInt("animLængde2", 2100);
 
         if (animLængde1 == 3400) gemKortereVærdier();

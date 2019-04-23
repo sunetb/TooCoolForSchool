@@ -12,9 +12,9 @@ import dk.stbn.alarm.diverse.K;
  */
 public class Lyttersystem {
 
+    boolean log = true;
+
     private static Lyttersystem instans;
-
-
 
     public static Lyttersystem getInstance(){
         if (instans == null) instans = new Lyttersystem();
@@ -48,16 +48,13 @@ public class Lyttersystem {
      * Må KUN kaldes fra hovedtråden
       */
     public void givBesked(int hændelse, String besked) {
-        p("1: givebesked MODTOG: : "+besked+ " hændelse: "+K.hændelsestekst(hændelse));
+        if (log) p("1: givebesked MODTOG fra: "+besked+ ". Hændelse: "+K.hændelsestekst(hændelse));
 
-        setSenesteHændelse(hændelse);
+        //setSenesteHændelse(hændelse);
 
         for (Observatør o: observatører) {
             o.opdater(hændelse);
         }
-        p("2: givBesked() SENDTE "+getSenesteHændelse() + ": "+ K.hændelsestekst(getSenesteHændelse())+" " + " tråd: "+Thread.currentThread().getName());
-
-        p("3: Hændelse: "+hændelse + " VS. senesteHændelse: "+getSenesteHændelse());
         //Util.baglog("Lyttersystem.givBesked(): Modenhed = "+ K.hændelsestekst(hændelse), A.a);
     }
 

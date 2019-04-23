@@ -337,11 +337,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     public void opdater(int event) {
         if (event == K.SYNLIGETEKSTER_OPDATERET){
+            pa.notifyDataSetChanged();
+            vp.setCurrentItem(a.synligeTekster.size()-1);
+            knapstatus(a.synligeTekster.size()-1, " opdater()");
              new Handler().postDelayed(() -> {
-                 pa.notifyDataSetChanged();
-                 vp.setCurrentItem(a.synligeTekster.size()-1);
-                 knapstatus(a.synligeTekster.size()-1, " opdater()");
-             }, 50);
+
+             }, 10);
 
         }
         else if (event == K.HTEKSTER_OPDATERET){

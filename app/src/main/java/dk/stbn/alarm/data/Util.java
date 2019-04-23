@@ -98,10 +98,10 @@ public class Util {
                             }
                             if ("o".equalsIgnoreCase(txt)){
                                 tempTekst.kategori = "o";
-                                p("persXML() Otekst fundet");
+                                p("Util.parseXML() Otekst fundet");
                             }
                             else if ("stop".equalsIgnoreCase(txt)){
-                                p("parseXML() stop fundet");
+                                p("Util.parseXML() stop fundet");
                                 break;
                             }
                             else {
@@ -115,7 +115,7 @@ public class Util {
                                     if (længde >4) {
                                         dato = dato.substring(0,længde-4);
                                         længde = dato.length();
-                                        p("ParseXML lang dato læst: "+dato);
+                                        p("Util.ParseXML lang dato læst: "+dato);
 
                                     }
                                     String tmpMåned = dato.substring(længde-2, længde);
@@ -193,7 +193,7 @@ public class Util {
 
         ArrayList[] data = {oteksterTmp, teksterTmp, mteksterTmp, hteksterTmp};
         p("Util.parseXML(): Data længde: "+ data.length + " | o: "+oteksterTmp.size() + " | i: "+teksterTmp.size() + " | m: "+mteksterTmp.size() + " | h: "+hteksterTmp.size());
-        p("Otekst 3 parsexml: "+oteksterTmp.get(2));
+        p("Util.Otekst 3 parseXML: "+oteksterTmp.get(2));
         return data;
     }
 
@@ -272,7 +272,7 @@ public class Util {
 
     public static void p(Object o){
         String kl = o +"   #t:" + tid();
-        System.out.println("_____"+kl);
+        System.out.println("________."+kl);
         A.debugmsg += kl +"<br>";
     }
 

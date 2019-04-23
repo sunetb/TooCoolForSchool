@@ -42,7 +42,7 @@ public class Tilstand {
         pref = s;
         modenhed = opdaterModenhed();
         p("Global modenhed efter opdaterModenhed: " + modenhed);
-        p("Modenhed i prefs: " + pref.getInt(MODENHED, -1));
+
     }
 
     /**
