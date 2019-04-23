@@ -128,7 +128,7 @@ public class A extends Application implements Observatør {
     @Override
     public void onCreate() {
         super.onCreate();
-        p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
+        p("%_%_%_%_%_%_%_%_%_%_%_% oncreate() kaldt  %_%_%_%_%_%_%_%_%_%_%_%");
         boolean EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator");
         if (!EMULATOR) {
             Fabric.with(getApplicationContext(), new Crashlytics());
@@ -258,7 +258,7 @@ public class A extends Application implements Observatør {
             Tekst oTekst2 = (Tekst) IO.læsObj(K.OTEKST_2, getApplicationContext());
             tempSynlige.add(oTekst2);
             ArrayList<Tekst> tekster = findItekster();
-            //Tag kun de første to tekster, så der vises tre i alt
+            //Tag kun de første to I-tekster, så der vises tre i alt
             if (tekster.size() > 0) tempSynlige.add(tekster.get(0));
             if (tekster.size() > 1) tempSynlige.add(tekster.get(1));
 
@@ -328,8 +328,7 @@ public class A extends Application implements Observatør {
             Tekst mtekst = mtekster.get(i);
             p("tjek mtekster: " + mtekst.id_int);
             p("IdTekst: " + mtekst.id);
-            //datoliste.add(mtekst.id_int);
-            //IO.gemObj(mtekst, "" + mtekst.id_int, getApplicationContext());
+
             if (mtekst.id_int >= dummyMTekst.id_int) {
 
                 if (!mFundet) {
@@ -349,7 +348,7 @@ public class A extends Application implements Observatør {
         return r;
 
     }
-
+    //TODO: hvad hvis der ikke er nogen match???
     private ArrayList<Tekst> findItekster() {
         ArrayList<Tekst> r = new ArrayList<>();
         ArrayList<Tekst> itekster = (ArrayList<Tekst>) IO.læsObj(K.ITEKSTER, getApplicationContext());
@@ -825,7 +824,7 @@ public class A extends Application implements Observatør {
 
 
 
-    //-- Kaldes når appen har kørt alle tekster igennnem og skal starte forfra med tekst1
+    //-- Kaldes når appen har kørt alle tekster igennnem og skal starte forfra med Otekst1
     void sletAlt() {
         tilstand.nulstil();
         p("sletAlt kaldt");
