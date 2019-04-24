@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "715623398218",
+    "firebase_url": "https://coolv2-18885.firebaseio.com",
+    "project_id": "coolv2-18885",
+    "storage_bucket": "coolv2-18885.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715623398218:android:8f6aa51f1ec4702e",
+        "android_client_info": {
+          "package_name": "dk.stbn.cool.alarm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "715623398218-gndinhkqrp431im7uca9h11oe41aadqc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dk.stbn.cool.alarm",
+            "certificate_hash": "c78d44c857ca843434f153338c0c67b6a8012268"
+          }
+        },
+        {
+          "client_id": "715623398218-81qdand7mr6o10ku2djsdid42ejunlq2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUytREHh7tQzcfOfsg0cAqjdbQdo3ydfk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "715623398218-81qdand7mr6o10ku2djsdid42ejunlq2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
