@@ -272,14 +272,19 @@ public class A extends Application implements Observatør {
 
         }
 
-        p("Tjekker om vi kan beholde de cachede tekster..");
+        p("Tjekker om de cachede tekster skal erstattes..");
 
+        //Der skal skiftes hvis gemt liste og ny liste er forskellig længde
         boolean skift = synligeTekster.size() != tempSynlige.size();
 
+        //Der skal skiftes hvis appen ikke er moden
+        if (tilstand.modenhed != K.MODENHED_MODEN) skift = true;
+
+        //Er appen moden og har listerne samme længde, må vi tjekke indholdet af listerne
         if (!skift) {
             boolean forskellige = false;
 
-            for (int i = 0; i < synligeTekster.size(); i++){
+            for (int i = 0; i < synligeTekster.size(); i++) {
                 Tekst synlig = synligeTekster.get(i);
                 Tekst temp = tempSynlige.get(i);
                 if (synlig.id_int != temp.id_int) {
@@ -291,16 +296,14 @@ public class A extends Application implements Observatør {
             skift = forskellige;
         }
 
-
         if (skift) {
-            p("Nej. Der er  et nyt udvalg af tekster");
+            p("JA. Der er  et nyt udvalg af tekster");
             synligeTekster = tempSynlige;
             pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
             lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "udvælgTekster(), der var et nyt udvalg");
             gemSynligeTekster();
-        }
-        else
-            p("Ja. Vi bruger de cachede tekster");
+        } else
+            p("NEJ. Vi bruger de cachede tekster");
 
         if (modenhed < K.MODENHED_TREDJE_DAG){
             //sørg for at der ikke vises notifikationer i starten
