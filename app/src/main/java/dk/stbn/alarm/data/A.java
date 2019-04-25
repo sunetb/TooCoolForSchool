@@ -293,6 +293,7 @@ public class A extends Application implements Observatør {
                 }
             }
 
+
             skift = forskellige;
         }
 
