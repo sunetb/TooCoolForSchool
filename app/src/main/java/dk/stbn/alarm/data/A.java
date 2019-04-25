@@ -31,6 +31,7 @@ import java.util.Locale;
 
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
+import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
@@ -352,7 +353,7 @@ public class A extends Application implements Observatør {
         return r;
 
     }
-    //TODO: hvad hvis der ikke er nogen match???
+
     private ArrayList<Tekst> findItekster() {
         ArrayList<Tekst> r = new ArrayList<>();
         ArrayList<Tekst> itekster = (ArrayList<Tekst>) IO.læsObj(K.ITEKSTER, getApplicationContext());
@@ -364,7 +365,6 @@ public class A extends Application implements Observatør {
         p("itekster længde: " + itekster.size());
 
         boolean iFundet = false;
-        //            fejlen med visning af tekster er her omkring
         for (int i = 0; i < itekster.size(); i++) {
             Tekst itekst = itekster.get(i);
             int tekstid = itekst.id_int;
@@ -391,7 +391,18 @@ public class A extends Application implements Observatør {
                     if (i > 0) r.add(itekster.get(i - 1));
                     else r.add(itekster.get(i));
                 }
+
             }
+
+
+        }
+        if (!iFundet){
+            p("Appen er løbet tør for tekster (Snart sommerferie)");
+            int længde = itekster.size();
+            r.add(itekster.get(længde-3));
+            r.add(itekster.get(længde-2));
+            r.add(itekster.get(længde-1));
+
         }
         return r;
 
@@ -411,6 +422,7 @@ public class A extends Application implements Observatør {
 
                 p("allerFørsteGang() henter alle tekster..");
                 ArrayList[] alleTekster = hentTeksterOnline("allerFørsteGang()");
+                p("Data længde: "+ alleTekster.length + " | o: "+alleTekster[0].size() + " | i: "+alleTekster[1].size() + " | m: "+alleTekster[2].size() + " | h: "+alleTekster[3].size());
 
                 //-- Denne kode burde egentlig stå i tilstand.opdaterModenhed() men er flyttet hertil så appen kun kan modnes hvis den får data første gang.
                 int idag = Util.lavDato(tilstand.masterDato);
@@ -453,7 +465,7 @@ public class A extends Application implements Observatør {
                 IO.gemObj(htekster, K.HTEKSTER, getApplicationContext());
 
                 //-- Gemmer O-tekst nr 2 og 3 til næste gang
-                otekster = alleTekster[0];
+
                 Tekst o2 = otekster.get(1);
                 o2.formater();
                 IO.gemObj(o2, K.OTEKST_2, getApplicationContext());
@@ -462,16 +474,19 @@ public class A extends Application implements Observatør {
                 o3.formater();
                 IO.gemObj(o3, K.OTEKST_3, getApplicationContext());
 
-                ArrayList<Tekst> itekster = alleTekster[1];
 
                 p("Formaterer resten af listerne..");
+                ArrayList<Tekst> itekster = alleTekster[1];
+                p("Itekster længde når den hentes i allerførstegang(): "+itekster.size());
+
                 for (Tekst t : itekster) t.formater();
-                Util.sorterStigende(itekster);
+                itekster = Util.sorterStigende(itekster);
 
                 ArrayList<Tekst> mtekster = alleTekster[2];
+                p("Mtekster længde når den hentes i allerførstegang(): "+itekster.size());
 
                 for (Tekst t : mtekster) t.formater();
-                Util.sorterStigende(mtekster);
+                mtekster = Util.sorterStigende(mtekster);
 
 
                 IO.gemObj(new ArrayList<Integer>(), K.GAMLE, getApplicationContext());
@@ -481,10 +496,12 @@ public class A extends Application implements Observatør {
                 if (tilstand.aktivitetenVises)
                     publishProgress(1);
                 else
-                    p("Aktiviteten STADIG ikke klar selvom data blev klar");
+                    p("Aktiviteten stadig ikke klar selvom data blev klar");
 
                 IO.gemObj(itekster, K.ITEKSTER, getApplicationContext());
+                p("Itekster længde når den gemmes i allerførstegang(): "+itekster.size());
                 IO.gemObj(mtekster, K.MTEKSTER, getApplicationContext());
+                p("Mtekster længde når den gemmes i allerførstegang(): "+mtekster.size());
 
                 gemEnkelteTeksterTilDisk(itekster);
                 gemEnkelteTeksterTilDisk(mtekster);
@@ -584,14 +601,14 @@ public class A extends Application implements Observatør {
 
                 ArrayList<Tekst> itekster = alleTekster[1];
                 for (Tekst t : itekster) t.formater();
-                Util.sorterStigende(itekster);
+                itekster = Util.sorterStigende(itekster);
                 IO.gemObj(itekster, K.ITEKSTER, getApplicationContext());
 
 
                 ArrayList<Tekst> mtekster = alleTekster[2];
 
                 for (Tekst t : mtekster) t.formater();
-                Util.sorterStigende(mtekster);
+                mtekster = Util.sorterStigende(mtekster);
                 IO.gemObj(mtekster, K.MTEKSTER, getApplicationContext());
                 publishProgress(1);
 
@@ -830,7 +847,7 @@ public class A extends Application implements Observatør {
 
     //-- Kaldes når appen har kørt alle tekster igennnem og skal starte forfra med Otekst1
     void sletAlt() {
-        tilstand.nulstil();
+        //tilstand.nulstil();
         p("sletAlt kaldt");
         sletDiskData();
         synligeTekster.clear();

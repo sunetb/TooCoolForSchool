@@ -57,7 +57,7 @@ public class K {
     public static final String versionUrl = "http://www.lightspeople.net/sune/skole/version.txt";
 
     //Datoer
-    public static final DateTime SOMMERFERIE_START = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
+     public static final DateTime SOMMERFERIE_START = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
     public static final DateTime SOMMERFERIE_SLUT =  new DateTime().withDayOfMonth(20).withMonthOfYear(8);
 
     //Filnavne

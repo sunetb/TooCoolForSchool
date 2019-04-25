@@ -48,7 +48,7 @@ public class Lyttersystem {
      * Må KUN kaldes fra hovedtråden
       */
     public void givBesked(int hændelse, String besked) {
-        if (log) p("1: givebesked MODTOG fra: "+besked+ ". Hændelse: "+K.hændelsestekst(hændelse));
+        if (log) p("1: givbesked() MODTOG fra: "+besked+ ". Hændelse: "+K.hændelsestekst(hændelse));
 
         //setSenesteHændelse(hændelse);
 

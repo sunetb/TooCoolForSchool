@@ -38,6 +38,7 @@ public class Tilstand {
 
     private Tilstand(SharedPreferences s) {
         masterDato = new DateTime();
+        p("Materdato: "+masterDato);
         a = A.a;
         pref = s;
         modenhed = opdaterModenhed();
@@ -58,6 +59,7 @@ public class Tilstand {
         boolean harPasseretSommerferie = Tid.efter(masterDato, K.SOMMERFERIE_SLUT) && tempModenhed == K.SOMMERFERIE;
         if (harPasseretSommerferie) {
             a.sletAlt();//nulstiller bla. prefs og derfor også harPasseretSommer..
+            nulstil();
             tempModenhed = K.MODENHED_HELT_FRISK;
             gemModenhed(K.MODENHED_FØRSTE_DAG);
 

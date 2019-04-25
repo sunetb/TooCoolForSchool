@@ -193,7 +193,6 @@ public class Util {
 
         ArrayList[] data = {oteksterTmp, teksterTmp, mteksterTmp, hteksterTmp};
         p("Util.parseXML(): Data længde: "+ data.length + " | o: "+oteksterTmp.size() + " | i: "+teksterTmp.size() + " | m: "+mteksterTmp.size() + " | h: "+hteksterTmp.size());
-        p("Util.Otekst 3 parseXML: "+oteksterTmp.get(2));
         return data;
     }
 
