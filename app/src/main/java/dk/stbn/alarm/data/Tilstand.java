@@ -58,10 +58,11 @@ public class Tilstand {
         //Har vi netop passeret sommerferien? Så nulstil appens data
         boolean harPasseretSommerferie = Tid.efter(masterDato, K.SOMMERFERIE_SLUT) && tempModenhed == K.SOMMERFERIE;
         if (harPasseretSommerferie) {
-            a.sletAlt();//nulstiller bla. prefs og derfor også harPasseretSommer..
-            nulstil();
-            tempModenhed = K.MODENHED_HELT_FRISK;
+            //a.sletAlt();//nulstiller bla. prefs og derfor også harPasseretSommer..
+
             gemModenhed(K.MODENHED_FØRSTE_DAG);
+            tempModenhed = K.MODENHED_HELT_FRISK;
+            return K.MODENHED_HELT_FRISK;
 
 
         } else {//Er det sommerferie?
@@ -133,7 +134,7 @@ public class Tilstand {
 
     void gemModenhed(int værdi) {
         pref.edit().putInt(MODENHED, værdi).commit();
-        p("gemModenhed() kaldt med vædi: " + værdi);
+        p("gemModenhed() kaldt med værdi: " + værdi);
     }
 
 
@@ -142,11 +143,8 @@ public class Tilstand {
      * Debugging
      */
     public void nulstil() {
-
-
-        modenhed = 0;
-        boolean femteDagFørsteGang = false;
-        skærmVendt = -1;
+        p("nulstil() blev kaldt");
+        instans = null;
     }
 
     /**

@@ -153,6 +153,14 @@ public class A extends Application implements Observatør {
         tilstand = Tilstand.getInstance(pref);
         alarmlogik = AlarmLogik.getInstance();
 
+        init();
+
+
+        p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
+        p("Gemt modenhed: " + pref.getInt("modenhed", -1));
+    }
+
+    void init(){
         if (alm == null) alm = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
         tjekSprog();
@@ -161,14 +169,10 @@ public class A extends Application implements Observatør {
         if (tilstand.modenhed == K.MODENHED_HELT_FRISK)
             udvælgTekster();
         else {
-            tjekTekstversion("A.onCreate()"); //Fyrer event og A.opdater() kaldes hvis der er nye tekster på nettet.
+            tjekTekstversion("init()"); //Fyrer event og A.opdater() kaldes hvis der er nye tekster på nettet.
             indlæsHtekster();
             visCachedeTekster();
         }
-
-
-        p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
-        p("Gemt modenhed: " + pref.getInt("modenhed", -1));
     }
 
     //Observer-callback
@@ -209,7 +213,7 @@ public class A extends Application implements Observatør {
         else p("Fejl: gemte synlige tekster fandes ikke");
     }
 
-    /**
+    /**this.getResources().getString(R.string.)
      * Udvælger tekster på baggrund af modenhed og om der er ny version på nettet
      */
     public void udvælgTekster() {
@@ -683,6 +687,7 @@ public class A extends Application implements Observatør {
             is.close();
         } catch (UnknownHostException uhex) {
             uhex.printStackTrace();
+            Lyttersystem.getInstance().givBesked(K.OFFLINE, "hentTeksterOnline()");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -847,13 +852,20 @@ public class A extends Application implements Observatør {
 
     //-- Kaldes når appen har kørt alle tekster igennnem og skal starte forfra med Otekst1
     void sletAlt() {
-        //tilstand.nulstil();
         p("sletAlt kaldt");
+        p("er tilstand null? "+ (tilstand == null));
+        if (tilstand == null) tilstand = Tilstand.getInstance(pref);
+        else {
+            Tilstand.getInstance(pref).nulstil();
+            tilstand = Tilstand.getInstance(pref);
+        }
         sletDiskData();
+        pref.edit().putInt("modenhed", K.MODENHED_FØRSTE_DAG).commit();
+
+
         synligeTekster.clear();
         synligeTekster.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
         Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE, "nulstillet");
-        tilstand.gemModenhed(K.MODENHED_HELT_FRISK);
         allerFørsteGang(); //her sættes pref modenhed til 1 = FØRSTE DAG
     }
 

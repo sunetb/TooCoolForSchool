@@ -35,6 +35,9 @@ public class K {
     public static final int TEKSTBASEN_OPDATERET = 7;
     public static final String SYV = "TEKSTBASEN_OPDATERET";
 
+    public static final int OFFLINE = 8;
+    public static final String OTTE = "OFFLINE";
+
 
 
     public static String hændelsestekst(int hændelse){

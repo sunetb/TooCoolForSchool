@@ -26,6 +26,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -36,6 +38,7 @@ import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
+import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import dk.stbn.alarm.lyttere.SletNotifikation_Lytter;
 
@@ -353,6 +356,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else if (event == K.NYE_HTEKSTER_PÅ_VEJ){
             extras.setEnabled(false);
             extras.getBackground().setAlpha(100);
+        }
+        else if (event == K.OFFLINE){
+            a.synligeTekster.add(new Tekst("OFFLINE", "Error: no internet connection. Check yourt settings and try again later", "a", new DateTime()));
+            Lyttersystem.getInstance().givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, ingen netforbindelse");
         }
     }
 
