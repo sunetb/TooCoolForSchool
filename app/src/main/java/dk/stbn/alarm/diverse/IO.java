@@ -22,6 +22,7 @@ import dk.stbn.alarm.data.Util;
 public class IO {
 
      public static Object læsObj(String filename, Context c) {
+         p("henter: "+filename);
          ObjectInputStream input = null;
         Object mitObj = null;
         File directory = new File(c.getFilesDir().getAbsolutePath()+ File.separator + "filer");
@@ -35,6 +36,7 @@ public class IO {
             } catch (StreamCorruptedException e) {
                 e.printStackTrace();
             } catch (FileNotFoundException e) {
+                p("fejl: ikke hentet: "+filename);
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -42,7 +44,7 @@ public class IO {
                 e.printStackTrace();
             }
         }
-        p("hentet: "+filename);
+        p("succes hentet: "+filename);
 
         return mitObj;
     }
@@ -81,13 +83,10 @@ public class IO {
         final Integer id = id_int;
         final Context ctx = c;
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<Integer> gamle =(ArrayList<Integer>) IO.læsObj("gamle", ctx);
-                if(!gamle.contains(id))gamle.add(id);
-                IO.gemObj(gamle, "gamle", ctx);
-            }
+        AsyncTask.execute(() -> {
+            ArrayList<Integer> gamle =(ArrayList<Integer>) IO.læsObj("gamle", ctx);
+            if(!gamle.contains(id))gamle.add(id);
+            IO.gemObj(gamle, "gamle", ctx);
         });
 
         p("føjet til gamle: "+id);

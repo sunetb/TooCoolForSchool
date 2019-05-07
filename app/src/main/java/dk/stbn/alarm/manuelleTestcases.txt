@@ -1,0 +1,42 @@
+Testcase:
+
+Pre: 
+slet appen
+Lav en frisk installation
+
+Installationsdato: 5 feb
+Forventet: Otekst 1
+Modenhed: 0 til 1
+
+Luk app
+luk proces
+sæt dato til X+1
+
+6 feb. modenhed 2: Otekst 1+2
+
+7 feb. modenhed 3: Otekst 1+2 + Itekst
+
+8 feb. modenhed 4 Otekst 2 + I  + I 
+
+9 feb. modenhed 6 I + I + I (+ evt M)
+
+
+_______________
+
+Opdater version.txt uden noget andet
+
+_______________
+
+
+Sommerferie
+pre: moden
+sæt dato til 9 juni
+post: tilstand bør være sommerferie
+
+pre: sommerferie
+sæt dato til 21 aug
+post: frisk
+
+
+
+

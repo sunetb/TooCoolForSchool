@@ -38,7 +38,7 @@ public class Tilstand {
 
     private Tilstand(SharedPreferences s) {
         masterDato = new DateTime();
-        p("Materdato: "+masterDato);
+        p("Masterdato: "+masterDato);
         a = A.a;
         pref = s;
         modenhed = opdaterModenhed();

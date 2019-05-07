@@ -487,7 +487,7 @@ public class A extends Application implements Observatør {
                 itekster = Util.sorterStigende(itekster);
 
                 ArrayList<Tekst> mtekster = alleTekster[2];
-                p("Mtekster længde når den hentes i allerførstegang(): "+itekster.size());
+                p("Mtekster længde når den hentes i allerførstegang(): "+mtekster.size());
 
                 for (Tekst t : mtekster) t.formater();
                 mtekster = Util.sorterStigende(mtekster);
