@@ -435,6 +435,7 @@ public class A extends Application implements Observatør {
                         .putInt("modenhed", K.MODENHED_FØRSTE_DAG)
                         .putInt("installationsdato", idag)
                         .commit();
+                tilstand.modenhed = K.MODENHED_FØRSTE_DAG;
                 //-- hertil
 
                 p("Finder O-tekst1...");
@@ -520,9 +521,9 @@ public class A extends Application implements Observatør {
                 super.onProgressUpdate(values);
                 int i = (int) values[0];
                 if (i == 1)
-                    lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: " + Thread.currentThread().getName());
+                    lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: ");
                 else if (i == 2)
-                    lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: " + Thread.currentThread().getName());
+                    lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: " );
 
             }
 
