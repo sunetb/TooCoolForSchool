@@ -271,6 +271,16 @@ public class A extends Application implements Observatør {
             p("Dag 5: MODEN ");
 
             ArrayList<Tekst> itekster = findItekster();
+
+            //Er appen ung og har kun én eller to I-tekster?
+            if (itekster.size() == 1) {
+                tempSynlige.add((Tekst)IO.læsObj(K.OTEKST_1, getApplicationContext()));
+                tempSynlige.add((Tekst)IO.læsObj(K.OTEKST_2, getApplicationContext()));
+            }
+            if (itekster.size() == 2) {
+
+                tempSynlige.add((Tekst)IO.læsObj(K.OTEKST_2, getApplicationContext()));
+            }
             tempSynlige.addAll(itekster);
             ArrayList<Tekst> mtekster = findMtekster();
             tempSynlige.addAll(mtekster);
