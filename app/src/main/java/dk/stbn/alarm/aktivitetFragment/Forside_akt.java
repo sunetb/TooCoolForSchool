@@ -73,10 +73,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         tilstand.aktivitetenVises = true;
         tjekOpstartstype(savedInstanceState);
 
-        if (A.testtilstand){
+        if (tilstand.testtilstand){
             if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_1, "Test-tilstand aktiveret");
         }
-        else if (A.testtilstand_2){
+        else if (tilstand.testtilstand_2){
             if (prefs.getBoolean("vistestdialog", true)) testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
         }
 
@@ -101,8 +101,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else if (v == extras)
             showDialog(1);
         else if (v == del){
-            if (A.testtilstand || A.testtilstand_2) {
-                if (A.testtilstand_2) {
+            if (tilstand.testtilstand || tilstand.testtilstand_2) {
+                if (tilstand.testtilstand_2) {
                     startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
                     datoÆndret = true;
                 }
@@ -135,7 +135,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             }
 
         } else if (v == kontakt) {
-            if (A.testtilstand) {
+            if (tilstand.testtilstand) {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -171,12 +171,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         kontakt.setOnClickListener(this);
 
 
-        if (a.debugging) {
+        if (tilstand.debugging) {
 
         }
         extras = (ImageButton) findViewById(R.id.extras);
         extras.setOnClickListener(this);
-        if (a.debugging) {
+        if (tilstand.debugging) {
 
         }
         if (!tilstand.hteksterKlar) {
@@ -197,14 +197,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
 
         // -- DEBUGGING
-        if (A.debugging) {
+        if (tilstand.debugging) {
 
             del.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
 
-                    a.testtilstand =  !a.testtilstand;
-                    if (A.testtilstand) {
+                    tilstand.testtilstand =  !tilstand.testtilstand;
+                    if (tilstand.testtilstand) {
                         testDialog(TESTTILSTAND_1,"Test-tilstand aktiveret");
 
                         del.setImageResource(R.drawable.en);
@@ -225,8 +225,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public boolean onLongClick(View v) {
 
-                    a.testtilstand_2 =  !a.testtilstand_2;
-                    if (a.testtilstand_2) {
+                    tilstand.testtilstand_2 =  !tilstand.testtilstand_2;
+                    if (tilstand.testtilstand_2) {
                         testDialog(TESTTILSTAND_2, "Test-tilstand aktiveret");
 
                         del.setImageResource(R.drawable.cool_nobkgr_50x50_rund);
@@ -278,7 +278,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         else {
             a.lytter.lyt(this);
             vp.addOnPageChangeListener(sideLytter);
-            if (A.debugging) pa.notifyDataSetChanged(); //lidt groft ?
+            if (tilstand.debugging) pa.notifyDataSetChanged(); //lidt groft ?
             visPosition = prefs.getInt("senesteposition", vp.getCurrentItem());
             p("onstart visposition fra prefs: "+visPosition);
             p("Hvad var der i prefs? "+prefs.getInt("senesteposition", 100000));
@@ -325,12 +325,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             tilbage.setEnabled(true);
             tilbage.getBackground().setAlpha(255);
         }
-        if (a.debugging){
-            if (a.testtilstand){
+        if (tilstand.debugging){
+            if (tilstand.testtilstand){
                 del.setImageResource(R.drawable.en);
                 kontakt.setImageResource(R.drawable.seks);
             }
-            else if (a.testtilstand_2){
+            else if (tilstand.testtilstand_2){
                 del.setImageResource(R.drawable.cool_nobkgr_50x50_rund);
             }
         }

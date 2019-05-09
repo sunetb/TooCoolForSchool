@@ -70,9 +70,7 @@ public class A extends Application implements Observatør {
     public static String debugmsg = hoved;
     public static String hale = "</body></html>";
 
-    public static boolean debugging = true;
-    public static boolean testtilstand = false;
-    public static boolean testtilstand_2 = false;
+
     public String henteurltest = "http://www.lightspeople.net/sune/skole/tekstertest.xml";
 
 
@@ -261,11 +259,17 @@ public class A extends Application implements Observatør {
         } else if (modenhed == K.MODENHED_FJERDE_DAG) {
             p("Dag 4 ");
             Tekst oTekst2 = (Tekst) IO.læsObj(K.OTEKST_2, getApplicationContext());
+
+
             tempSynlige.add(oTekst2);
             ArrayList<Tekst> tekster = findItekster();
             //Tag kun de første to I-tekster, så der vises tre i alt
             if (tekster.size() > 0) tempSynlige.add(tekster.get(0));
             if (tekster.size() > 1) tempSynlige.add(tekster.get(1));
+
+            //sørger for at der altid er tre tekster, også lige efter sommerferien
+            if (tempSynlige.size() == 2)
+                tempSynlige.add(0, (Tekst)IO.læsObj(K.OTEKST_1, getApplicationContext()));
 
         } else if (modenhed == K.MODENHED_MODEN) {
             p("Dag 5: MODEN ");

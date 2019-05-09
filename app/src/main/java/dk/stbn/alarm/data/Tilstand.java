@@ -11,6 +11,7 @@ import dk.stbn.alarm.diverse.Tid;
 public class Tilstand {
 
 
+
 //TODO Skal den laves om til ViewModel?
 
     public DateTime masterDato;
@@ -26,7 +27,17 @@ public class Tilstand {
     SharedPreferences pref;
     A a;
 
+
+
+    //Test/debug
+    public boolean testtilstand = false;
+    public  boolean testtilstand_2 = false;
+    public  boolean debugging = true;
+
+
+
     private final String MODENHED = "modenhed";
+
 
     private static Tilstand instans;
 
