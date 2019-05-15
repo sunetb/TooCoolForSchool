@@ -276,7 +276,7 @@ public class A extends Application implements Observatør {
 
             ArrayList<Tekst> itekster = findItekster();
 
-            //Er appen ung og har kun én eller to I-tekster?
+            //Særtilfælde: er appen ung og har kun én eller to I-tekster?
             if (itekster.size() == 1) {
                 tempSynlige.add((Tekst)IO.læsObj(K.OTEKST_1, getApplicationContext()));
                 tempSynlige.add((Tekst)IO.læsObj(K.OTEKST_2, getApplicationContext()));
@@ -334,7 +334,10 @@ public class A extends Application implements Observatør {
         p("udvælgTekster() færdig");
     }
 
-
+    /**
+     * Finder de M-tekster som skal vises idag
+     * @return
+     */
     private ArrayList<Tekst> findMtekster() {
         ArrayList<Tekst> r = new ArrayList<>();
         ArrayList<Tekst> mtekster = (ArrayList<Tekst>) IO.læsObj(K.MTEKSTER, getApplicationContext());
@@ -372,6 +375,10 @@ public class A extends Application implements Observatør {
 
     }
 
+    /**
+     * Finder de I-tekster som skal vises idag
+     * @return array med tekster
+     */
     private ArrayList<Tekst> findItekster() {
         ArrayList<Tekst> r = new ArrayList<>();
         ArrayList<Tekst> itekster = (ArrayList<Tekst>) IO.læsObj(K.ITEKSTER, getApplicationContext());
