@@ -23,6 +23,7 @@ public class Tilstand {
     public int sidstKendteVindueshøjde = 0;
 
     public boolean nyTekstversion = false;
+    public boolean boot = false; //Er appen startet af boot-lytteren
 
     SharedPreferences pref;
     A a;
@@ -65,11 +66,17 @@ public class Tilstand {
 
         int tempModenhed = pref.getInt(MODENHED, K.MODENHED_HELT_FRISK);
         p("Gemt modenhed er: " + tempModenhed);
-
+        if (tempModenhed == K.MODENHED_HELT_FRISK) {
+            //koden herfra, hvor tempModenhed sættes til FØRSTE_DAG, er flyttet til A.allerFørsteGang()
+            // for at den ikke bliver modnet med mindre appen får hentet sine data
+            p("den var frisk");
+            gemModenhed(K.MODENHED_HELT_FRISK);
+            return K.MODENHED_HELT_FRISK;
+        }
         //Har vi netop passeret sommerferien? Så nulstil appens data
         boolean harPasseretSommerferie = Tid.efter(masterDato, K.SOMMERFERIE_SLUT) && tempModenhed == K.SOMMERFERIE;
         if (harPasseretSommerferie) {
-            //a.sletAlt();//nulstiller bla. prefs og derfor også harPasseretSommer..
+            p("Vi har passeret sommerferien");
 
             gemModenhed(K.MODENHED_FØRSTE_DAG);
             tempModenhed = K.MODENHED_HELT_FRISK;
@@ -78,8 +85,10 @@ public class Tilstand {
 
         } else {//Er det sommerferie?
             boolean sommerferie = Tid.efter(masterDato, K.SOMMERFERIE_START) && Tid.før(masterDato, K.SOMMERFERIE_SLUT);
+            p("Er det sommerferie? "+sommerferie);
 
             if (sommerferie) {
+
                 gemModenhed(K.SOMMERFERIE);
                 pref.edit()
                         .putInt("senesteposition", -1)
@@ -92,12 +101,8 @@ public class Tilstand {
 
         int idag = Util.lavDato(masterDato);
 
-        if (tempModenhed == K.MODENHED_HELT_FRISK) {
-            //koden herfra, hvor tempModenhed sættes til FØRSTE_DAG, er flyttet til A.allerFørsteGang()
-            // for at den ikke bliver modnet med mindre appen får hentet sine data
 
-            return K.MODENHED_HELT_FRISK;
-        } else if (tempModenhed == K.MODENHED_FØRSTE_DAG) {
+        if (tempModenhed == K.MODENHED_FØRSTE_DAG) {
             int instDato = pref.getInt("installationsdato", 0);
             if (idag == instDato) return K.MODENHED_FØRSTE_DAG;
             else {

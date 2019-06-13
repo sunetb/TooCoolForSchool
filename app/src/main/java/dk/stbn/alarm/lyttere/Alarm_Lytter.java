@@ -72,11 +72,13 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
 
-        mBuilder.setSmallIcon(R.drawable.cool_nobkgr_71x71)
-                        .setContentTitle("Too Cool for School")
-                        .setContentText(overskrift)
-                        .setAutoCancel(true)
-                        .setOnlyAlertOnce(true);
+        mBuilder
+                .setSmallIcon(R.drawable.cool_nobkgr_71x71)
+                .setContentTitle("Too Cool for School")
+                .setContentText(overskrift)
+                .setAutoCancel(true)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .setOnlyAlertOnce(true);
         //ingen effekt: .setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

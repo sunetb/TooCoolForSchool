@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
 import dk.stbn.alarm.data.AlarmLogik;
+import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.K;
 
@@ -21,12 +22,15 @@ public class Boot_Lytter extends BroadcastReceiver  {
        @Override
         public void onReceive(Context context, Intent intent) {
 
-
            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+           Tilstand tilstand = Tilstand.getInstance(pref);
+           tilstand.boot = true;
 
             if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
             {
                //if (A.debugging) Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
+
+
 
                 int modenhed = pref.getInt("modenhed", -1);
 

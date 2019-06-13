@@ -32,6 +32,7 @@ import java.util.Locale;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.diverse.Tid;
+import dk.stbn.alarm.lyttere.Alarm_Lytter;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
@@ -152,7 +153,7 @@ public class A extends Application implements Observatør {
         alarmlogik = AlarmLogik.getInstance();
 
         init();
-
+        Alarm_Lytter.bygNotifikation(this, "123", "123", 123);
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
         p("Gemt modenhed: " + pref.getInt("modenhed", -1));
