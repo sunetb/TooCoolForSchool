@@ -153,7 +153,6 @@ public class A extends Application implements Observatør {
         alarmlogik = AlarmLogik.getInstance();
 
         init();
-        Alarm_Lytter.bygNotifikation(this, "123", "123", 123);
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
         p("Gemt modenhed: " + pref.getInt("modenhed", -1));
@@ -226,7 +225,7 @@ public class A extends Application implements Observatør {
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_2, getApplicationContext()));
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_3, getApplicationContext()));
-
+//GEM DETTE
         } else if (modenhed == K.MODENHED_HELT_FRISK) {
             p("udvælgTekster() Modenhed: Helt frisk");
             allerFørsteGang();
@@ -244,7 +243,7 @@ public class A extends Application implements Observatør {
             Tekst oTekst2 = (Tekst) IO.læsObj(K.OTEKST_2, getApplicationContext());
             tempSynlige.add(oTekst1);
             tempSynlige.add(oTekst2);
-
+//hertil
         } else if (modenhed == K.MODENHED_TREDJE_DAG) {
             p("Dag 3 ");
 

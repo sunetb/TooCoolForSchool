@@ -15,7 +15,7 @@ public class Tilstand {
 //TODO Skal den laves om til ViewModel?
 
     public DateTime masterDato;
-    public int modenhed;
+    public int modenhed; //app-tilstand
     private boolean femteDagFørsteGang;
     public int skærmVendt;
     public boolean hteksterKlar = false;
