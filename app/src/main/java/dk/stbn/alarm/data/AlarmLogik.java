@@ -205,7 +205,7 @@ public class AlarmLogik {
     }
 
 
-    void vækMigImorgen(Context c, DateTime masterdato){
+    public void vækMigImorgen(Context c, DateTime masterdato){
 
         ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
         PackageManager pm = c.getPackageManager();

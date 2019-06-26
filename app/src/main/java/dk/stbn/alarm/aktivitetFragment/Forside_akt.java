@@ -195,7 +195,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             public void onPageScrollStateChanged(int state) {}
         };
 
-
+/*
         // -- DEBUGGING
         if (tilstand.debugging) {
 
@@ -256,7 +256,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     return true;
                 }
             });
-        }
+        }*/
 
     }
 

@@ -47,7 +47,9 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
         p("Alarm_Lytter.onRecieve() kaldt ");
         //if (A.debugging) Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
-        bygNotifikation(context, "TEST", "Test", 0);
+        bygNotifikation(context, "Automatisk hver dag", "Test", 0);
+
+        al.vækMigImorgen(context, tilstand.masterDato);
 
         //Flyt til anden metode:
 /*

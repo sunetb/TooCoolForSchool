@@ -172,7 +172,7 @@ public class A extends Application implements Observatør {
             indlæsHtekster();
             visCachedeTekster();
         }
-        Alarm_Lytter.bygNotifikation(this, "hej", "hej2", 0);
+        Alarm_Lytter.bygNotifikation(this, "Appen er startet", "hej2", 0);
         //Når appen er moden eller hvis telefonen har været slukket
         if (tilstand.femteDagFørsteGang || tilstand.boot) AlarmLogik.getInstance().vækMigImorgen(getApplicationContext(), tilstand.masterDato);
     }
