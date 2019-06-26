@@ -260,6 +260,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
