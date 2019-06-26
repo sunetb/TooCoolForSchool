@@ -36,8 +36,8 @@ public class Alarm_Lytter extends BroadcastReceiver {
     AlarmLogik al;
     Tilstand tilstand;
 
-
-    final String NOTIFICATION_CHANNEL_ID = "4565";
+//Kun static under test!!
+    final static String NOTIFICATION_CHANNEL_ID = "4565";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -188,7 +188,9 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
     }
 
-    public void bygNotifikation (Context context, String overskrift, String id, int id_int) {
+
+    //Kun static under test!!
+    public static void bygNotifikation (Context context, String overskrift, String id, int id_int) {
         //opdateret i henhold til https://stackoverflow.com/questions/44489657/android-o-reporting-notification-not-posted-to-channel-but-it-is
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
