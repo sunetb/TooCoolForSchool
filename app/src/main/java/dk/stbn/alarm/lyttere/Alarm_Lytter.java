@@ -22,6 +22,7 @@ import dk.stbn.alarm.R;
 import dk.stbn.alarm.aktivitetFragment.Forside_akt;
 import dk.stbn.alarm.data.AlarmLogik;
 import dk.stbn.alarm.data.Tekst;
+import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
@@ -32,33 +33,33 @@ import dk.stbn.alarm.diverse.K;
 public class Alarm_Lytter extends BroadcastReceiver {
 
 
-
+    AlarmLogik al;
+    Tilstand tilstand;
 
 
     final String NOTIFICATION_CHANNEL_ID = "4565";
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        al = AlarmLogik.getInstance();
+        tilstand = Tilstand.getInstance(context);
 
-        ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", context);
-        Bundle b = intent.getExtras();
 
-        String overskrift = b.getString("overskrift");
-        String id = b.getString("tekstId");
-        int id_int = b.getInt("id_int");
-
-        p("Alarm_Lytter.onRecieve() modtog "+overskrift);
+        p("Alarm_Lytter.onRecieve() kaldt ");
         //if (A.debugging) Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
+        bygNotifikation(context, "TEST", "Test", 0);
 
+        //Flyt til anden metode:
+/*
+        ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", context);
         if (gamle != null && gamle.contains(id))
-            p("Notifikation for "+id+" findes har været vist");
+            p("Notifikation for "+id+" har allerede været vist");
         else
-            bygNotifikation(context, overskrift, id, id_int);
+            bygNotifikation(context, "TEST", "Test", id_int);
 
         Util.baglog("Alarm_Lytter.onRecieve(): "+ id + " " +overskrift, context);
-        AlarmLogik.getInstance().opdaterKalender(context, "Alarm_Lytter.onrecieve");
-
-
+        //al.opdaterKalender(context, "Alarm_Lytter.onrecieve");
+*/
     }
 
 
@@ -70,6 +71,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
     //Tilstand
     //
 
+    /*
     void tjekNyTekst(Context c){
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(c);
 
@@ -179,6 +181,8 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
         p("udvælgTekster() færdig");
     }
+    */
+
 
     void startNotifikationskanal(){
 

@@ -14,7 +14,7 @@ import dk.stbn.alarm.diverse.K;
 
 /**
  * Created by sune on 6/6/16.
- * Opdaterer alarmer. Alarmer slettes når telefonen slukkes. Derfor skal de sættes igen ved opstart
+ * Alarmer slettes når telefonen slukkes. Derfor skal de sættes flaget boot i tilstand, så appen ved at der ikke er nogen alarmer lagret
  */
 public class Boot_Lytter extends BroadcastReceiver  {
 
@@ -22,38 +22,28 @@ public class Boot_Lytter extends BroadcastReceiver  {
        @Override
         public void onReceive(Context context, Intent intent) {
 
-           SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-           Tilstand tilstand = Tilstand.getInstance(pref);
-           tilstand.boot = true;
 
             if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
             {
                //if (A.debugging) Toast.makeText(context, "hændelse boot modtaget af tooCoolToScool2", Toast.LENGTH_LONG).show();
 
+                Tilstand tilstand = Tilstand.getInstance(context);
+                tilstand.boot = true;
 
 
-                int modenhed = pref.getInt("modenhed", -1);
+                int modenhed = tilstand.pref.getInt("modenhed", -1);
 
                 if (modenhed == K.MODENHED_MODEN) {
                     AsyncTask.execute(new Runnable() {
                         @Override
                         public void run() {
-                            AlarmLogik.getInstance().opdaterKalender(context, "boot-lytter");
+                            //AlarmLogik.getInstance().opdaterKalender(context, "boot-lytter");
                         }
                     });
 /*
-                    new AsyncTask() {
-                        @Override
-                        protected Object doInBackground(Object[] params) {
-
-
-
-                            return null;
-                        }
-                    }.execute();
 */
                 }
-                Util.baglog("Boot_Lytter.onRecieve(): Modenhed = "+ pref.getInt("modenhed", -1), context);
+               // Util.baglog("Boot_Lytter.onRecieve(): Modenhed = "+ pref.getInt("modenhed", -1), context);
             }
         }
 

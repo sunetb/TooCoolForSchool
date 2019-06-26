@@ -59,7 +59,7 @@ public class AlarmLogik {
         i.cancel();
         alm.cancel(i);
     }
-
+/*
     void startAlarm (Context c, Tekst t) {
         Util.p("Util.startAlarm() modtog "+t.overskrift);
 
@@ -152,7 +152,7 @@ public class AlarmLogik {
         IO.gemObj(gamle, "gamle", c);
     }
 
-    void rensUdIAlarmer(final Context c){
+    void rensUdIAlarmer(Context c){
         Util.p("Util.rensUdIAlarmer kaldt");
         final Context cx = c;
 
@@ -182,6 +182,8 @@ public class AlarmLogik {
 
     }
 
+ */
+
     void sletAlarm (Context c, Tekst t){
         Util.p("Util.sletAlarm kaldt med tekst: "+t.toString(0));
 
@@ -203,7 +205,35 @@ public class AlarmLogik {
     }
 
 
-    //Flyttes til tekstlogik???
+    void vækMigImorgen(Context c, DateTime masterdato){
+
+        ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
+        PackageManager pm = c.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+         PendingIntent alarmIntent;
+
+        Intent intent = new Intent(c, Alarm_Lytter.class);
+
+        DateTime imorgenKl01 = masterdato.withTime(1,0,0,0).plusDays(1);
+
+        String action = ""+imorgenKl01.toLocalDate();
+
+        intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+        alarmIntent = PendingIntent.getBroadcast(c, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
+
+        AlarmManager alarmMgr = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+
+        alarmMgr.set(AlarmManager.RTC, imorgenKl01.getMillis(), alarmIntent);
+    }
+
+
+
+
+
+
+    //Flyttes til tekstlogik!!
     boolean visMtekst(DateTime mTid, DateTime masterDato){
         String logbesked = "Util.visMtekst() "+ mTid.getDayOfMonth()+ "/"+mTid.getMonthOfYear();
         //-- Eks: 11 september     ///Vises                    5, 6, 7, 8, 9, 10, 11

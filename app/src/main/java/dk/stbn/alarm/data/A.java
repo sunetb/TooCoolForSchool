@@ -132,7 +132,7 @@ public class A extends Application implements Observatør {
         boolean EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator");
         if (!EMULATOR) {
             Fabric.with(getApplicationContext(), new Crashlytics());
-            Util.baglog = true;
+            //Util.baglog = true;
             p("Enhed: " + Build.MODEL + "  " + Build.PRODUCT);
         }
         AppSpector
@@ -149,8 +149,9 @@ public class A extends Application implements Observatør {
 
         lytter = Lyttersystem.getInstance();
         lytter.lyt(this);
-        tilstand = Tilstand.getInstance(pref);
+        tilstand = Tilstand.getInstance(getApplicationContext());
         alarmlogik = AlarmLogik.getInstance();
+        //TODO: tekstlogik = Tekstlogik.getInstance();
 
         init();
 
@@ -171,6 +172,9 @@ public class A extends Application implements Observatør {
             indlæsHtekster();
             visCachedeTekster();
         }
+
+        //Når appen er moden eller hvis telefonen har været slukket
+        if (tilstand.femteDagFørsteGang || tilstand.boot) AlarmLogik.getInstance().vækMigImorgen(getApplicationContext(), tilstand.masterDato);
     }
 
     //Observer-callback
@@ -196,6 +200,7 @@ public class A extends Application implements Observatør {
         pref.edit().putString("sprog", sprog).commit();
         p("SPROG " + sprog);
     }
+
 
     /**
      * Henter gemte synlige tekster fra sidst
@@ -876,10 +881,10 @@ public class A extends Application implements Observatør {
     void sletAlt() {
         p("sletAlt kaldt");
         p("er tilstand null? "+ (tilstand == null));
-        if (tilstand == null) tilstand = Tilstand.getInstance(pref);
+        if (tilstand == null) tilstand = Tilstand.getInstance(getApplicationContext());
         else {
-            Tilstand.getInstance(pref).nulstil();
-            tilstand = Tilstand.getInstance(pref);
+            Tilstand.getInstance(getApplicationContext()).nulstil();
+            tilstand = Tilstand.getInstance(getApplicationContext());
         }
         sletDiskData();
         pref.edit().putInt("modenhed", K.MODENHED_FØRSTE_DAG).commit();

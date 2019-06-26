@@ -1,6 +1,8 @@
 package dk.stbn.alarm.data;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import org.joda.time.DateTime;
@@ -16,7 +18,7 @@ public class Tilstand {
 
     public DateTime masterDato;
     public int modenhed; //app-tilstand
-    private boolean femteDagFørsteGang;
+    boolean femteDagFørsteGang;
     public int skærmVendt;
     public boolean hteksterKlar = false;
     public boolean aktivitetenVises = false; //tjekker om aktiviteten vises før der er data at vise
@@ -25,7 +27,7 @@ public class Tilstand {
     public boolean nyTekstversion = false;
     public boolean boot = false; //Er appen startet af boot-lytteren
 
-    SharedPreferences pref;
+    public SharedPreferences pref;
     A a;
 
 
@@ -42,17 +44,17 @@ public class Tilstand {
 
     private static Tilstand instans;
 
-    public static Tilstand getInstance(SharedPreferences s) {
-        if (instans == null) instans = new Tilstand(s);
+    public static Tilstand getInstance(Context c) {
+        if (instans == null) instans = new Tilstand(c);
         return instans;
     }
 
 
-    private Tilstand(SharedPreferences s) {
+    private Tilstand(Context c) {
         masterDato = new DateTime();
         p("Masterdato: "+masterDato);
         a = A.a;
-        pref = s;
+        pref = PreferenceManager.getDefaultSharedPreferences(c);
         modenhed = opdaterModenhed();
         p("Global modenhed efter opdaterModenhed: " + modenhed);
 
@@ -137,7 +139,9 @@ public class Tilstand {
             }
         } else if (tempModenhed == K.MODENHED_FJERDE_DAG) {
             int instDatoPlusTre = pref.getInt("tjekInst", 0);
-            if (idag == instDatoPlusTre) return K.MODENHED_FJERDE_DAG;
+            if (idag == instDatoPlusTre) {
+                return K.MODENHED_FJERDE_DAG;
+            }
             else {
                 gemModenhed(K.MODENHED_MODEN);
                 femteDagFørsteGang = true;
