@@ -206,6 +206,7 @@ public class AlarmLogik {
 
 
     public void vækMigImorgen(Context c, DateTime masterdato){
+        DateTime imorgenKl01 = masterdato.withTime(1,0,0,0).plusDays(1);
 
         ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
         PackageManager pm = c.getPackageManager();
@@ -215,11 +216,10 @@ public class AlarmLogik {
         PendingIntent alarmIntent;
 
         Intent intent = new Intent(c, Alarm_Lytter.class);
-        intent.putExtra("tag", "test: fra vækMigImorgen()");
-        DateTime imorgenKl01 = masterdato.withTime(1,0,0,0).plusDays(1);
 
         String action = ""+imorgenKl01.toLocalDate();
-
+        intent.putExtra("tag", "Test: Denne noti er automatisk sat den "+action+" kl 01.00");
+        Util.p("AlarmLytter.VækMigImorgen() dato: "+action);
         intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
         alarmIntent = PendingIntent.getBroadcast(c, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -238,7 +238,7 @@ public class AlarmLogik {
         PendingIntent alarmIntent;
 
         Intent intent = new Intent(c, Alarm_Lytter.class);
-        intent.putExtra("tag", "test: fra vækMigOmLidt()");
+        intent.putExtra("tag", "testing testing 1 2 3 4 ");
 
         DateTime imorgenKl01 = masterdato.plus(2000);
 

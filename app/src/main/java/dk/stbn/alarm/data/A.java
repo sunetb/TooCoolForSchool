@@ -191,8 +191,7 @@ public class A extends Application implements Observatør {
         //Når appen er moden eller hvis telefonen har været slukket
         if (tilstand.femteDagFørsteGang || tilstand.boot || tilstand.modenhed == K.SOMMERFERIE) alarmlogik.vækMigImorgen(getApplicationContext(), tilstand.masterDato);
 
-        //kuin test:
-        alarmlogik.vækMigOmLidt(getApplicationContext(), tilstand.masterDato);
+
     }
 
     //Observer-callback

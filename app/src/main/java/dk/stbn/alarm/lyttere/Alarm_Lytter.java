@@ -37,20 +37,20 @@ public class Alarm_Lytter extends BroadcastReceiver {
     Tilstand tilstand;
 
 //Kun static under test!!
-    final static String NOTIFICATION_CHANNEL_ID = "4565";
+    final String NOTIFICATION_CHANNEL_ID = "4565";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         al = AlarmLogik.getInstance();
         tilstand = Tilstand.getInstance(context);
-        Bundle b = intent.getExtras();
+        String besked = intent.getExtras().getString("tag", "Fejl");
 
 
-        p("Alarm_Lytter.onRecieve() kaldt. "+ b.getString("tag", "OBS: intet tag"));
+        p("Alarm_Lytter.onRecieve() kaldt. "+ besked);
 
 
         //Kun til test:
-        bygNotifikation(context, "Automatisk hver dag", "Test", 0);
+        bygNotifikation(context, besked, "Test", 0);
 
         al.vækMigImorgen(context, tilstand.masterDato);
 
@@ -195,7 +195,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
 
     //Kun static under test!!
-    public static void bygNotifikation (Context context, String overskrift, String id, int id_int) {
+    public void bygNotifikation (Context context, String overskrift, String id, int id_int) {
         //opdateret i henhold til https://stackoverflow.com/questions/44489657/android-o-reporting-notification-not-posted-to-channel-but-it-is
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
