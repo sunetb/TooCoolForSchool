@@ -20,6 +20,8 @@ import org.joda.time.DateTime;
 
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.AlarmLogik;
+import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 
 
@@ -93,7 +95,10 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         //-- Skriver tekst-data til loggen
         //a.testTekster ();
         //-- Skriver baggrunds-lytter-log
-        Util.skrivBaglog(this);
+        //Util.skrivBaglog(this);
+
+        //kuin test:
+        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato);
 
     }
 
