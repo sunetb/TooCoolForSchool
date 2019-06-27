@@ -183,17 +183,26 @@ public class A extends Application implements Observatør {
             indlæsHtekster();
             visCachedeTekster();
         }
-
-        //kun test
-        // Alarm_Lytter.bygNotifikation(this, "Appen er startet", "hej2", 0);
-
-
-        //Når appen er moden eller hvis telefonen har været slukket
-        if (tilstand.femteDagFørsteGang || tilstand.boot || tilstand.modenhed == K.SOMMERFERIE) alarmlogik.vækMigImorgen(getApplicationContext(), tilstand.masterDato);
+        startAlarmLoop();
 
 
     }
 
+    void startAlarmLoop() {
+
+
+        if (tilstand.femteDagFørsteGang || tilstand.boot || tilstand.modenhed == K.SOMMERFERIE) {
+
+            //vækMigImorgen skal kun fyres én gang i sommerferien
+            boolean alleredeStartet = pref.getBoolean("alarmloop allerede startet", false);
+            pref.edit().putBoolean("alarmloop allerede startet", true);
+            if (tilstand.modenhed == K.SOMMERFERIE && alleredeStartet)
+                return;
+
+            alarmlogik.vækMigImorgen(getApplicationContext(), tilstand.masterDato);
+
+        }
+    }
     //Observer-callback
     @Override
     public void opdater(int hændelse) {
