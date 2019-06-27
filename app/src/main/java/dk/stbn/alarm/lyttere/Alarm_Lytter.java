@@ -43,10 +43,13 @@ public class Alarm_Lytter extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         al = AlarmLogik.getInstance();
         tilstand = Tilstand.getInstance(context);
+        Bundle b = intent.getExtras();
 
 
-        p("Alarm_Lytter.onRecieve() kaldt ");
-        //if (A.debugging) Toast.makeText(context, "Alarm modtaget"+id, Toast.LENGTH_LONG).show();
+        p("Alarm_Lytter.onRecieve() kaldt. "+ b.getString("tag", "OBS: intet tag"));
+
+
+        //Kun til test:
         bygNotifikation(context, "Automatisk hver dag", "Test", 0);
 
         al.vækMigImorgen(context, tilstand.masterDato);

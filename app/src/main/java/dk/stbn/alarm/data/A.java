@@ -121,6 +121,17 @@ public class A extends Application implements Observatør {
     Refactoring
     *
     *
+
+
+
+
+
+    Vi kan ikke teste noti-loop i sommerferien fordi modehed går fra 0 til 6.
+    Løsning:
+
+
+
+
     *
     * */
 
@@ -172,9 +183,16 @@ public class A extends Application implements Observatør {
             indlæsHtekster();
             visCachedeTekster();
         }
-        Alarm_Lytter.bygNotifikation(this, "Appen er startet", "hej2", 0);
+
+        //kun test
+        // Alarm_Lytter.bygNotifikation(this, "Appen er startet", "hej2", 0);
+
+
         //Når appen er moden eller hvis telefonen har været slukket
-        if (tilstand.femteDagFørsteGang || tilstand.boot) AlarmLogik.getInstance().vækMigImorgen(getApplicationContext(), tilstand.masterDato);
+        if (tilstand.femteDagFørsteGang || tilstand.boot || tilstand.modenhed == K.SOMMERFERIE) alarmlogik.vækMigImorgen(getApplicationContext(), tilstand.masterDato);
+
+        //kuin test:
+        alarmlogik.vækMigOmLidt(getApplicationContext(), tilstand.masterDato);
     }
 
     //Observer-callback

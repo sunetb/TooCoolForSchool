@@ -416,11 +416,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                 }
                 else {
-                    p("FEJL: Teksten fra notifikationen fandtes ikke i synligeTekster!");
-                    Tekst t = (Tekst) IO.læsObj(""+id, this);
-                    a.synligeTekster.add(t);
-                    pa.notifyDataSetChanged();
-                    prefs.edit().putInt("senesteposition", a.synligeTekster.size()-1).commit();
+                    p("FEJL: Teksten fra notifikationen fandtes ikke i synligeTekster! ID: "+id);
+                    if (id != 0) {
+                        Tekst t = (Tekst) IO.læsObj(""+id, this);
+                        a.synligeTekster.add(t);
+                        pa.notifyDataSetChanged();
+                        prefs.edit().putInt("senesteposition", a.synligeTekster.size()-1).commit();
+                    }
+
                    // vp.setCurrentItem(husk);
                     //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
 

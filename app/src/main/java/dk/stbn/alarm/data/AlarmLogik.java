@@ -212,10 +212,10 @@ public class AlarmLogik {
 
         pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 
-         PendingIntent alarmIntent;
+        PendingIntent alarmIntent;
 
         Intent intent = new Intent(c, Alarm_Lytter.class);
-
+        intent.putExtra("tag", "test: fra vækMigImorgen()");
         DateTime imorgenKl01 = masterdato.withTime(1,0,0,0).plusDays(1);
 
         String action = ""+imorgenKl01.toLocalDate();
@@ -228,7 +228,29 @@ public class AlarmLogik {
         alarmMgr.set(AlarmManager.RTC, imorgenKl01.getMillis(), alarmIntent);
     }
 
+    public void vækMigOmLidt(Context c, DateTime masterdato){
 
+        ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
+        PackageManager pm = c.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+        PendingIntent alarmIntent;
+
+        Intent intent = new Intent(c, Alarm_Lytter.class);
+        intent.putExtra("tag", "test: fra vækMigOmLidt()");
+
+        DateTime imorgenKl01 = masterdato.plus(2000);
+
+        String action = ""+imorgenKl01.toLocalDate();
+
+        intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+        alarmIntent = PendingIntent.getBroadcast(c, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
+
+        AlarmManager alarmMgr = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+
+        alarmMgr.set(AlarmManager.RTC, imorgenKl01.getMillis(), alarmIntent);
+    }
 
 
 
