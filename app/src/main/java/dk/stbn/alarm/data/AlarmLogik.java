@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 
 import dk.stbn.alarm.diverse.IO;
+import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Alarm_Lytter;
 import dk.stbn.alarm.lyttere.Boot_Lytter;
@@ -273,5 +275,22 @@ public class AlarmLogik {
         Util.p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!Tid.efter(syvFør,masterDato));
 
         return !Tid.efter(syvFør,masterDato);
+    }
+
+    void startAlarmLoop(Context c) {
+        Tilstand t = Tilstand.getInstance(c);
+
+
+        if (t.femteDagFørsteGang || t.boot || t.modenhed == K.SOMMERFERIE) {
+
+            //vækMigImorgen skal kun fyres én gang i sommerferien
+            boolean alleredeStartet = t.pref.getBoolean("alarmloop allerede startet", false);
+            t.pref.edit().putBoolean("alarmloop allerede startet", true);
+            if (t.modenhed == K.SOMMERFERIE && alleredeStartet)
+                return;
+
+            vækMigImorgen(c, t.masterDato);
+
+        }
     }
 }

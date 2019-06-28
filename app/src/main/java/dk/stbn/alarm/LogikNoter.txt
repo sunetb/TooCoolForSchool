@@ -37,3 +37,4 @@ Evt M-tekst
 Notifikation for nyeste I-tekst + evt M-tekst
 
 
+Når det er sommerferie og man installerer appen.
