@@ -43,7 +43,7 @@ public class A extends Application implements Observatør {
     public Lyttersystem lytter;
     static AlarmManager alm; //TVM
     AlarmLogik alarmlogik;
-    Tekstlogik tekstlogik;
+    public Tekstlogik tekstlogik;
 
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
@@ -159,7 +159,7 @@ public class A extends Application implements Observatør {
         lytter.lyt(this);
         tilstand = Tilstand.getInstance(getApplicationContext());
         alarmlogik = AlarmLogik.getInstance();
-        tekstlogik = Tekstlogik.getInstance();
+        tekstlogik = Tekstlogik.getInstance(getApplicationContext());
 
         init();
 
@@ -170,15 +170,15 @@ public class A extends Application implements Observatør {
     void init(){
         if (alm == null) alm = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
-        tjekSprog();
+        tekstlogik.tjekSprog();
 
 
         if (tilstand.modenhed == K.MODENHED_HELT_FRISK)
-            tekstlogik.udvælgTekster(getApplicationContext());
+            tekstlogik.udvælgTekster();
         else {
-            tjekTekstversion("init()"); //Fyrer event og A.opdater() kaldes hvis der er nye tekster på nettet.
-            indlæsHtekster();
-            visCachedeTekster();
+            tekstlogik.tjekTekstversion("init()"); //Fyrer event og A.opdater() kaldes hvis der er nye tekster på nettet.
+            tekstlogik.indlæsHtekster();
+            tekstlogik.visCachedeTekster();
         }
         alarmlogik.startAlarmLoop(this);
 
@@ -190,398 +190,24 @@ public class A extends Application implements Observatør {
     public void opdater(int hændelse) {
 
         if (hændelse == K.NYE_TEKSTER_ONLINE)
-            opdaterTekstbasen();
+            tekstlogik.opdaterTekstbasen();
         else if (hændelse == K.INGEN_NYE_TEKSTER_ONLINE || hændelse == K.TEKSTBASEN_OPDATERET)
-            tekstlogik.udvælgTekster(getApplicationContext());
+            tekstlogik.udvælgTekster();
         else if (hændelse == K.HTEKSTER_OPDATERET)
             tilstand.hteksterKlar = true;
         else if (hændelse == K.SPROG_ÆNDRET)
-            opdaterTekstbasen();
+            tekstlogik.opdaterTekstbasen();
 
     }
 
 
-    private void tjekSprog() {
-        String sprog = Locale.getDefault().getLanguage();
-        String gemtSprog = pref.getString("sprog", "ikke sat");
-        //TODO:
-        pref.edit().putString("sprog", sprog).commit();
-        p("SPROG " + sprog);
-    }
 
 
-    /**
-     * Henter gemte synlige tekster fra sidst
-     */
-    void visCachedeTekster() {
-
-        synligeTekster = (ArrayList<Tekst>) IO.læsObj(K.SYNLIGETEKSTER, getApplicationContext());
-
-        if (synligeTekster != null) {
-            lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "visCachedeTekster()");
-            p("visCachedeTekster() synligeTekster længde: "+synligeTekster.size());
-        }
-        else p("Fejl: gemte synlige tekster fandes ikke");
-    }
-
-
-
-
-    /**
-     * Særlig fordi vi ved præcis hvilken tekst som skal vises når appen er nyinstalleret og alt andet kan køres i baggrunden.
-     * Plus at diverse filer oprettes på disken ved første kørsel
-     */
-    void allerFørsteGang() {
-
-        new AsyncTask() {
-
-            @Override
-            protected Object doInBackground(Object[] params) {
-
-                p("allerFørsteGang() henter alle tekster..");
-                ArrayList[] alleTekster = hentTeksterOnline("allerFørsteGang()");
-                p("Data længde: "+ alleTekster.length + " | o: "+alleTekster[0].size() + " | i: "+alleTekster[1].size() + " | m: "+alleTekster[2].size() + " | h: "+alleTekster[3].size());
-
-                //-- Denne kode burde egentlig stå i tilstand.opdaterModenhed() men er flyttet hertil så appen kun kan modnes hvis den får data første gang.
-                int idag = Util.lavDato(tilstand.masterDato);
-
-                pref.edit()
-                        .putInt("modenhed", K.MODENHED_FØRSTE_DAG)
-                        .putInt("installationsdato", idag)
-                        .commit();
-                tilstand.modenhed = K.MODENHED_FØRSTE_DAG;
-                //-- hertil
-
-                p("Finder O-tekst1...");
-                ArrayList<Tekst> otekster = alleTekster[0];
-                Tekst o1 = otekster.get(0);
-                o1.formater();
-                synligeTekster.add(o1);
-                p("Så er der O-tekst i array!");
-
-                p("Event til aktiviteten om at synlige tekster er klar");
-
-                if (tilstand.aktivitetenVises) {
-                    publishProgress(1);
-                }
-                else {
-                    p("Aktiviteten blev klar EFTER at data blev klar");
-                }
-
-                IO.gemObj(o1, K.OTEKST_1, getApplicationContext());
-
-                p("Formaterer H-tekster...");
-                htekster = alleTekster[3];
-                for (Tekst t : htekster)
-                    t.formater();
-
-                for (Tekst t : htekster)
-                    hteksterOverskrifter.add(t.overskrift.toUpperCase());
-
-                p("Event til aktiviteten om at H-tekster er klar");
-
-                publishProgress(2);
-                IO.gemObj(htekster, K.HTEKSTER, getApplicationContext());
-
-                //-- Gemmer O-tekst nr 2 og 3 til næste gang
-
-                Tekst o2 = otekster.get(1);
-                o2.formater();
-                IO.gemObj(o2, K.OTEKST_2, getApplicationContext());
-
-                Tekst o3 = otekster.get(2);
-                o3.formater();
-                IO.gemObj(o3, K.OTEKST_3, getApplicationContext());
-
-
-                p("Formaterer resten af listerne..");
-                ArrayList<Tekst> itekster = alleTekster[1];
-                p("Itekster længde når den hentes i allerførstegang(): "+itekster.size());
-
-                for (Tekst t : itekster) t.formater();
-                itekster = Util.sorterStigende(itekster);
-
-                ArrayList<Tekst> mtekster = alleTekster[2];
-                p("Mtekster længde når den hentes i allerførstegang(): "+mtekster.size());
-
-                for (Tekst t : mtekster) t.formater();
-                mtekster = Util.sorterStigende(mtekster);
-
-
-                IO.gemObj(new ArrayList<Integer>(), K.GAMLE, getApplicationContext());
-                IO.gemObj(new ArrayList<Integer>(), K.DATOLISTE, getApplicationContext());
-                IO.gemObj(new ArrayList<Integer>(), K.SYNLIGEDATOER, getApplicationContext());
-
-                if (tilstand.aktivitetenVises)
-                    publishProgress(1);
-                else
-                    p("Aktiviteten stadig ikke klar selvom data blev klar");
-
-                IO.gemObj(itekster, K.ITEKSTER, getApplicationContext());
-                p("Itekster længde når den gemmes i allerførstegang(): "+itekster.size());
-                IO.gemObj(mtekster, K.MTEKSTER, getApplicationContext());
-                p("Mtekster længde når den gemmes i allerførstegang(): "+mtekster.size());
-
-                gemEnkelteTeksterTilDisk(itekster);
-                gemEnkelteTeksterTilDisk(mtekster);
-
-
-                return null;
-            }
-
-
-            @Override
-            protected void onProgressUpdate(Object... values) {
-                super.onProgressUpdate(values);
-                int i = (int) values[0];
-                if (i == 1)
-                    lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "initallerførste Otekst klar, UI-tråd: ");
-                else if (i == 2)
-                    lytter.givBesked(K.HTEKSTER_OPDATERET, "initAllerførste_2 htekst, forgrund: " );
-
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-
-                if (synligeTekster.size() == 0) {
-                    prøvIgen();
-                }
-                else{
-                    gemSynligeTekster();
-
-                    tjekTekstversion("allerFørsteGang()"); //kaldes for at lagre versionsnummeret for tekster på nettet
-
-                }
-
-
-            }
-
-
-        }.execute();
-    }
-
-    private void prøvIgen() {
-
-        t("Fejl ved hentning af data. Prøver igen...\nTjek evt. om der er netforbindelse");
-
-        new Handler().postDelayed(() -> {
-            p("Prøvigen() kaldt ");
-            allerFørsteGang();
-
-        }, 5000);
-
-    }
-
-
-    /**Som sikkerhed skal vi kunne hente en enkelt M- eller I-tekst fra disken på dens ID
-     *
-     * @param tekster
-     */
-    private void gemEnkelteTeksterTilDisk(ArrayList<Tekst> tekster) {
-
-            new AsyncTask() {
-                @Override
-                protected Object doInBackground(Object[] objects) {
-                    for (Tekst tekst : tekster)
-                        IO.gemObj(tekst, "" + tekst.id_int, getApplicationContext());
-                    return null;
-                }
-            }.execute();
-    }
-
-
-
-    public void gemSynligeTekster() {
-        IO.gemObj(synligeTekster, K.SYNLIGETEKSTER, getApplicationContext());
-    }
-
-    private void opdaterTekstbasen(){
-        new AsyncTask() {
-
-            @Override
-            protected Object doInBackground(Object[] params) {
-
-                p("opdaterTekstbasen() henter alle tekster..");
-                ArrayList[] alleTekster = hentTeksterOnline("opdaterTekstbasen()");
-
-                ArrayList<Tekst> otekster = alleTekster[0];
-                Tekst o1 = otekster.get(0);
-                o1.formater();
-                IO.gemObj(o1, K.OTEKST_1, getApplicationContext());
-                otekster = alleTekster[0];
-                Tekst o2 = otekster.get(1);
-                o2.formater();
-                IO.gemObj(o2, K.OTEKST_2, getApplicationContext());
-                Tekst o3 = otekster.get(2);
-                o3.formater();
-                IO.gemObj(o3, K.OTEKST_3, getApplicationContext());
-
-                ArrayList<Tekst> itekster = alleTekster[1];
-                for (Tekst t : itekster) t.formater();
-                itekster = Util.sorterStigende(itekster);
-                IO.gemObj(itekster, K.ITEKSTER, getApplicationContext());
-
-
-                ArrayList<Tekst> mtekster = alleTekster[2];
-
-                for (Tekst t : mtekster) t.formater();
-                mtekster = Util.sorterStigende(mtekster);
-                IO.gemObj(mtekster, K.MTEKSTER, getApplicationContext());
-                publishProgress(1);
-
-                ArrayList<Tekst> htekster = alleTekster[3];
-                for (Tekst t : htekster)
-                    t.formater();
-
-                for (Tekst t : htekster)
-                    hteksterOverskrifter.add(t.overskrift.toUpperCase());
-                p("Event til aktiviteten om at H-tekster er klar");
-
-                publishProgress(2);
-                IO.gemObj(htekster, K.HTEKSTER, getApplicationContext());
-
-                gemEnkelteTeksterTilDisk(itekster);
-                gemEnkelteTeksterTilDisk(mtekster);
-
-                return null;
-            }
-
-
-            @Override
-            protected void onProgressUpdate(Object... values) {
-                super.onProgressUpdate(values);
-                int i = (int) values[0];
-                if (i == 1)
-                    lytter.givBesked(K.TEKSTBASEN_OPDATERET, "opdaterTekstbasen()");
-                if (i == 2)
-                    lytter.givBesked(K.HTEKSTER_OPDATERET, "opdaterTekstbasen()");
-
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-
-
-
-            }
-
-
-        }.execute();
-
-
-    }
-
-    /**
-     * Henter tekster på nettet. Må KUN kaldes fra baggrundtråd
-     * @param kaldtFra
-     * @return
-     */
-    private ArrayList[] hentTeksterOnline(String kaldtFra) {
-        p("hentTeksterOnline() kaldt fra " + kaldtFra);
-        String input = "";
-        try {
-            //Tjekker sprog:
-            String sprog = Locale.getDefault().getLanguage();
-            pref.edit().putString("sprog", sprog).commit();
-            p("henter nye tekster på sprog: " + sprog);
-            URL u = new URL(K.henteurlDK);
-            if (sprog.equalsIgnoreCase("de")) u = new URL(K.henteurlDE);
-            InputStream is = u.openStream();
-            is = new BufferedInputStream(is);
-            is.mark(1);
-            int read;
-            read = is.read();
-            if (read == 0xef) is.read();
-            else is.reset();
-
-            input = Util.inputStreamSomStreng(is);
-
-            is.close();
-        } catch (UnknownHostException uhex) {
-            uhex.printStackTrace();
-            Lyttersystem.getInstance().givBesked(K.OFFLINE, "hentTeksterOnline()");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return Util.parseXML(input, "hentTeksterOnline");
-
-    }
-
-    /**
-     * Fyrer en event hvis der er ny version
-     *
-     * @param kaldtFra
-     */
-    private void tjekTekstversion(String kaldtFra) {
-        p("tjekTekstversion() kaldt fra " + kaldtFra);
-
-        new AsyncTask() {
-
-            @Override
-            protected Object doInBackground(Object... tekst) {
-
-                String versionStreng = "";
-
-                try {
-                    URL url = new URL(K.versionUrl);
-
-                    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-                    String str;
-                    while ((str = in.readLine()) != null) {
-                        versionStreng += str;
-                    }
-                    in.close();
-
-                } catch (MalformedURLException me) {
-                    me.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return versionStreng;
-            }
-
-
-            @Override
-            protected void onPostExecute(Object tekst) {
-                super.onPostExecute(tekst);
-                String versionstekst = (String) tekst;
-                int netversion = -1;
-
-                if (!"".equals(versionstekst) && (versionstekst != null))
-                    netversion = Util.tryParseInt(versionstekst);
-                else
-                    p("Fejl: Hentet tekstversion null eller tom");
-
-                p("netversion: " + netversion);
-                int gemtTekstversion = pref.getInt(K.TEKSTVERSION, 0);
-                p("gemt tekstversion: " + gemtTekstversion);
-
-                if (gemtTekstversion < netversion) {
-                    //Måske giver det ikke rigtig mening med event længere efter Den Store Revidering
-                    if (tilstand.modenhed > K.MODENHED_HELT_FRISK) //vi skal ikke fyre event første dag, da dse nyeste data allerede er hentet
-                        lytter.givBesked(K.NYE_TEKSTER_ONLINE, "tjektekstversion, nye online");
-                    pref.edit().putInt(K.TEKSTVERSION, netversion).commit();
-                }
-                else {
-                    lytter.givBesked(K.INGEN_NYE_TEKSTER_ONLINE, "tjektekstversion, ingen nye online");
-                }
-
-            }
-        }.execute();
-
-    }
 
 
     /**
      * debugging: Tving ny app-dato. GAMMEL
      *
-     * @param antaldage
      */
     /*public void rul(int antaldage) {
         p("rul() kaldt");
@@ -626,42 +252,6 @@ public class A extends Application implements Observatør {
     }
 */
 
-    /**
-     * Henter gemte Htekster og genererer en liste med overskrifterne
-     */
-    void indlæsHtekster() {
-
-        lytter.givBesked(K.NYE_HTEKSTER_PÅ_VEJ, "indlæsHtekster()"); //Så brugeren ikke trykker netop mens den opdateres
-
-        new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-
-                p("indlæsHtekster() start");
-
-                ArrayList<Tekst> gemteHtekster = (ArrayList<Tekst>) IO.læsObj(K.HTEKSTER, getApplicationContext());
-                if (gemteHtekster == null) {
-                    p("Fejl! ingen h-tekster på disk");
-                    return false;
-                }
-                ArrayList<String> temp = new ArrayList<>();
-                for (Tekst t : gemteHtekster) temp.add(t.overskrift.toUpperCase());
-                hteksterOverskrifter = temp;
-                htekster = gemteHtekster;
-                p("indlæsHtekster() slut");
-
-                return true;
-            }
-
-            @Override
-            protected void onPostExecute(Object gikOK) {
-                super.onPostExecute(gikOK);
-                if ((boolean) gikOK) lytter.givBesked(K.HTEKSTER_OPDATERET, "indlæsHtekster()");
-
-            }
-        }.execute();
-
-    }
 
 
 
@@ -681,7 +271,7 @@ public class A extends Application implements Observatør {
         synligeTekster.clear();
         synligeTekster.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
         Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE, "nulstillet");
-        allerFørsteGang(); //her sættes pref modenhed til 1 = FØRSTE DAG
+        tekstlogik.allerFørsteGang(); //her sættes pref modenhed til 1 = FØRSTE DAG
     }
 
     void sletDiskData() {
@@ -700,22 +290,6 @@ public class A extends Application implements Observatør {
     }
 
 
-    int findTekstnr(int id) {
-
-        for (int i = 0; i < synligeTekster.size(); i++)
-            if (id == synligeTekster.get(i).id_int) return i;
-
-        return -1;
-    }
-
-    //-- Alle Htekster har samme id_int
-    public int findTekstnr(String overskrift) {
-        for (int i = 0; i < synligeTekster.size(); i++)
-            if (overskrift.equals(synligeTekster.get(i).overskrift)) return i;
-
-        return -1;
-
-    }
 
 
     void t(String s) {

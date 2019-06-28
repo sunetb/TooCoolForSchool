@@ -594,7 +594,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                             vp.setCurrentItem(a.synligeTekster.size()-1);
                         }
                         else {
-                            vp.setCurrentItem(a.findTekstnr(valgtHTekst.overskrift));
+                            vp.setCurrentItem(a.tekstlogik.findTekstnr(valgtHTekst.overskrift));
                         }
                         hListeadapter = null;
                         klikket = true;

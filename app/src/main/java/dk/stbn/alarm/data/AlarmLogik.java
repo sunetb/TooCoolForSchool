@@ -257,25 +257,6 @@ public class AlarmLogik {
 
 
 
-    //Flyttes til tekstlogik!!
-    boolean visMtekst(DateTime mTid, DateTime masterDato){
-        String logbesked = "Util.visMtekst() "+ mTid.getDayOfMonth()+ "/"+mTid.getMonthOfYear();
-        //-- Eks: 11 september     ///Vises                    5, 6, 7, 8, 9, 10, 11
-                                   ///Vises ikke: 1, 2, 3. 4.                         12, 13, 14, sept
-
-        //-- Tjek om  m-dato er idag
-        if (Tid.erSammeDato(mTid, masterDato)) return true;
-
-
-        //-- Tjek om idag er 12 sept eller efter.
-        if (Tid.før(mTid,masterDato)) return false;
-
-        //-- Tjek om idag er 4. sept eller tidligere
-        DateTime syvFør = mTid.minusDays(7);
-        Util.p(logbesked + " dato var mindre end en uge gammel. Skal den vises? "+!Tid.efter(syvFør,masterDato));
-
-        return !Tid.efter(syvFør,masterDato);
-    }
 
     void startAlarmLoop(Context c) {
         Tilstand t = Tilstand.getInstance(c);
