@@ -97,8 +97,7 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         //-- Skriver baggrunds-lytter-log
         //Util.skrivBaglog(this);
 
-        //kuin test:
-        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato);
+
 
     }
 
@@ -116,16 +115,13 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
             udfyldt = true;
         }
 
-        if (udfyldt && et_besked.getText().toString().equals("")) {
-            Toast.makeText(this, getResources().getString(R.string.manglerbesked), Toast.LENGTH_LONG).show();
-            udfyldt = false;
-        }
+       // if (udfyldt && et_besked.getText().toString().equals("")) {
+        //    Toast.makeText(this, getResources().getString(R.string.manglerbesked), Toast.LENGTH_LONG).show();
+        //    udfyldt = false;
+        //}
 
-        else if (udfyldt){
+       if (udfyldt){
             besked = et_besked.getText().toString();
-            udfyldt = true;
-        }
-        if (udfyldt) {
             tilSingleton();
             sendmail();
             finish();

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import dk.stbn.alarm.R;
+import dk.stbn.alarm.data.AlarmLogik;
 import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Tilstand;
@@ -487,58 +488,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             "\n"+
             "Husk at sætte hak i Automatisk dato og klokkeslæt igen når du er færdig med at teste";
 
-    ///kun til test
-    void bygNotifikation (Context context, String overskrift, String id, int id_int) {
-
-        p("bygnotifokation test modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
-
-        NotificationCompat.Builder mBuilder =
-                null;
-        //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            mBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.cool_nobkgr_71x71)
-                    .setContentTitle("Too Cool for School")
-                    .setContentText(overskrift)
-                    .setAutoCancel(true)
-                    .setCategory(Notification.CATEGORY_ALARM)
-                    .setOnlyAlertOnce(true);
-       // }
-
-        //ingen effekt.setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
-
-        Intent resultIntent = new Intent(context, Forside_akt.class);
-        resultIntent.putExtra("overskrift", overskrift);
-        resultIntent.putExtra("tekstId", id);
-        resultIntent.putExtra("id_int", id_int);
-        resultIntent.putExtra("fraAlarm", true);
-        resultIntent.setAction(id); //lille hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        //stackBuilder.addParentStack(Forside.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_CANCEL_CURRENT //FLAG_ONE_SHOT//
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Notification n = mBuilder
-                .build();
-
-        //Hvis brugeren sletter notifikationen ved swipe eller tømmer alle notifikationer
-        Intent sletteIntent = new Intent(context, SletNotifikation_Lytter.class);
-        sletteIntent.putExtra("tekstId", id);
-        sletteIntent.setAction(id);
-
-        n.deleteIntent = PendingIntent.getBroadcast(context, 0, sletteIntent, 0);
-        mNotificationManager.notify(id_int, n);
 
 
-    }
-
-//TODO: Flyttes til Application-singleton?
+//TODO: Flyttes til Application-singleton
     //Fra https://stackoverflow.com/questions/34285383/android-how-to-detect-language-has-been-changes-on-phone-setting
     public BroadcastReceiver setupLangReceiver(){
 
@@ -566,6 +518,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     @Override
     protected Dialog onCreateDialog(int id){
+
+        //kun test:
+        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato);
 
         p("Dialog: htekster længde: "+a.htekster.size());
         final AlertDialog.Builder extraliste = new AlertDialog.Builder(this);
