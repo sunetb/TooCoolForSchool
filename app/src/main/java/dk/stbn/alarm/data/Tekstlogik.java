@@ -1,5 +1,6 @@
 package dk.stbn.alarm.data;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.AsyncTask;
@@ -29,18 +30,24 @@ public class Tekstlogik {
 
 
     private static Tekstlogik tl;
-    ArrayList<Tekst> synligeTekster;
-    ArrayList<String> hteksterOverskrifter;
-    ArrayList<Tekst> htekster;
+    public ArrayList<Tekst> synligeTekster;
+    public ArrayList<String> hteksterOverskrifter;
+    public ArrayList<Tekst> htekster;
+
+
+
 
     Lyttersystem lytter;
     Tilstand t;
     private Context c;
 
+
+
     private Tekstlogik(Context c){
         this.c = c;
         lytter = Lyttersystem.getInstance();
         t = Tilstand.getInstance(c);
+
     }
 
     public static Tekstlogik getInstance(Context c){

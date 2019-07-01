@@ -208,6 +208,7 @@ public class AlarmLogik {
 
 
     public void vækMigImorgen(Context c, DateTime masterdato){
+
         DateTime imorgenKl01 = masterdato.withTime(1,0,0,0).plusDays(1);
 
         ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
@@ -230,7 +231,7 @@ public class AlarmLogik {
         alarmMgr.set(AlarmManager.RTC, imorgenKl01.getMillis(), alarmIntent);
     }
 
-    public void vækMigOmLidt(Context c, DateTime masterdato){
+    public void vækMigOmLidt(Context c, DateTime masterdato, int min){
 
         ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
         PackageManager pm = c.getPackageManager();
@@ -240,9 +241,9 @@ public class AlarmLogik {
         PendingIntent alarmIntent;
 
         Intent intent = new Intent(c, Alarm_Lytter.class);
-        intent.putExtra("tag", "testing testing 1 2 3 4 ");
-
-        DateTime imorgenKl01 = masterdato.plus(2000);
+        intent.putExtra("tag", "Noti: "+min+" min");
+        Util.p("AlarmLytter.vækMigOmLidt() kaldt");
+        DateTime imorgenKl01 = masterdato.plus(min*60*1000);
 
         String action = ""+imorgenKl01.toLocalDate();
 

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Util;
 
 
@@ -14,11 +15,11 @@ import dk.stbn.alarm.data.Util;
  */
 public class PagerAdapter extends FragmentPagerAdapter {
 
-    A a;
+    Tekstlogik tl;
 
     public PagerAdapter(FragmentManager fm) {
         super(fm);
-        a= A.a;
+        tl = Tekstlogik.getInstance(null);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return a.synligeTekster.size();
+        return tl.synligeTekster.size();
     }
 
     @Override

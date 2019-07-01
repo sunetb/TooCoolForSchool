@@ -2,6 +2,7 @@ package dk.stbn.alarm.data;
 
 import android.app.AlarmManager;
 import android.app.Application;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -47,9 +48,6 @@ public class A extends Application implements Observatør {
 
 //////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
 
-    public ArrayList<Tekst> synligeTekster = new ArrayList();  //bruges af pageradapteren //TVM
-    public ArrayList<Tekst> htekster = new ArrayList();  //TVM
-    public ArrayList<String> hteksterOverskrifter = new ArrayList(); //TVM
 
 
 //////////-------------------------//////////
@@ -67,7 +65,6 @@ public class A extends Application implements Observatør {
     public static String hoved = "<!DOCTYPE html ><html><head><meta content=\"text/html; charset=ISO-8859-1\" http-equiv=\"content-type\"><title>Log</title></head><body style=\"color: white; background-color: black;\">";
     public static String debugmsg = hoved;
     public static String hale = "</body></html>";
-
 
     public String henteurltest = "http://www.lightspeople.net/sune/skole/tekstertest.xml";
 
@@ -268,8 +265,8 @@ public class A extends Application implements Observatør {
         pref.edit().putInt("modenhed", K.MODENHED_FØRSTE_DAG).commit();
 
 
-        synligeTekster.clear();
-        synligeTekster.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
+        tekstlogik.synligeTekster.clear();
+        tekstlogik.synligeTekster.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
         Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE, "nulstillet");
         tekstlogik.allerFørsteGang(); //her sættes pref modenhed til 1 = FØRSTE DAG
     }

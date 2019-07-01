@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,8 +34,10 @@ import java.util.Locale;
 
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.data.AlarmLogik;
+import dk.stbn.alarm.data.Data;
 import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.IO;
@@ -56,6 +59,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     ArrayAdapter hListeadapter = null;
     public BroadcastReceiver mLangReceiver = null;
     Tilstand tilstand;
+    Tekstlogik tl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         a = A.a;
         prefs = a.pref;
         tilstand = Tilstand.getInstance(getApplicationContext());
+        tl = Tekstlogik.getInstance(this);
+
         p(" idag er: "+ tilstand.masterDato.getDayOfMonth() + ": " + tilstand.masterDato.getMonthOfYear() + " - "+ tilstand.masterDato.getYear());
         setupLangReceiver();
         initUI();
@@ -96,7 +102,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         if (v==tilbage && positionNu > 0) {
             vp.setCurrentItem(--positionNu);
         }
-        else if (v == frem && positionNu != a.synligeTekster.size()-1){
+        else if (v == frem && positionNu != tl.synligeTekster.size()-1){
             vp.setCurrentItem(++positionNu);
         }
         else if (v == extras)
@@ -125,7 +131,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                // i.putExtra(Intent.EXTRA_TEXT, "Hej tjek denne app ud: https://play.google.com/store/apps/details?id=dk.stbn.cool.alarm");
 
-                Tekst deletekst = a.synligeTekster.get(vp.getCurrentItem());
+                Tekst deletekst = tl.synligeTekster.get(vp.getCurrentItem());
 
                 String s = deletekst.overskrift + "\n\n" + Html.fromHtml(deletekst.brødtekst).toString() + "\nTjek appen TOO COOL FOR SCHOOL ud på:  https://play.google.com/store/apps/details?id=dk.stbn.cool.alarm" ;
                 p(s);
@@ -284,9 +290,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             visPosition = prefs.getInt("senesteposition", vp.getCurrentItem());
             p("onstart visposition fra prefs: "+visPosition);
             p("Hvad var der i prefs? "+prefs.getInt("senesteposition", 100000));
-            p("hvor lang er tekstlisten "+a.synligeTekster.size());
-            if (visPosition >= a.synligeTekster.size()) visPosition = -1;
-            if (visPosition == -1) visPosition = a.synligeTekster.size() - 1;
+            p("hvor lang er tekstlisten "+tl.synligeTekster.size());
+            if (visPosition >= tl.synligeTekster.size()) visPosition = -1;
+            if (visPosition == -1) visPosition = tl.synligeTekster.size() - 1;
             p("onstart visposition efter tjek: "+visPosition);
 
             vp.setCurrentItem(visPosition);
@@ -306,7 +312,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     }
 
     public void knapstatus (int nu, String kaldtFra) {
-        int max = a.synligeTekster.size()-1;
+        int max = tl.synligeTekster.size()-1;
 		p("knapstatus: nu="+nu+" max="+max + "Kaldt fra "+kaldtFra);
 
         if (max == 0) nu = 0;
@@ -343,8 +349,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     public void opdater(int event) {
         if (event == K.SYNLIGETEKSTER_OPDATERET){
             pa.notifyDataSetChanged();
-            vp.setCurrentItem(a.synligeTekster.size()-1);
-            knapstatus(a.synligeTekster.size()-1, " opdater()");
+            vp.setCurrentItem(tl.synligeTekster.size()-1);
+            knapstatus(tl.synligeTekster.size()-1, " opdater()");
              new Handler().postDelayed(() -> {
 
              }, 10);
@@ -360,7 +366,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             extras.getBackground().setAlpha(100);
         }
         else if (event == K.OFFLINE){
-            a.synligeTekster.add(new Tekst("OFFLINE", "Error: no internet connection. Check yourt settings and try again later", "a", new DateTime()));
+            tl.synligeTekster.add(new Tekst("OFFLINE", "Error: no internet connection. Check yourt settings and try again later", "a", new DateTime()));
             Lyttersystem.getInstance().givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, ingen netforbindelse");
         }
     }
@@ -401,10 +407,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 IO.føjTilGamle(id,this);
 
                 int husk = -1;
-                for (int i = 0; i < a.synligeTekster.size(); i++) {
-                    p("søger synligetkster igennem: "+ a.synligeTekster.get(i).id_int);
+                for (int i = 0; i < tl.synligeTekster.size(); i++) {
+                    p("søger synligetkster igennem: "+ tl.synligeTekster.get(i).id_int);
 
-                    if (a.synligeTekster.get(i).id_int == id) {
+                    if (tl.synligeTekster.get(i).id_int == id) {
                         husk = i;
                         break;
                     }
@@ -420,9 +426,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     p("FEJL: Teksten fra notifikationen fandtes ikke i synligeTekster! ID: "+id);
                     if (id != 0) {
                         Tekst t = (Tekst) IO.læsObj(""+id, this);
-                        a.synligeTekster.add(t);
+                        tl.synligeTekster.add(t);
                         pa.notifyDataSetChanged();
-                        prefs.edit().putInt("senesteposition", a.synligeTekster.size()-1).commit();
+                        prefs.edit().putInt("senesteposition", tl.synligeTekster.size()-1).commit();
                     }
 
                    // vp.setCurrentItem(husk);
@@ -520,9 +526,18 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     protected Dialog onCreateDialog(int id){
 
         //kun test:
-        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato);
+        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 1);
 
-        p("Dialog: htekster længde: "+a.htekster.size());
+        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 20);
+
+        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 60);
+
+        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 60*6);
+
+        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 60*24);
+
+
+        p("Dialog: htekster længde: "+tl.htekster.size());
         final AlertDialog.Builder extraliste = new AlertDialog.Builder(this);
 
         TextView t  = new TextView(this);
@@ -534,19 +549,19 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         extraliste.setCustomTitle(t);
 
         ArrayAdapter aad =
-                new ArrayAdapter(this, android.R.layout.simple_list_item_1, a.hteksterOverskrifter); // ArrayAdapter slut
+                new ArrayAdapter(this, android.R.layout.simple_list_item_1, tl.hteksterOverskrifter); // ArrayAdapter slut
 
         extraliste.setAdapter(aad,
                 new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int valgt) {
-                        Tekst valgtHTekst = a.htekster.get(valgt);
+                        Tekst valgtHTekst = tl.htekster.get(valgt);
 
-                        if (!a.synligeTekster.contains(valgtHTekst)) {
-                            a.synligeTekster.add(valgtHTekst);
+                        if (!tl.synligeTekster.contains(valgtHTekst)) {
+                            tl.synligeTekster.add(valgtHTekst);
                             a.lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog");
                             pa.notifyDataSetChanged();
-                            vp.setCurrentItem(a.synligeTekster.size()-1);
+                            vp.setCurrentItem(tl.synligeTekster.size()-1);
                         }
                         else {
                             vp.setCurrentItem(a.tekstlogik.findTekstnr(valgtHTekst.overskrift));

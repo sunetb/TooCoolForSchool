@@ -15,6 +15,7 @@ import android.widget.TextView;
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.K;
 
@@ -25,7 +26,7 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 	View divi;
 
     int position = -1;
-    A a;
+    Tekstlogik tl;
 	private Tekst tekst;
 
     public TekstFragment_frag() {
@@ -34,10 +35,10 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        a = A.a;
+        tl = Tekstlogik.getInstance(getActivity());
 		position = getArguments().getInt("pos", 0);
-		if (position >= a.synligeTekster.size() || position < 0) position = a.synligeTekster.size()-1;
-		tekst= a.synligeTekster.get(position);
+		if (position >= tl.synligeTekster.size() || position < 0) position = tl.synligeTekster.size()-1;
+		tekst= tl.synligeTekster.get(position);
 		
         p("Fragment oncreate. Pos: "+position);
     }
@@ -52,9 +53,9 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 		w = (WebView) v.findViewById(R.id.brodtekstweb);
 		w.setBackgroundColor(Color.BLACK); //forhindrer hvidt blink ved skærmvending
 
-		p("synligeTekster.size="+a.synligeTekster.size());
-		if (a.synligeTekster.size() == 0 || tekst == null){
-			a.opdater(K.NYE_TEKSTER_ONLINE);
+		p("synligeTekster.size="+tl.synligeTekster.size());
+		if (tl.synligeTekster.size() == 0 || tekst == null){
+
 			p("onCreateView() FEJL ingen data");
 			t.setText(Html.fromHtml("Vent et øjeblik"));
 			w.loadData(A.hoved +"Netforbindelsen er måske langsom. Hvis der ikke sker noget om lidt, så prøv at genstarte appen.."+ A.hale, "text/html; charset=utf-8", "UTF-8");
@@ -76,13 +77,13 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 			}
 		}
 		p("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-		p(a.synligeTekster.size());
+		p(tl.synligeTekster.size());
 
 		//-- Hvis teksten er M eller H: gul overskrift
 		if (null == tekst || null == tekst.kategori) {
 
 			t.setText(Html.fromHtml("Vent lidt"));
-			w.loadData(A.hoved +"Der er sket en fejl. Vi arbejder på sagen. Netforbindelsen er måske langsom. Hvis der ikke sker noget om lidt, så prøv at genstarte appen.."+ A.hale, "text/html; charset=utf-8", "UTF-8");
+			w.loadData(A.hoved +"Der er sket en fejl. Vi arbejder på sagen. Netforbindelsen er måske langsom. Hvis der ikke sker noget om lidt, så prøv at genstarte appen.."+A.hale, "text/html; charset=utf-8", "UTF-8");
 
 			return v;
 		}

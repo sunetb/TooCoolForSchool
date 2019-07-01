@@ -213,7 +213,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
 
         p("bygnotifikation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
-        Util.baglog("Notifikation bygget: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int, context);
+        //Util.baglog("Notifikation bygget: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int, context);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
 

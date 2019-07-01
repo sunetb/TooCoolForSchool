@@ -69,6 +69,7 @@ dependencies {
     }
     implementation "com.appspector:android-sdk:1.+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
