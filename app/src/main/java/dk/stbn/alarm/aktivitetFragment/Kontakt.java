@@ -16,12 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joda.time.DateTime;
-
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.data.A;
-import dk.stbn.alarm.data.AlarmLogik;
-import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 
 

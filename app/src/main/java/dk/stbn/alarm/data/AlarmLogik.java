@@ -4,11 +4,9 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
 import org.joda.time.DateTime;
@@ -17,7 +15,6 @@ import java.util.ArrayList;
 
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
-import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Alarm_Lytter;
 import dk.stbn.alarm.lyttere.Boot_Lytter;
 
@@ -36,7 +33,7 @@ public class AlarmLogik {
     }
 
     public void notiBrugt(Context c, Intent intent){
-        Util.p("Util.notiBrugt kaldt");
+        p("notiBrugt kaldt");
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
 
         //tjek om første opstart. Hmm ER det nu også nødvendigt?
@@ -49,10 +46,10 @@ public class AlarmLogik {
         id = intent.getExtras().getString("tekstId");
         int id_int = intent.getExtras().getInt("id_int", 0);
 
-        Util.p("Util.notiBrugt modtog: id: "+id + "id_int: "+id_int);
+        p("notiBrugt modtog: id: "+id + "id_int: "+id_int);
 
         IO.føjTilGamle(id_int, c);
-        Util.p("Util.notiBrugt tjek sættet:");
+        p("notiBrugt tjek sættet:");
 
         PendingIntent i = PendingIntent.getBroadcast(c, id_int, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alm = A.alm;
@@ -187,7 +184,7 @@ public class AlarmLogik {
  */
 
     void sletAlarm (Context c, Tekst t){
-        Util.p("Util.sletAlarm kaldt med tekst: "+t.toString(0));
+        p("sletAlarm kaldt med tekst: "+t.toString(0));
 
         Intent intent = new Intent(c, Alarm_Lytter.class);
 
@@ -206,10 +203,7 @@ public class AlarmLogik {
 
     }
 
-
-    public void vækMigImorgen(Context c, DateTime masterdato){
-
-        DateTime imorgenKl01 = masterdato.withTime(1,0,0,0).plusDays(1);
+    public void sætAlarm(Context c, DateTime tidspunkt, String evtBesked){
 
         ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
         PackageManager pm = c.getPackageManager();
@@ -220,44 +214,19 @@ public class AlarmLogik {
 
         Intent intent = new Intent(c, Alarm_Lytter.class);
 
-        String action = ""+imorgenKl01.toLocalDate();
-        intent.putExtra("tag", "Test: Denne noti er automatisk sat den "+action+" kl 01.00");
-        Util.p("AlarmLytter.VækMigImorgen() dato: "+action);
+        int id = tidspunkt.getMillis() >= Integer.MAX_VALUE ? (int) tidspunkt.getMillis()/2000000000 : (int) tidspunkt.getMillis();
+        p("id: "+id);
+        String action = ""+tidspunkt.toLocalDate();
+        intent.putExtra("tag", evtBesked)
+        .putExtra("id", id);
+        p("AlarmLytter.sætAlarm() dato: "+action);
         intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
         alarmIntent = PendingIntent.getBroadcast(c, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
         AlarmManager alarmMgr = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 
-        alarmMgr.set(AlarmManager.RTC, imorgenKl01.getMillis(), alarmIntent);
+        alarmMgr.set(AlarmManager.RTC, tidspunkt.getMillis(), alarmIntent);
     }
-
-    public void vækMigOmLidt(Context c, DateTime masterdato, int min){
-
-        ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
-        PackageManager pm = c.getPackageManager();
-
-        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
-        PendingIntent alarmIntent;
-
-        Intent intent = new Intent(c, Alarm_Lytter.class);
-        intent.putExtra("tag", "Noti: "+min+" min");
-        Util.p("AlarmLytter.vækMigOmLidt() kaldt");
-        DateTime imorgenKl01 = masterdato.plus(min*60*1000);
-
-        String action = ""+imorgenKl01.toLocalDate();
-
-        intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
-        alarmIntent = PendingIntent.getBroadcast(c, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
-
-        AlarmManager alarmMgr = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
-
-        alarmMgr.set(AlarmManager.RTC, imorgenKl01.getMillis(), alarmIntent);
-    }
-
-
-
-
 
     void startAlarmLoop(Context c) {
         Tilstand t = Tilstand.getInstance(c);
@@ -265,14 +234,18 @@ public class AlarmLogik {
 
         if (t.femteDagFørsteGang || t.boot || t.modenhed == K.SOMMERFERIE) {
 
-            //vækMigImorgen skal kun fyres én gang i sommerferien
+            //loopet skal kun startes én gang i sommerferien
             boolean alleredeStartet = t.pref.getBoolean("alarmloop allerede startet", false);
             t.pref.edit().putBoolean("alarmloop allerede startet", true);
             if (t.modenhed == K.SOMMERFERIE && alleredeStartet)
                 return;
 
-            vækMigImorgen(c, t.masterDato);
+            sætAlarm(c, t.masterDato.plusDays(1).withTime(1,0,0,0), "loop");
 
         }
+    }
+
+    void p (Object o){
+        Util.p("AlarmLogik."+o);
     }
 }

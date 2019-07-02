@@ -2,8 +2,6 @@ package dk.stbn.alarm.lyttere;
 
 import java.util.ArrayList;
 
-import dk.stbn.alarm.data.A;
-import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.K;
 

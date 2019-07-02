@@ -13,11 +13,10 @@ import android.webkit.WebView;
 import android.widget.TextView;
 
 import dk.stbn.alarm.R;
-import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Util;
-import dk.stbn.alarm.diverse.K;
 
 
 public class TekstFragment_frag extends Fragment implements View.OnClickListener {

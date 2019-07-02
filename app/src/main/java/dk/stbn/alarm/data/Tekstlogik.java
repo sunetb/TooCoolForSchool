@@ -1,8 +1,6 @@
 package dk.stbn.alarm.data;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.widget.Toast;
@@ -27,27 +25,19 @@ import dk.stbn.alarm.lyttere.Lyttersystem;
 
 public class Tekstlogik {
 
-
-
     private static Tekstlogik tl;
-    public ArrayList<Tekst> synligeTekster;
-    public ArrayList<String> hteksterOverskrifter;
-    public ArrayList<Tekst> htekster;
-
-
-
+    public ArrayList<Tekst> synligeTekster = new ArrayList<>();
+    public ArrayList<String> hteksterOverskrifter = new ArrayList<>();
+    public ArrayList<Tekst> htekster = new ArrayList<>();
 
     Lyttersystem lytter;
     Tilstand t;
     private Context c;
 
-
-
     private Tekstlogik(Context c){
         this.c = c;
         lytter = Lyttersystem.getInstance();
         t = Tilstand.getInstance(c);
-
     }
 
     public static Tekstlogik getInstance(Context c){
@@ -71,7 +61,7 @@ public class Tekstlogik {
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_1, c));
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_2, c));
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_3, c));
-//GEM DETTE
+
         } else if (modenhed == K.MODENHED_HELT_FRISK) {
             p("udvælgTekster() Modenhed: Helt frisk");
             allerFørsteGang();
@@ -89,7 +79,7 @@ public class Tekstlogik {
             Tekst oTekst2 = (Tekst) IO.læsObj(K.OTEKST_2, c);
             tempSynlige.add(oTekst1);
             tempSynlige.add(oTekst2);
-//hertil
+
         } else if (modenhed == K.MODENHED_TREDJE_DAG) {
             p("Dag 3 ");
 
@@ -157,8 +147,6 @@ public class Tekstlogik {
                     break;
                 }
             }
-
-
             skift = forskellige;
         }
 

@@ -2,37 +2,26 @@ package dk.stbn.alarm.data;
 
 import android.app.AlarmManager;
 import android.app.Application;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.appspector.sdk.AppSpector;
-import com.crashlytics.android.Crashlytics;
-//import com.google.firebase.database.DatabaseReference;
-//import com.google.firebase.database.DatabaseReference;
-//import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import com.crashlytics.android.Crashlytics;
+
 import java.util.ArrayList;
-import java.util.Locale;
 
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
+
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * Created by sune on 5/31/16.
@@ -140,10 +129,7 @@ public class A extends Application implements Observatør {
             //Util.baglog = true;
             p("Enhed: " + Build.MODEL + "  " + Build.PRODUCT);
         }
-        AppSpector
-                .build(getApplicationContext())
-                .withDefaultMonitors()
-                .run("android_ZDdiOWY3YWQtZGVjNy00ZWNiLThkMTAtYTI4YmI2OWIzNDEy");
+
 //        FirebaseApp.initializeApp(ctx);
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
 

@@ -2,8 +2,6 @@ package dk.stbn.alarm.diverse;
 
 import org.joda.time.DateTime;
 
-import dk.stbn.alarm.data.Util;
-
 public class Tid {
 
 

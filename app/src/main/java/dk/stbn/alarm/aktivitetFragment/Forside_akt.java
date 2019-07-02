@@ -1,10 +1,6 @@
 package dk.stbn.alarm.aktivitetFragment;
 
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,8 +10,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,14 +23,12 @@ import android.widget.TextView;
 
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 import dk.stbn.alarm.R;
-import dk.stbn.alarm.data.AlarmLogik;
-import dk.stbn.alarm.data.Data;
-import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.A;
+import dk.stbn.alarm.data.AlarmLogik;
+import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
@@ -44,7 +36,6 @@ import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
-import dk.stbn.alarm.lyttere.SletNotifikation_Lytter;
 
 public class Forside_akt extends AppCompatActivity implements View.OnClickListener, Observatør {
 
@@ -526,15 +517,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     protected Dialog onCreateDialog(int id){
 
         //kun test:
-        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 1);
+        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(2), "Test: 2 min");
 
-        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 20);
+        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(4), "Test: 2 min");
 
-        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 60);
+        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(6), "Test: 2 min");
 
-        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 60*6);
+        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(8), "Test: 2 min");
 
-        AlarmLogik.getInstance().vækMigOmLidt(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato, 60*24);
 
 
         p("Dialog: htekster længde: "+tl.htekster.size());

@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Util;
 
@@ -59,6 +58,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
             android:paddingBottom="4dp"
             android:paddingTop="4dp" />
     * */
+
 
 
 }
