@@ -31,7 +31,6 @@ public class A extends Application implements Observatør {
     //public static A a;
     public SharedPreferences pref;
     public Lyttersystem lytter;
-    static AlarmManager alm; //TVM
     AlarmLogik alarmlogik;
     public Tekstlogik tekstlogik;
 
@@ -151,7 +150,6 @@ public class A extends Application implements Observatør {
     }
 
     void init(){
-        if (alm == null) alm = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
         tekstlogik.tjekSprog();
 
@@ -160,10 +158,12 @@ public class A extends Application implements Observatør {
             tekstlogik.udvælgTekster();
         else {
             tekstlogik.tjekTekstversion("init()"); //Fyrer event og A.opdater() kaldes hvis der er nye tekster på nettet.
-            tekstlogik.indlæsHtekster();
             tekstlogik.visCachedeTekster();
+            tekstlogik.indlæsHtekster();
+
+            alarmlogik.startAlarmLoop(this);
         }
-        alarmlogik.startAlarmLoop(this);
+
 
 
     }
@@ -172,14 +172,13 @@ public class A extends Application implements Observatør {
     @Override
     public void opdater(int hændelse) {
 
-        if (hændelse == K.NYE_TEKSTER_ONLINE)
+        if (hændelse == K.NYE_TEKSTER_ONLINE || hændelse == K.SPROG_ÆNDRET)
             tekstlogik.opdaterTekstbasen();
         else if (hændelse == K.INGEN_NYE_TEKSTER_ONLINE || hændelse == K.TEKSTBASEN_OPDATERET)
             tekstlogik.udvælgTekster();
         else if (hændelse == K.HTEKSTER_OPDATERET)
             tilstand.hteksterKlar = true;
-        else if (hændelse == K.SPROG_ÆNDRET)
-            tekstlogik.opdaterTekstbasen();
+
 
     }
 

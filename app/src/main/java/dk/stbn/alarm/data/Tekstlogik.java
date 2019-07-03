@@ -45,6 +45,19 @@ public class Tekstlogik {
         return tl;
     }
 
+    /**
+     * Henter gemte synlige tekster fra sidst
+     */
+    void visCachedeTekster() {
+
+        synligeTekster = (ArrayList<Tekst>) IO.læsObj(K.SYNLIGETEKSTER, c);
+
+        if (synligeTekster != null) {
+            lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "visCachedeTekster()");
+            p("visCachedeTekster() synligeTekster længde: "+synligeTekster.size());
+        }
+        else p("Fejl: gemte synlige tekster fandes ikke");
+    }
 
 
     /**
@@ -61,6 +74,8 @@ public class Tekstlogik {
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_1, c));
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_2, c));
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_3, c));
+            synligeTekster = tempSynlige;
+            return;
 
         } else if (modenhed == K.MODENHED_HELT_FRISK) {
             p("udvælgTekster() Modenhed: Helt frisk");
@@ -131,6 +146,7 @@ public class Tekstlogik {
 
         //Der skal skiftes hvis gemt liste og ny liste er forskellig længde
         boolean skift = synligeTekster.size() != tempSynlige.size();
+        p("Skift? "+skift);
 
         //Der skal skiftes hvis appen ikke er moden
         if (modenhed != K.MODENHED_MODEN) skift = true;
@@ -149,6 +165,7 @@ public class Tekstlogik {
             }
             skift = forskellige;
         }
+
 
         if (skift) {
             p("JA. Der er  et nyt udvalg af tekster");
@@ -224,19 +241,6 @@ public class Tekstlogik {
 
     }
 
-    /**
-     * Henter gemte synlige tekster fra sidst
-     */
-    void visCachedeTekster() {
-
-        synligeTekster = (ArrayList<Tekst>) IO.læsObj(K.SYNLIGETEKSTER, c);
-
-        if (synligeTekster != null) {
-            lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "visCachedeTekster()");
-            p("visCachedeTekster() synligeTekster længde: "+synligeTekster.size());
-        }
-        else p("Fejl: gemte synlige tekster fandes ikke");
-    }
 
 
     /**

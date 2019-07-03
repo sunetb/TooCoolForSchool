@@ -21,6 +21,7 @@ import dk.stbn.alarm.lyttere.Boot_Lytter;
 public class AlarmLogik {
 
     private static AlarmLogik al;
+    private AlarmManager alm;
 
     AlarmLogik(){
 
@@ -35,7 +36,7 @@ public class AlarmLogik {
     public void notiBrugt(Context c, Intent intent){
         p("notiBrugt kaldt");
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-
+        alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
         //tjek om første opstart. Hmm ER det nu også nødvendigt?
         boolean førsteOpstart = sp.getBoolean("førstegang", true);
 
@@ -52,9 +53,7 @@ public class AlarmLogik {
         p("notiBrugt tjek sættet:");
 
         PendingIntent i = PendingIntent.getBroadcast(c, id_int, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alm = A.alm;
-        if (alm == null) alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
-        else Util.p("Util.notiBrugt(): alarmManager eksisterer");
+
         i.cancel();
         alm.cancel(i);
     }
@@ -185,7 +184,7 @@ public class AlarmLogik {
 
     void sletAlarm (Context c, Tekst t){
         p("sletAlarm kaldt med tekst: "+t.toString(0));
-
+        alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(c, Alarm_Lytter.class);
 
         intent.putExtra("id_int", t.id_int);
@@ -196,15 +195,15 @@ public class AlarmLogik {
         intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
 
         PendingIntent i = PendingIntent.getBroadcast(c, t.id_int, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alm = A.alm;
-        if (alm == null) alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+
+
         i.cancel();
         alm.cancel(i);
 
     }
 
     public void sætAlarm(Context c, DateTime tidspunkt, String evtBesked){
-
+        alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
         ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
         PackageManager pm = c.getPackageManager();
 
@@ -226,9 +225,9 @@ public class AlarmLogik {
         intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
         alarmIntent = PendingIntent.getBroadcast(c, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
-        AlarmManager alarmMgr = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 
-        alarmMgr.set(AlarmManager.RTC, tidspunkt.getMillis(), alarmIntent);
+
+        alm.set(AlarmManager.RTC, tidspunkt.getMillis(), alarmIntent);
     }
 
     void startAlarmLoop(Context c) {
