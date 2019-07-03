@@ -37,7 +37,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         int id = intent.getExtras().getInt("id", 0);
 
 
-        p("Alarm_Lytter.onRecieve() kaldt. "+ besked);
+        p("onRecieve() kaldt. "+ besked);
 
 
         //Kun til test:

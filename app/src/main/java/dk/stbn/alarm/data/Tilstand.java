@@ -28,7 +28,7 @@ public class Tilstand {
     public boolean boot = false; //Er appen startet af boot-lytteren
 
     public SharedPreferences pref;
-    A a;
+
 
 
 
@@ -53,7 +53,6 @@ public class Tilstand {
     private Tilstand(Context c) {
         masterDato = new DateTime();
         p("Masterdato: "+masterDato);
-        a = A.a;
         pref = PreferenceManager.getDefaultSharedPreferences(c);
         modenhed = opdaterModenhed();
         p("Global modenhed efter opdaterModenhed: " + modenhed);

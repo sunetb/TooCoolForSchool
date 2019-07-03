@@ -24,7 +24,7 @@ import dk.stbn.alarm.data.Util;
 
 public class Kontakt extends AppCompatActivity implements View.OnClickListener {
 
-    A a = A.a;
+
 
     Button send;
 

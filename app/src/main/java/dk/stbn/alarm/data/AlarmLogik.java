@@ -213,13 +213,16 @@ public class AlarmLogik {
         PendingIntent alarmIntent;
 
         Intent intent = new Intent(c, Alarm_Lytter.class);
-
-        int id = tidspunkt.getMillis() >= Integer.MAX_VALUE ? (int) tidspunkt.getMillis()/2000000000 : (int) tidspunkt.getMillis();
+        p("millis: "+ tidspunkt.getMillis());
+        int id = lavIntId(tidspunkt.getMillis());
         p("id: "+id);
         String action = ""+tidspunkt.toLocalDate();
-        intent.putExtra("tag", evtBesked)
-        .putExtra("id", id);
-        p("AlarmLytter.sætAlarm() dato: "+action);
+
+        intent
+                .putExtra("tag", evtBesked)
+                .putExtra("id", id);
+
+        p("sætAlarm() dato: "+action);
         intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
         alarmIntent = PendingIntent.getBroadcast(c, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -230,7 +233,6 @@ public class AlarmLogik {
 
     void startAlarmLoop(Context c) {
         Tilstand t = Tilstand.getInstance(c);
-
 
         if (t.femteDagFørsteGang || t.boot || t.modenhed == K.SOMMERFERIE) {
 
@@ -245,6 +247,13 @@ public class AlarmLogik {
         }
     }
 
+    private int lavIntId (long l) {
+
+        while(l >= Integer.MAX_VALUE) l= l/1000;
+
+        return (int) l;
+
+    }
     void p (Object o){
         Util.p("AlarmLogik."+o);
     }

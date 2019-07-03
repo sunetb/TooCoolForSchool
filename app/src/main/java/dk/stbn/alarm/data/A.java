@@ -28,7 +28,7 @@ import io.fabric.sdk.android.Fabric;
  */
 public class A extends Application implements Observatør {
 
-    public static A a;
+    //public static A a;
     public SharedPreferences pref;
     public Lyttersystem lytter;
     static AlarmManager alm; //TVM
@@ -135,7 +135,7 @@ public class A extends Application implements Observatør {
 
         Util.starttid = System.currentTimeMillis();
 
-        a = this;
+        //a = this;
         pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         lytter = Lyttersystem.getInstance();

@@ -33,6 +33,7 @@ public class IO {
                 input = new ObjectInputStream(new FileInputStream(directory+ File.separator + filename));
                 mitObj = input.readObject();
                 input.close();
+                p("succes hentet: "+filename);
             } catch (StreamCorruptedException e) {
                 e.printStackTrace();
             } catch (FileNotFoundException e) {
@@ -44,7 +45,7 @@ public class IO {
                 e.printStackTrace();
             }
         }
-        p("succes hentet: "+filename);
+
 
         return mitObj;
     }
@@ -68,6 +69,7 @@ public class IO {
                     out = new ObjectOutputStream(new FileOutputStream(directory+ File.separator + filnavn));
                     out.writeObject(mitObj);
                     out.close();
+                    p("gemt: "+filnavn);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -76,7 +78,7 @@ public class IO {
             }
         });
 
-        p("gemt: "+filnavn);
+
     }
 
     public static void føjTilGamle(int id_int, Context c){

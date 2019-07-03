@@ -41,7 +41,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     PagerAdapter pa;
     ViewPager vp;
-    A a;
+
     SharedPreferences prefs;
     ImageButton frem, tilbage, del, kontakt, extras;
     ViewPager.OnPageChangeListener sideLytter;
@@ -60,9 +60,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         getSupportActionBar().setIcon(R.drawable.cool_nobkgr_50x50_rund);
 
         p("%%%%%%%%%%%%%%%%%%%%%%% oncreate() kaldt  %%%%%%%%%%%%%%%%%%%%%%%");
-        a = A.a;
-        prefs = a.pref;
+
+
         tilstand = Tilstand.getInstance(getApplicationContext());
+        prefs = tilstand.pref;
         tl = Tekstlogik.getInstance(this);
 
         p(" idag er: "+ tilstand.masterDato.getDayOfMonth() + ": " + tilstand.masterDato.getMonthOfYear() + " - "+ tilstand.masterDato.getYear());
@@ -275,7 +276,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         }
         else {
-            a.lytter.lyt(this);
+            Lyttersystem.getInstance().lyt(this);
             vp.addOnPageChangeListener(sideLytter);
             if (tilstand.debugging) pa.notifyDataSetChanged(); //lidt groft ?
             visPosition = prefs.getInt("senesteposition", vp.getCurrentItem());
@@ -295,7 +296,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-        a.lytter.afregistrer(this);
+        Lyttersystem.getInstance().afregistrer(this);
         vp.removeOnPageChangeListener(sideLytter);
         tilstand.aktivitetenVises = false;
         prefs.edit().putInt("senesteposition", vp.getCurrentItem()).commit();
@@ -498,7 +499,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     p("Sprog ændret til: "+ Locale.getDefault().getLanguage());
-                    a.lytter.givBesked(K.SPROG_ÆNDRET, "Sproglytter");
+                    Lyttersystem.getInstance().givBesked(K.SPROG_ÆNDRET, "Sproglytter");
                 }
 
             };
@@ -517,13 +518,13 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     protected Dialog onCreateDialog(int id){
 
         //kun test:
-        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(2), "Test: 2 min");
+        //AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(1), "Test: 1 min");
 
-        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(4), "Test: 2 min");
+        //AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(4), "Test: 2 min");
 
-        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(6), "Test: 2 min");
+        //AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(6), "Test: 2 min");
 
-        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(8), "Test: 2 min");
+        //AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(8), "Test: 2 min");
 
 
 
@@ -549,12 +550,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                         if (!tl.synligeTekster.contains(valgtHTekst)) {
                             tl.synligeTekster.add(valgtHTekst);
-                            a.lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog");
+                            Lyttersystem.getInstance().givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog");
                             pa.notifyDataSetChanged();
                             vp.setCurrentItem(tl.synligeTekster.size()-1);
                         }
                         else {
-                            vp.setCurrentItem(a.tekstlogik.findTekstnr(valgtHTekst.overskrift));
+                            vp.setCurrentItem(Tekstlogik.getInstance(getApplicationContext()).findTekstnr(valgtHTekst.overskrift));
                         }
                         hListeadapter = null;
                         klikket = true;
