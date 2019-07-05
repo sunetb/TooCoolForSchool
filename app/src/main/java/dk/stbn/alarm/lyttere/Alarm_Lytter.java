@@ -11,6 +11,8 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
+import org.joda.time.DateTime;
+
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.aktivitetFragment.Forside_akt;
 import dk.stbn.alarm.data.AlarmLogik;
@@ -38,7 +40,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
 
         p("onRecieve() kaldt. "+ besked);
-
+        Util.baglog("Alarm_Lytter onRecieve kaldt med besked: "+besked + " id: "+id + " tidspunkt: "+new DateTime(), context);
 
         //Kun til test:
         bygNotifikation(context, besked, "Test", id);

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dk.stbn.alarm">
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -9,12 +10,13 @@
     <application
         android:name=".data.A"
         android:allowBackup="false"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@drawable/cool_nobkgr_71x71"
         android:label="Too Cool For School"
         android:supportsRtl="true"
         android:theme="@style/SortBaggrund"
-        android:fullBackupContent="@xml/backup_descriptor"
         android:usesCleartextTraffic="true">
+        <activity android:name=".aktivitetFragment.LogAktivitet"></activity>
         <activity android:name=".aktivitetFragment.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,6 +42,7 @@
         <receiver android:name=".lyttere.SletNotifikation_Lytter" />
 
         <activity android:name=".aktivitetFragment.Kontakt" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a473bb17c446dada4b78b47051b2b561970908f7" />

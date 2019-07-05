@@ -194,14 +194,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             public void onPageScrollStateChanged(int state) {}
         };
 
-        del.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
 
-
-                return true;
-            }
-        });
 
 
 /*

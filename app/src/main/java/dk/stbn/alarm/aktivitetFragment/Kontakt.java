@@ -131,7 +131,7 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         p("endMail()");
 
         String afstedtekst = besked +"\n\n"+getResources().getString(R.string.hilsen)+"\n"+ navn;
-        if (sendlog.isChecked()) afstedtekst+= ver+"\n\n\n\n"+ A.debugmsg + A.hale;
+        if (sendlog.isChecked()) afstedtekst+= ver+"\n\n\n\n"+ A.debugmsg + Util.getBaglog(getApplicationContext()) + A.hale;
 
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("message/rfc822");

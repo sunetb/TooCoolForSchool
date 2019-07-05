@@ -291,6 +291,11 @@ public class Util {
         p(log);
     }
 
+    public static String getBaglog (Context c){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        String log = "%%%%%%%%%%%%%%%%%%%% Baggrundslog %%%%%%%%%%%%%%%%%%%%\n" + sp.getString("baggrundslog", "");
+        return log;
+    }
 
 
 
