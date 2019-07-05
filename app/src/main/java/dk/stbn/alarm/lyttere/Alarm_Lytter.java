@@ -43,7 +43,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         //Kun til test:
         bygNotifikation(context, besked, "Test", id);
 
-        al.sætAlarm(context, tilstand.masterDato.plusDays(1).withTime(1,0,0,0), "hver nat kl 01");
+        al.sætAlarm(context, tilstand.masterDato.plusDays(1).withTime(1,0,0,0), "loop igang");
 
         //Flyt til anden metode:
 /*

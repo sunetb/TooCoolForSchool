@@ -292,9 +292,6 @@ public class Util {
     }
 
 
-    public static void kørIBaggrund(Runnable r) {
-        new Thread(r).start();
-    }
 
 
 

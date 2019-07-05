@@ -33,6 +33,51 @@ public class AlarmLogik {
         return al;
     }
 
+    public void sætAlarm(Context c, DateTime tidspunkt, String evtBesked){
+        p("sætAlarm() modtog dato: "+tidspunkt);
+        p("nu er "+new DateTime());
+
+        alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+        ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
+        PackageManager pm = c.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+        p("millis: "+ tidspunkt.getMillis());
+        int id = lavIntId(tidspunkt.getMillis());
+        p("id: "+id);
+        String action = ""+tidspunkt.toLocalDate();
+        p("sætAlarm() dato: "+action);
+
+        Intent intentSomSendesMedPendingIntentet = new Intent(c, Alarm_Lytter.class);
+
+        intentSomSendesMedPendingIntentet
+                .putExtra("tag", evtBesked)
+                .putExtra("id", id)
+                .setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(c, 0, intentSomSendesMedPendingIntentet,  PendingIntent.FLAG_CANCEL_CURRENT);
+        alm.set(AlarmManager.RTC, tidspunkt.getMillis(), alarmIntent);
+    }
+
+    void startAlarmLoop(Context c) {
+        p("startAlarmloop kaldt");
+        Tilstand t = Tilstand.getInstance(c);
+
+        if (t.femteDagFørsteGang || t.boot || t.modenhed == K.SOMMERFERIE) {
+
+            //loopet skal kun startes én gang i sommerferien
+            boolean alleredeStartet = t.pref.getBoolean("alarmloop allerede startet", false);
+            t.pref.edit().putBoolean("alarmloop allerede startet", true);
+            if (t.modenhed == K.SOMMERFERIE && alleredeStartet)
+                return;
+
+            p("startAlarmloop sætter alarm til: "+t.masterDato.plusDays(1).withTime(1,0,0,0));
+            sætAlarm(c, t.masterDato.plusDays(1).withTime(1,0,0,0), "loop");
+
+        }
+    }
+
     public void notiBrugt(Context c, Intent intent){
         p("notiBrugt kaldt");
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -202,49 +247,7 @@ public class AlarmLogik {
 
     }
 
-    public void sætAlarm(Context c, DateTime tidspunkt, String evtBesked){
-        alm = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
-        ComponentName receiver = new ComponentName(c, Boot_Lytter.class);
-        PackageManager pm = c.getPackageManager();
 
-        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
-        PendingIntent alarmIntent;
-
-        Intent intent = new Intent(c, Alarm_Lytter.class);
-        p("millis: "+ tidspunkt.getMillis());
-        int id = lavIntId(tidspunkt.getMillis());
-        p("id: "+id);
-        String action = ""+tidspunkt.toLocalDate();
-
-        intent
-                .putExtra("tag", evtBesked)
-                .putExtra("id", id);
-
-        p("sætAlarm() dato: "+action);
-        intent.setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
-        alarmIntent = PendingIntent.getBroadcast(c, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
-
-
-
-        alm.set(AlarmManager.RTC, tidspunkt.getMillis(), alarmIntent);
-    }
-
-    void startAlarmLoop(Context c) {
-        Tilstand t = Tilstand.getInstance(c);
-
-        if (t.femteDagFørsteGang || t.boot || t.modenhed == K.SOMMERFERIE) {
-
-            //loopet skal kun startes én gang i sommerferien
-            boolean alleredeStartet = t.pref.getBoolean("alarmloop allerede startet", false);
-            t.pref.edit().putBoolean("alarmloop allerede startet", true);
-            if (t.modenhed == K.SOMMERFERIE && alleredeStartet)
-                return;
-
-            sætAlarm(c, t.masterDato.plusDays(1).withTime(1,0,0,0), "loop");
-
-        }
-    }
 
     private int lavIntId (long l) {
 
