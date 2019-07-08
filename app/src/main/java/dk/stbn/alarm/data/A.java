@@ -127,6 +127,7 @@ public class A extends Application implements Observatør {
             Fabric.with(getApplicationContext(), new Crashlytics());
             //Util.baglog = true;
             p("Enhed: " + Build.MODEL + "  " + Build.PRODUCT);
+            p("Androidversion: "+Build.VERSION.SDK_INT);
         }
 
 //        FirebaseApp.initializeApp(ctx);
@@ -143,6 +144,17 @@ public class A extends Application implements Observatør {
         alarmlogik = AlarmLogik.getInstance();
         tekstlogik = Tekstlogik.getInstance(getApplicationContext());
 
+
+
+
+        //Nulstil alle data
+        boolean erNulstillet = pref.getBoolean("erNulstillet1",false);
+        if(!erNulstillet){
+            sletAlt();
+
+            pref.edit().putBoolean("erNulstillet1", true).commit();
+
+        }
         init();
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
@@ -167,6 +179,8 @@ public class A extends Application implements Observatør {
 
 
     }
+
+
 
     //Observer-callback
     @Override
@@ -240,14 +254,14 @@ public class A extends Application implements Observatør {
     //-- Kaldes når appen har kørt alle tekster igennnem og skal starte forfra med Otekst1
     void sletAlt() {
         p("sletAlt kaldt");
-        p("er tilstand null? "+ (tilstand == null));
-        if (tilstand == null) tilstand = Tilstand.getInstance(getApplicationContext());
-        else {
-            Tilstand.getInstance(getApplicationContext()).nulstil();
-            tilstand = Tilstand.getInstance(getApplicationContext());
-        }
         sletDiskData();
         pref.edit().putInt("modenhed", K.MODENHED_FØRSTE_DAG).commit();
+        tilstand = null;
+        tilstand = Tilstand.getInstance(getApplicationContext());
+        alarmlogik = null;
+        alarmlogik = AlarmLogik.getInstance();
+        tekstlogik = null;
+        tekstlogik = Tekstlogik.getInstance(getApplicationContext());
 
 
         tekstlogik.synligeTekster.clear();

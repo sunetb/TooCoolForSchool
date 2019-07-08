@@ -132,7 +132,7 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
 
         String afstedtekst = besked +"\n\n"+getResources().getString(R.string.hilsen)+"\n"+ navn;
         if (sendlog.isChecked()) afstedtekst+= ver+"\n\n\n\n"+ A.debugmsg + Util.getBaglog(getApplicationContext()) + A.hale;
-
+        p(Util.getBaglog(getApplicationContext()));
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("message/rfc822");
         i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"sunetb@gmail.com"});
