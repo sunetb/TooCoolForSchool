@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.VisibleForTesting;
 import android.widget.Toast;
 
 
@@ -140,22 +141,32 @@ public class A extends Application implements Observatør {
 
         lytter = Lyttersystem.getInstance();
         lytter.lyt(this);
-        tilstand = Tilstand.getInstance(getApplicationContext());
-        alarmlogik = AlarmLogik.getInstance();
-        tekstlogik = Tekstlogik.getInstance(getApplicationContext());
-
-
-
 
         //Nulstil alle data
-        boolean erNulstillet = pref.getBoolean("erNulstillet1",false);
+        int tæl = 7;
+        boolean erNulstillet = pref.getBoolean("erNulstillet"+tæl,false);
+
         if(!erNulstillet){
             sletAlt();
 
-            pref.edit().putBoolean("erNulstillet1", true).commit();
+            pref.edit().putBoolean("erNulstillet"+tæl, true).commit();
+            p("Data blev nulstillet");
 
         }
-        init();
+
+        else {
+
+
+            tilstand = Tilstand.getInstance(getApplicationContext());
+            alarmlogik = AlarmLogik.getInstance();
+            tekstlogik = Tekstlogik.getInstance(getApplicationContext());
+            init();
+        }
+
+
+
+
+
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
         p("Gemt modenhed: " + pref.getInt("modenhed", -1));
@@ -264,9 +275,9 @@ public class A extends Application implements Observatør {
         tekstlogik = Tekstlogik.getInstance(getApplicationContext());
 
 
-        tekstlogik.synligeTekster.clear();
-        tekstlogik.synligeTekster.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
-        Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE, "nulstillet");
+       // tekstlogik.synligeTekster.clear();
+        //tekstlogik.synligeTekster.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
+        //Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE, "nulstillet");
         tekstlogik.allerFørsteGang(); //her sættes pref modenhed til 1 = FØRSTE DAG
     }
 

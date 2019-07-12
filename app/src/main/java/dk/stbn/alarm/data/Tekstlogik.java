@@ -64,7 +64,7 @@ public class Tekstlogik {
      * Udvælger tekster på baggrund af modenhed og om der er ny version på nettet
      */
     public void udvælgTekster() {
-        int modenhed = Tilstand.getInstance(c).modenhed;
+        int modenhed = t.modenhed;
 
         ArrayList<Tekst> tempSynlige = new ArrayList<>();
 
@@ -75,6 +75,7 @@ public class Tekstlogik {
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_2, c));
             tempSynlige.add((Tekst) IO.læsObj(K.OTEKST_3, c));
             synligeTekster = tempSynlige;
+            lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "udvælgTekster() (Sommerferie)");
             return;
 
         } else if (modenhed == K.MODENHED_HELT_FRISK) {
@@ -170,7 +171,7 @@ public class Tekstlogik {
         if (skift) {
             p("JA. Der er  et nyt udvalg af tekster");
             synligeTekster = tempSynlige;
-            Tilstand.getInstance(c).pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
+            t.pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
             lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "udvælgTekster(), der var et nyt udvalg");
             gemSynligeTekster();
         } else
@@ -251,7 +252,7 @@ public class Tekstlogik {
         ArrayList<Tekst> r = new ArrayList<>();
         ArrayList<Tekst> mtekster = (ArrayList<Tekst>) IO.læsObj(K.MTEKSTER, c);
 
-        Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", Tilstand.getInstance(c).masterDato);
+        Tekst dummyMTekst = new Tekst("DummyOverskrift", "DummyBrødtekst", "m", t.masterDato);
         dummyMTekst.lavId();
         p("Tjek M dummytekst id: " + dummyMTekst.id_int);
 
@@ -272,7 +273,7 @@ public class Tekstlogik {
                         p("Eksakt match Mtekst");
                         r.add(mtekst);
 
-                    } else if (visMtekst(mtekst.dato, Tilstand.getInstance(c).masterDato)) {
+                    } else if (visMtekst(mtekst.dato, t.masterDato)) {
                         r.add(mtekst);
                         p("Mtekst ineksakt match --");
                     }
@@ -533,7 +534,7 @@ public class Tekstlogik {
             is.close();
         } catch (UnknownHostException uhex) {
             uhex.printStackTrace();
-            Lyttersystem.getInstance().givBesked(K.OFFLINE, "hentTeksterOnline()");
+            lytter.givBesked(K.OFFLINE, "hentTeksterOnline()");
         } catch (IOException ex) {
             ex.printStackTrace();
         }

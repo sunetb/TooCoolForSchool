@@ -395,10 +395,18 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 if (skærmvending()) p(opstart+"På grund af skærmvending");
                 else p(opstart+"Genstartet af systemet eller brugeren");
             }
-            else {
+            else if (true) {
+                ///OBS KUN I TESTFASEN HUSK AT SLETTE if true RETURN*!!!!!!!!!!!!!!!!!!!
+                return;
+            }
+                    else{
                 int id = startBundle.getInt("id_int");
 
                 p(opstart+" NOTIFIKATION: "+ startBundle.getString("overskrift") + "id_int: "+id);
+
+
+
+
                 IO.føjTilGamle(id,this);
 
                 int husk = -1;
@@ -421,8 +429,11 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     p("FEJL: Teksten fra notifikationen fandtes ikke i synligeTekster! ID: "+id);
                     if (id != 0) {
                         Tekst t = (Tekst) IO.læsObj(""+id, this);
-                        tl.synligeTekster.add(t);
-                        pa.notifyDataSetChanged();
+                        if (t != null) {
+                            tl.synligeTekster.add(t);
+                            pa.notifyDataSetChanged();
+                        }
+
                         prefs.edit().putInt("senesteposition", tl.synligeTekster.size()-1).commit();
                     }
 
@@ -430,7 +441,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                     //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
 
                 }
-                //Util.baglog("Forside.tjekOpstartsType(): Startet fra noti: "+ id + " " +startBundle.getString("overskrift"), this);
+                Util.baglog("tjekOpstartsType(): Startet fra noti: "+ id + " " +startBundle.getString("overskrift"), this);
             }
         }
     }
@@ -527,7 +538,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
         //AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(6), "Test: 2 min");
 
-        //AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(8), "Test: 2 min");
+        p("Tester alarmflow: sætter alarm om 2 min");
+        AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(2), "Test: 2 min");
 
 
 
