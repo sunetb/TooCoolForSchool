@@ -16,6 +16,7 @@ import org.joda.time.DateTime;
 import dk.stbn.alarm.R;
 import dk.stbn.alarm.aktivitetFragment.Forside_akt;
 import dk.stbn.alarm.data.AlarmLogik;
+import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 
@@ -27,13 +28,15 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
     AlarmLogik al;
     Tilstand tilstand;
+    Tekstlogik t;
 
-//Kun static under test!!
-    final String NOTIFICATION_CHANNEL_ID = "4565";
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
         al = AlarmLogik.getInstance();
+        t = Tekstlogik.getInstance(context);
+
         tilstand = Tilstand.getInstance(context);
         String besked = intent.getExtras().getString("tag", "Fejl");
         int id = intent.getExtras().getInt("id", 0);
@@ -43,7 +46,7 @@ public class Alarm_Lytter extends BroadcastReceiver {
         Util.baglog("Alarm_Lytter onRecieve kaldt med besked: "+besked + " id: "+id + " tidspunkt: "+new DateTime(), context);
 
         //Kun til test:
-        bygNotifikation(context, besked, "Test", id);
+       // bygNotifikation(context, besked, "Test", id);
 
         al.sætAlarm(context, tilstand.masterDato.plusDays(1).withTime(1,0,0,0), "loop igang");
 
@@ -61,13 +64,6 @@ public class Alarm_Lytter extends BroadcastReceiver {
     }
 
 
-    ////////////////////////////OVERVEJ LIGE IGEN:::::::
-    //Nu er chancen for at få opdelt logikke mere meningsfuldt
-    //En ide:
-    //Alarmlogik
-    //Tekstlogik
-    //Tilstand
-    //
 
     /*
     void tjekNyTekst(Context c){
@@ -188,80 +184,6 @@ public class Alarm_Lytter extends BroadcastReceiver {
 
 
     //Kun static under test!!
-    public void bygNotifikation (Context context, String overskrift, String id, int id_int) {
-        //opdateret i henhold til https://stackoverflow.com/questions/44489657/android-o-reporting-notification-not-posted-to-channel-but-it-is
-
-        //NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-/*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-*/
-        p("bygnotifikation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
-        //Util.baglog("Notifikation bygget: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int, context);
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
-
-        mBuilder
-                .setSmallIcon(R.drawable.cool_nobkgr_71x71)
-                .setContentTitle("Too Cool for School")
-                .setContentText(overskrift)
-                .setAutoCancel(true)
-                .setChannelId(NOTIFICATION_CHANNEL_ID)
-                .setOnlyAlertOnce(true);
-        //ingen effekt: .setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mBuilder.setCategory(Notification.CATEGORY_ALARM);
-        }
-
-
-        Intent resultIntent = new Intent(context, Forside_akt.class);
-        resultIntent.putExtra("overskrift", overskrift);
-        resultIntent.putExtra("tekstId", id);
-        resultIntent.putExtra("id_int", id_int);
-        resultIntent.putExtra("fraAlarm", true);
-        resultIntent.setAction(id); //-- lille hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        //stackBuilder.addParentStack(Forside.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_CANCEL_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        //NotificationManager mNotificationManager =
-          //      (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-        Notification n = mBuilder.build();
-
-        CharSequence name = context.getString(R.string.app_name);
-        String description = "Too Cool for School";
-        int importance = NotificationManager.IMPORTANCE_HIGH;///.IMPORTANCE_DEFAULT;
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance));
-        } else {
-           // notificationManager.notify(id_int, mBuilder.build());
-        }
-        //-- Hvis brugeren sletter notifikationen ved swipe eller tømmer alle notifikationer
-        Intent sletteIntent = new Intent(context, SletNotifikation_Lytter.class);
-        sletteIntent.putExtra("tekstId", id)
-                .putExtra("id_int", id_int);
-        sletteIntent.setAction(id);
-        n.deleteIntent = PendingIntent.getBroadcast(context, 0, sletteIntent, 0);
-
-        notificationManager.notify(id_int, n);
-    }
 
 
     void p (Object o){

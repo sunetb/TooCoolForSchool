@@ -1,27 +1,37 @@
 package dk.stbn.alarm.data;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
+import dk.stbn.alarm.R;
+import dk.stbn.alarm.aktivitetFragment.Forside_akt;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.lyttere.Alarm_Lytter;
 import dk.stbn.alarm.lyttere.Boot_Lytter;
+import dk.stbn.alarm.lyttere.SletNotifikation_Lytter;
 
 public class AlarmLogik {
 
     private static AlarmLogik al;
     private AlarmManager alm;
+    final String NOTIFICATION_CHANNEL_ID = "4565";
 
     AlarmLogik(){
 
@@ -71,6 +81,7 @@ public class AlarmLogik {
         if (t.femteDagFørsteGang || t.boot || t.modenhed == K.SOMMERFERIE) {
 
             //loopet skal kun startes én gang i sommerferien
+            //TODO: OBS visker kun én gang!!! Fix det
             boolean alleredeStartet = t.pref.getBoolean("alarmloop allerede startet", false);
             t.pref.edit().putBoolean("alarmloop allerede startet", true);
             if (t.modenhed == K.SOMMERFERIE && alleredeStartet)
@@ -250,6 +261,71 @@ public class AlarmLogik {
         alm.cancel(i);
 
     }
+
+    public void bygNotifikation (Context context, String overskrift, String id, int id_int) {
+        //opdateret i henhold til https://stackoverflow.com/questions/44489657/android-o-reporting-notification-not-posted-to-channel-but-it-is
+
+
+        p("bygnotifikation modtog: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int);
+        Util.baglog("Notifikation bygget: "+overskrift+ " IDStreng: "+id + " id_int: "+id_int, context);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
+
+        mBuilder
+                .setSmallIcon(R.drawable.cool_nobkgr_71x71)
+                .setContentTitle("Too Cool for School")
+                .setContentText(overskrift)
+                .setAutoCancel(true)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .setOnlyAlertOnce(true);
+        //ingen effekt: .setDeleteIntent(PendingIntent.getActivity(context, 0, sletteIntent, 0))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setCategory(Notification.CATEGORY_ALARM);
+        }
+
+
+        Intent resultIntent = new Intent(context, Forside_akt.class);
+        resultIntent.putExtra("overskrift", overskrift);
+        resultIntent.putExtra("tekstId", id);
+        resultIntent.putExtra("id_int", id_int);
+        resultIntent.putExtra("fraAlarm", true);
+        resultIntent.setAction(id); //-- lille hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        //stackBuilder.addParentStack(Forside.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_CANCEL_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        //NotificationManager mNotificationManager =
+        //      (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+        Notification n = mBuilder.build();
+
+        CharSequence name = context.getString(R.string.app_name);
+        String description = "Too Cool for School";
+        int importance = NotificationManager.IMPORTANCE_HIGH;///.IMPORTANCE_DEFAULT;
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance));
+        }
+
+        //-- Hvis brugeren sletter notifikationen ved swipe eller tømmer alle notifikationer
+        Intent sletteIntent = new Intent(context, SletNotifikation_Lytter.class);
+        sletteIntent.putExtra("tekstId", id)
+                .putExtra("id_int", id_int);
+        sletteIntent.setAction(id);
+        n.deleteIntent = PendingIntent.getBroadcast(context, 0, sletteIntent, 0);
+
+        notificationManager.notify(id_int, n);
+    }
+
 
 
 

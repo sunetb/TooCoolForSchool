@@ -395,17 +395,10 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 if (skærmvending()) p(opstart+"På grund af skærmvending");
                 else p(opstart+"Genstartet af systemet eller brugeren");
             }
-            else if (true) {
-                ///OBS KUN I TESTFASEN HUSK AT SLETTE if true RETURN*!!!!!!!!!!!!!!!!!!!
-                return;
-            }
-                    else{
+            else {
                 int id = startBundle.getInt("id_int");
 
                 p(opstart+" NOTIFIKATION: "+ startBundle.getString("overskrift") + "id_int: "+id);
-
-
-
 
                 IO.føjTilGamle(id,this);
 

@@ -1,8 +1,10 @@
 package dk.stbn.alarm.data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
@@ -38,6 +40,7 @@ public class Tekstlogik {
         this.c = c;
         lytter = Lyttersystem.getInstance();
         t = Tilstand.getInstance(c);
+
     }
 
     public static Tekstlogik getInstance(Context c){
@@ -173,6 +176,7 @@ public class Tekstlogik {
             synligeTekster = tempSynlige;
             t.pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
             lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "udvælgTekster(), der var et nyt udvalg");
+
             gemSynligeTekster();
         } else
             p("NEJ. Vi bruger de cachede tekster");
@@ -182,9 +186,47 @@ public class Tekstlogik {
             for (Tekst t : synligeTekster)
                 IO.føjTilGamle(t.id_int, c);
         }
-
+        tjekForNoti(t.masterDato);
         p("udvælgTekster() færdig");
     }
+
+    void tjekForMNoti(DateTime masterDato) {
+
+    }
+
+    void tjekForNoti(DateTime masterdato) {
+
+        //Har vi allerede tjekket idag?
+        String idag = ""+ Tid.kl00(masterdato);
+
+        String sidstTjekket = t.pref.getString("sidstTjekket", "");
+
+        if (idag.equals(sidstTjekket)) return;
+
+        t.pref.edit().putString("sidstTjekket", sidstTjekket).apply();
+        //
+        ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
+
+        for (Tekst t : synligeTekster){
+            if (t.kategori.equals("i")){
+                if (!gamle.contains(t)) AlarmLogik.getInstance().bygNotifikation(c, t.overskrift, t.id, t.id_int);
+            }
+            else if (t.kategori.equals("m")){
+                if(Tid.syvDageFør(masterdato,t.dato) || Tid.erSammeDato(masterdato, t.dato)) AlarmLogik.getInstance().bygNotifikation(c, t.overskrift, t.id, t.id_int);
+
+            }
+
+        }
+
+
+
+
+
+
+
+
+    }
+
     /**
      * Finder de I-tekster som skal vises idag
      * @return array med tekster

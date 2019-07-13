@@ -29,24 +29,12 @@ import io.fabric.sdk.android.Fabric;
  */
 public class A extends Application implements Observatør {
 
-    //public static A a;
+
     public SharedPreferences pref;
     public Lyttersystem lytter;
     AlarmLogik alarmlogik;
     public Tekstlogik tekstlogik;
-
-//////////---------- TEKSTFRAGMENT/AKTIVITET DATA ----------//////////
-
-
-
-//////////-------------------------//////////
-
-
-//////////---------- APP TILSTAND ----------//////////
-
     public Tilstand tilstand;
-
-//////////-------------------------//////////
 
 
 ////TEST / DEBUGGING////////////////////////////////////////////////
@@ -146,7 +134,7 @@ public class A extends Application implements Observatør {
         int tæl = 7;
         boolean erNulstillet = pref.getBoolean("erNulstillet"+tæl,false);
 
-        if(!erNulstillet){
+        if( ! erNulstillet ){
             sletAlt();
 
             pref.edit().putBoolean("erNulstillet"+tæl, true).commit();
@@ -155,7 +143,6 @@ public class A extends Application implements Observatør {
         }
 
         else {
-
 
             tilstand = Tilstand.getInstance(getApplicationContext());
             alarmlogik = AlarmLogik.getInstance();

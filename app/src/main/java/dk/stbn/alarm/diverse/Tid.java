@@ -31,7 +31,11 @@ public class Tid {
         return efter(denne, start) && før(denne, slut);
     }
 
-    static DateTime kl00(DateTime i){
+    public static DateTime kl00(DateTime i){
         return i.withTime(0,0,0,0);
+    }
+
+    public static boolean syvDageFør(DateTime a, DateTime b) {
+        return erSammeDato(kl00(a).plusDays(7), kl00(b));
     }
 }
