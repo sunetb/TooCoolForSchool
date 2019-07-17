@@ -26,7 +26,6 @@ import org.joda.time.DateTime;
 import java.util.Locale;
 
 import dk.stbn.alarm.R;
-import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.AlarmLogik;
 import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.Tekstlogik;
@@ -591,9 +590,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         dlg.getWindow().setAttributes(lp);
     }
 
-    void p(Object o){
-        String kl = "Forside.";
-        Util.p(kl+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
     void t(String s){
         Util.t(this,s);

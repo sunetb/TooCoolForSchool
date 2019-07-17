@@ -2,6 +2,8 @@ package dk.stbn.alarm.diverse;
 
 import org.joda.time.DateTime;
 
+import dk.stbn.alarm.data.Util;
+
 public class Tid {
 
 
@@ -37,5 +39,10 @@ public class Tid {
 
     public static boolean syvDageFør(DateTime a, DateTime b) {
         return erSammeDato(kl00(a).plusDays(7), kl00(b));
+    }
+
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
 }

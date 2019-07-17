@@ -174,7 +174,7 @@ public class Tilstand {
     }
 
     void p(Object o) {
-        String kl = "Tilstand.";
+        String kl = this.getClass().getSimpleName() + ".";
         Util.p(kl + o);
     }
 

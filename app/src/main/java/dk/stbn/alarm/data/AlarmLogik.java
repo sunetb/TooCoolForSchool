@@ -336,7 +336,8 @@ public class AlarmLogik {
         return (int) l;
 
     }
-    void p (Object o){
-        Util.p("AlarmLogik."+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
 }

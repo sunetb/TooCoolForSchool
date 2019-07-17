@@ -94,9 +94,9 @@ public class Splash extends AppCompatActivity implements Runnable {
         super.finish();
         handler.removeCallbacks(this);
     }
-    void p(Object o){
-        String kl = "Splash.";
-        Util.p(kl+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
 
 

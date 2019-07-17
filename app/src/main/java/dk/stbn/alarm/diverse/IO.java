@@ -95,9 +95,9 @@ public class IO {
 
     }
 
-    static void p(Object o){
-        String kl = "IO.";
-        Util.p(kl+o);
+    static void p(Object o) {
+        String kl = "IO" + ".";
+        Util.p(kl + o);
     }
 
 }

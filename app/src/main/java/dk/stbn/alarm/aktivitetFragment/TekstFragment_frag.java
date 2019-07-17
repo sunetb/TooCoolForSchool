@@ -130,7 +130,8 @@ public class TekstFragment_frag extends Fragment implements View.OnClickListener
 		}
 	}
 
-	void p(Object o){
-		Util.p("TekstFragment."+o);
+	void p(Object o) {
+		String kl = this.getClass().getSimpleName() + ".";
+		Util.p(kl + o);
 	}
 }

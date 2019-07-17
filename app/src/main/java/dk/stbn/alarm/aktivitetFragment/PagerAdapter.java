@@ -43,10 +43,10 @@ public class PagerAdapter extends FragmentPagerAdapter {
         return "";//a.overskrifter.get(position);
     }
 
-    void p (Object o){
-        Util.p("PagerAdapter."+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
-
     /*
     *
     * Skal ind i xml hvis denne skal være aktiv:

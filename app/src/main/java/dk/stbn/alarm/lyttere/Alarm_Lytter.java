@@ -186,8 +186,9 @@ public class Alarm_Lytter extends BroadcastReceiver {
     //Kun static under test!!
 
 
-    void p (Object o){
-        Util.p("Alarm_Lytter."+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
 
 }

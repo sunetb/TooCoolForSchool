@@ -158,10 +158,9 @@ public class Kontakt extends AppCompatActivity implements View.OnClickListener {
         tilSingleton();
 
     }
-    void p(Object o){
-
-        String kl = "Kontakt.";
-        Util.p(kl+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
 
 }

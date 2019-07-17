@@ -58,7 +58,8 @@ public class Lyttersystem {
 
 
 
-    void p(Object o){
-        Util.p("Lyttersystem."+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
 }

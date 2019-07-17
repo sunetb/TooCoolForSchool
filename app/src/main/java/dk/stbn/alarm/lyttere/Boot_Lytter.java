@@ -34,8 +34,9 @@ public class Boot_Lytter extends BroadcastReceiver  {
 
 
 
-    void p (Object o){
-        Util.p("Boot_Lytter."+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
 
 

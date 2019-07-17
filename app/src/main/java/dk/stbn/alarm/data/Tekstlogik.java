@@ -1,10 +1,8 @@
 package dk.stbn.alarm.data;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
@@ -25,7 +23,7 @@ import dk.stbn.alarm.diverse.K;
 import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 
-public class Tekstlogik {
+public class Tekstlogik  {
 
     private static Tekstlogik tl;
     public ArrayList<Tekst> synligeTekster = new ArrayList<>();
@@ -172,14 +170,14 @@ public class Tekstlogik {
 
 
         if (skift) {
-            p("JA. Der er  et nyt udvalg af tekster");
+            p(jn(skift) + " Der er  et nyt udvalg af tekster");
             synligeTekster = tempSynlige;
             t.pref.edit().putInt("senesteposition", -1).commit(); //Sætter ViewPagerens position til nyeste element
             lytter.givBesked(K.SYNLIGETEKSTER_OPDATERET, "udvælgTekster(), der var et nyt udvalg");
 
             gemSynligeTekster();
         } else
-            p("NEJ. Vi bruger de cachede tekster");
+            p(jn(skift) + " Vi bruger de cachede tekster");
 
         if (modenhed < K.MODENHED_TREDJE_DAG){
             //sørg for at der ikke vises notifikationer i starten
@@ -190,12 +188,10 @@ public class Tekstlogik {
         p("udvælgTekster() færdig");
     }
 
-    void tjekForMNoti(DateTime masterDato) {
-
-    }
 
     void tjekForNoti(DateTime masterdato) {
 
+        p("tjekForNoti kaldt");
         //Har vi allerede tjekket idag?
         String idag = ""+ Tid.kl00(masterdato);
 
@@ -203,18 +199,26 @@ public class Tekstlogik {
 
         if (idag.equals(sidstTjekket)) return;
 
+        p("har ikke været kaldt før idag");
+
         t.pref.edit().putString("sidstTjekket", sidstTjekket).apply();
-        //
+
         ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
 
         for (Tekst t : synligeTekster){
             if (t.kategori.equals("i")){
                 if (!gamle.contains(t)) AlarmLogik.getInstance().bygNotifikation(c, t.overskrift, t.id, t.id_int);
+                p("der var en I-noti");
             }
             else if (t.kategori.equals("m")){
-                if(Tid.syvDageFør(masterdato,t.dato) || Tid.erSammeDato(masterdato, t.dato)) AlarmLogik.getInstance().bygNotifikation(c, t.overskrift, t.id, t.id_int);
+                if(Tid.syvDageFør(masterdato,t.dato) || Tid.erSammeDato(masterdato, t.dato)) {
+                    AlarmLogik.getInstance().bygNotifikation(c, t.overskrift, t.id, t.id_int);
+                    p("der var en M-noti");
+                }
 
             }
+            p("ingen ny noti");
+
 
         }
 
@@ -225,6 +229,11 @@ public class Tekstlogik {
 
 
 
+    }
+
+    String jn (boolean b){
+        if (b) return " JA ";
+        return " NEJ ";
     }
 
     /**
@@ -744,7 +753,7 @@ public class Tekstlogik {
             p("Prøvigen() kaldt ");
             allerFørsteGang();
 
-        }, 5000);
+        }, 3000);
 
     }
 
@@ -771,8 +780,7 @@ public class Tekstlogik {
     }
 
     void p(Object o) {
-        String kl = "Tekstlogik.";
+        String kl = this.getClass().getSimpleName() + ".";
         Util.p(kl + o);
     }
-
 }

@@ -291,7 +291,7 @@ public class A extends Application implements Observatør {
     }
 
     void p(Object o) {
-        String kl = "A.";
+        String kl = this.getClass().getSimpleName() + ".";
         Util.p(kl + o);
     }
 

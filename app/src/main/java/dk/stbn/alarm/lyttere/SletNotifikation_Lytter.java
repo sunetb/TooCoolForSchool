@@ -29,8 +29,9 @@ public class SletNotifikation_Lytter extends BroadcastReceiver {
         }
 
 
-    void p (Object o){
-        Util.p("NotifikationSlettet."+o);
+    void p(Object o) {
+        String kl = this.getClass().getSimpleName() + ".";
+        Util.p(kl + o);
     }
 
 }
