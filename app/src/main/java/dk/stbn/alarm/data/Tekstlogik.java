@@ -189,7 +189,7 @@ public class Tekstlogik  {
     }
 
 
-    void tjekForNoti(DateTime masterdato) {
+    public void tjekForNoti(DateTime masterdato) {
 
         p("tjekForNoti kaldt");
         //Har vi allerede tjekket idag?
@@ -219,6 +219,8 @@ public class Tekstlogik  {
             }
             p("ingen ny noti");
 
+            //Kun til test:
+            AlarmLogik.getInstance().bygNotifikation(c, "Testnoti", "hver dag", 123);
 
         }
 

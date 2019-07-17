@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 import dk.stbn.alarm.diverse.K;
@@ -20,15 +21,17 @@ public class Boot_Lytter extends BroadcastReceiver  {
 
        @Override
         public void onReceive(Context context, Intent intent) {
-           SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
 
 
             if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
             {
                 Tilstand tilstand = Tilstand.getInstance(context);
                 tilstand.boot = true;
+                Tekstlogik t = Tekstlogik.getInstance(context);
+                t.tjekForNoti(tilstand.masterDato);
 
-                Util.baglog("Boot_Lytter.onRecieve(): Modenhed = "+ pref.getInt("modenhed", -1), context);
+                Util.baglog("Boot_Lytter.onRecieve(): Modenhed = "+ tilstand.modenhed, context);
             }
         }
 

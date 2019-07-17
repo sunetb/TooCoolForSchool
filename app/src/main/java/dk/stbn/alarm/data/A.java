@@ -4,6 +4,8 @@ import android.app.AlarmManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.VisibleForTesting;
@@ -14,8 +16,10 @@ import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
 
+import dk.stbn.alarm.R;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
+import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
@@ -119,25 +123,35 @@ public class A extends Application implements Observatør {
             p("Androidversion: "+Build.VERSION.SDK_INT);
         }
 
+
 //        FirebaseApp.initializeApp(ctx);
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         Util.starttid = System.currentTimeMillis();
 
-        //a = this;
         pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         lytter = Lyttersystem.getInstance();
         lytter.lyt(this);
 
-        //Nulstil alle data
-        int tæl = 7;
-        boolean erNulstillet = pref.getBoolean("erNulstillet"+tæl,false);
+        //Nulstil alle data ved ny version
+
+
+        PackageInfo pInfo = null;
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String appVersion = pInfo.versionName + "1";
+
+        boolean erNulstillet = pref.getBoolean(appVersion,false);
 
         if( ! erNulstillet ){
             sletAlt();
 
-            pref.edit().putBoolean("erNulstillet"+tæl, true).commit();
+            pref.edit().putBoolean(appVersion, true).commit();
             p("Data blev nulstillet");
 
         }
@@ -150,11 +164,6 @@ public class A extends Application implements Observatør {
             init();
         }
 
-
-
-
-
-
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
         p("Gemt modenhed: " + pref.getInt("modenhed", -1));
     }
@@ -162,7 +171,6 @@ public class A extends Application implements Observatør {
     void init(){
 
         tekstlogik.tjekSprog();
-
 
         if (tilstand.modenhed == K.MODENHED_HELT_FRISK)
             tekstlogik.udvælgTekster();
