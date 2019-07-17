@@ -1,7 +1,10 @@
 package dk.stbn.alarm.diverse;
 
+import android.content.Context;
+
 import org.joda.time.DateTime;
 
+import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
 
 public class Tid {
@@ -23,9 +26,9 @@ public class Tid {
         return kl00(a).isAfter(kl00(b));
     }
 
-    public static boolean fortid (DateTime d){
+    public static boolean fortid (DateTime d, Context c){
 
-        return kl00(d).isBefore(kl00(new DateTime()));
+        return kl00(d).isBefore(kl00(Tilstand.getInstance(c).masterDato));
     }
 
     public static boolean mellem(DateTime denne, DateTime start, DateTime slut )

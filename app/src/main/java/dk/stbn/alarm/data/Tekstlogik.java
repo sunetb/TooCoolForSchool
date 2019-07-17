@@ -82,7 +82,7 @@ public class Tekstlogik  {
         } else if (modenhed == K.MODENHED_HELT_FRISK) {
             p("udvælgTekster() Modenhed: Helt frisk");
             allerFørsteGang();
-            IO.gemObj(new DateTime(), K.MASTERDATO, c);
+            IO.gemObj(t.masterDato, K.MASTERDATO, c);
 
         } else if (modenhed == K.MODENHED_FØRSTE_DAG) {
             p("Dag 1, ikke første gang");

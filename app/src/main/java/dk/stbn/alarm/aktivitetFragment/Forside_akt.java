@@ -360,7 +360,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             extras.getBackground().setAlpha(100);
         }
         else if (event == K.OFFLINE){
-            tl.synligeTekster.add(new Tekst("OFFLINE", "Error: no internet connection. Check yourt settings and try again later", "a", new DateTime()));
+            tl.synligeTekster.add(new Tekst("OFFLINE", "Error: no internet connection. Check your settings and try again later", "a", new DateTime()));
             Lyttersystem.getInstance().givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, ingen netforbindelse");
         }
     }
