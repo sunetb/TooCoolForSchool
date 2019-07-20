@@ -399,7 +399,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
                 p(opstart+" NOTIFIKATION: "+ startBundle.getString("overskrift") + "id_int: "+id);
 
-                IO.føjTilGamle(id,this);
+                IO.føjTilGamle(id,getApplicationContext());
 
                 int husk = -1;
                 for (int i = 0; i < tl.synligeTekster.size(); i++) {

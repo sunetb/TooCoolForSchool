@@ -201,18 +201,23 @@ public class Tekstlogik  {
 
         p("har ikke været kaldt før idag");
 
-        t.pref.edit().putString("sidstTjekket", sidstTjekket).apply();
+        t.pref.edit().putString("sidstTjekket", idag).apply();
 
         ArrayList<Integer> gamle = (ArrayList<Integer>) IO.læsObj("gamle", c);
 
         for (Tekst t : synligeTekster){
             if (t.kategori.equals("i")){
                 if (!gamle.contains(t)) AlarmLogik.getInstance().bygNotifikation(c, t.overskrift, t.id, t.id_int);
+                IO.føjTilGamle(t.id_int, c);
                 p("der var en I-noti");
             }
             else if (t.kategori.equals("m")){
+                String overskrift = t.overskrift;
+                if(Tid.syvDageFør(masterdato,t.dato)) overskrift = "Om en uge: "+overskrift;
+
                 if(Tid.syvDageFør(masterdato,t.dato) || Tid.erSammeDato(masterdato, t.dato)) {
-                    AlarmLogik.getInstance().bygNotifikation(c, t.overskrift, t.id, t.id_int);
+                    AlarmLogik.getInstance().bygNotifikation(c, overskrift, t.id, t.id_int);
+
                     p("der var en M-noti");
                 }
 
@@ -221,6 +226,7 @@ public class Tekstlogik  {
 
             //Kun til test:
             AlarmLogik.getInstance().bygNotifikation(c, "Testnoti", "hver dag", 123);
+
 
         }
 

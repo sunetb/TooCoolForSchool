@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import dk.stbn.alarm.data.AlarmLogik;
 import dk.stbn.alarm.data.Tekstlogik;
 import dk.stbn.alarm.data.Tilstand;
 import dk.stbn.alarm.data.Util;
@@ -30,7 +31,6 @@ public class Boot_Lytter extends BroadcastReceiver  {
                 tilstand.boot = true;
                 Tekstlogik t = Tekstlogik.getInstance(context);
                 t.tjekForNoti(tilstand.masterDato);
-
                 Util.baglog("Boot_Lytter.onRecieve(): Modenhed = "+ tilstand.modenhed, context);
             }
         }

@@ -1,0 +1,42 @@
+o	Overblik
+o	FIND OG BRUG STILLE BESKÆFTIGELSER
+o	SOMMERFERIE
+
+
+m1908	Verdens humanitærdag
+i2508	Lektier
+i709	FIND EN HJÆLPER I KLASSEN
+m1109	World trade center. Den 11. september.
+i1409	MÆRKEDAGE
+i2809	ØVELSE GØR MESTER
+m0110	Vegetardag.Den 1. oktober
+i510	EN LÆRERS ERFARINGER
+m1710	International dag for udryddelse af fattigdom.Den 17. oktober.
+i1910	GØR SOM OM
+i2610	KONFIRMATIONEN
+i211	VÆR MINIMAL AKTIV I TIMERNE (IND I MELLEM)
+i911	ET MINIMUM AF SPØRGSMÅL
+m1411	Diabetis.Den 14. november.
+i2311	DEN  MUNDTLIGE EKSAMEN
+m2911	International solidaritetsdag for det palestinensiske folk.   Den 29. november
+m0112	Aids-dag. Den 1. december
+i712	DEN SKRIFTLIGE EKSAMEN
+m1012	Menneskerettighedsdag. Den 10. december.
+i1412	Spil med, hvis læreren uopfordret spørger dig
+i401	Snak bare læreren efter munden på den effektive måde.
+i1101	Spejling
+m2101	International Krammedag.Den 21. januar.
+i2501	Det læreren gerne vil høre.
+i802	Øjenkontakt kan undgås.
+m1402	VALENTINSDAG Den 14. februar
+i2302	Koma eller koncentration
+m803	INTERNATIONAL KVINDEDAG. Den 8. marts.
+i1403	Kommentar
+i404	DIN LÆRER
+m0704	VERDENS SUNDHEDSDAG. Den 7. april.
+i1804	Lærerens hitliste kan være god at have
+i205	Hvis du smiler til din lærer
+m0205	INTERNATIONAL DAG FOR LOVLIGGØRELSE AF MARIHUANA. Den 2. maj.
+i1705	Sid roligt mens du lytter
+i3005	Tak for din medvirken
+m3105	RØGFRI DAG. Den 31. maj.
