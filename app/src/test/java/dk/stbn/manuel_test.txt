@@ -1,0 +1,123 @@
+Frisk inst 1. aug:
+	Testnoti ses.
+	Kun Otekst1 ses.
+	Luk på Tilbageknap og tryk på noti:
+		Kun Otekst1.
+	Swipe ud af ram og start:
+!		Otekst 1 + 2 + 3
+
+Ud af ram, 2. aug, start:
+!	Ingen testnoti (måske ventede jeg ikke længe nok)
+	Otekst 1 + 2 + 3.
+
+Ud af ram, 3. aug:
+	Testnoti
+	Start: Otekst 1 + 2 + 3
+
+Ud af ram, 4. aug:
+	Testnoti
+	Start: Otekst 1 + 2 + 3
+
+Ud af ram, 5. aug:
+	Testnoti
+	Start: Otekst 1 + 2 + 3
+
+Ud af ram, 10. aug:
+(!)	Ingen noti
+	Start:
+		Otekst 1 + 2 + Lektier
+		Testnoti ses
+		Lektier noti ses
+	Swipe begge noti
+Log: modenhed efter opdaterModenhed: 0
+
+*Tjek om det er fordi sletAlt bliver kaldt
+
+Ud af ram, 11. aug:
+(!)	Ingen noti
+	Start:
+!		Otekst1
+(!)		Ingen noti
+	Ud af ram, start:
+		Otekst1
+Log: modenhed efter opdaterModenhed: 1
+
+
+Ud af ram, 11. aug:
+	Testnoti efter laaang tid!
+	Tryk på noti:
+	    Otekst 1 + 2
+
+Ud af ram, 13. aug:
+    Testnoti efter laaang tid!
+    Tryk på noti:
+    	    Otekst 1 + 2 + Lektier
+    Ingen Mtekst og ingen M-noti
+!   Burde vise m1908 Verdens humanitærdag
+*Min fejl: Jeg kom til at springe den 12 aug over. (test igen med skiftet 11-12 aug)
+
+Ud af ram, 14. aug:
+    Testnoti
+!   Noti for Lektier (Lektiers dato er 25. aug og teksten var ny igår)
+*Datoen ignoreres nu hvor vi kigger på synligetekster. Men kommer tjekket for sent?
+    Tryk på noti:
+        	    Otekst 1 + 2 + Lektier
+
+Ud af ram, 15. aug:
+!   Noti for Lektier
+    Testnoti
+    Tryk på testnoti:
+        Otekst 1 + 2 + Lektier
+(!)        Teksten m1908 Verdens humanitærdag ses, men ikke noti
+
+*Først idag at er appen moden, måske derfor M-tekst først vises nu?
+
+Ud af ram, tryk på Lektier-noti:
+    Otekst 1 + 2 + Lektier + Teksten m1908 Verdens humanitærdag
+
+Ud af ram, 16. aug, start:
+    Testnoti
+!!  Noti for Lektier
+*vises selv om der er blevet trykket på den
+    Otekst 1 + 2 + Lektier + Teksten m1908 Verdens humanitærdag
+Swipe Lektier-noti
+
+Ud af ram, 17. aug, start:
+    Testnoti
+!!  Noti for Lektier
+*vises selv om den er blevet slettet
+    Otekst 1 + 2 + Lektier + Teksten m1908 Verdens humanitærdag
+
+Ud af ram, 18. aug, start:
+    Testnoti
+!!  Noti for Lektier
+    Otekst 1 + 2 + Lektier + Teksten m1908 Verdens humanitærdag
+
+Ud af ram, 19. aug,
+    Testnoti
+!!  Noti for Lektier
+    Noti for m1908 Verdens humanitærdag
+    Otekst 1 + 2 + Lektier + Teksten m1908 Verdens humanitærdag
+
+Ud af ram, 20. aug, start
+    Otekst 1 + 2 + Lektier
+    (fik fumlet lidt og glemte at slette noti inden jeg skiftede dato, måske vistes Lektier?)
+
+Ud af ram, 31. aug, start
+    Testnoti
+!!  Noti for Lektier
+
+Ud af ram, 7 sept
+    Testnoti
+!!! Noti for Lektier
+!   Ikke noti for i709	FIND EN HJÆLPER I KLASSEN
+*glemte at se om selve tesksten vises
+!   Viser ikke m1109	World trade center. Den 11. september.
+
+Ud af ram, 8 sept, start
+!   Ingen noti
+    Otekst 2 + Lektier + FIND EN HJÆLPER + m1109	World trade center. Den 11. september.
+
+////////////////////
+Overvejelse:
+Det giver ikke så meget mening at notifikationer vises idet appen starter op..
