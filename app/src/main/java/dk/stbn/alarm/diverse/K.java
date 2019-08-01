@@ -61,7 +61,7 @@ public class K {
 
     //Datoer
     public static final DateTime SOMMERFERIE_START = new DateTime().withDayOfMonth(8).withMonthOfYear(6);
-    public static final DateTime SOMMERFERIE_SLUT =  new DateTime().withDayOfMonth(12).withMonthOfYear(8);
+    public static final DateTime SOMMERFERIE_SLUT =  new DateTime().withDayOfMonth(10).withMonthOfYear(8);
 
     //Filnavne
     public static final String OTEKST_1 = "otekst1";
