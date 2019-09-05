@@ -26,6 +26,7 @@ import org.joda.time.DateTime;
 import java.util.Locale;
 
 import dk.stbn.alarm.R;
+import dk.stbn.alarm.data.A;
 import dk.stbn.alarm.data.AlarmLogik;
 import dk.stbn.alarm.data.Tekst;
 import dk.stbn.alarm.data.Tekstlogik;
@@ -195,7 +196,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
 
 
+        del.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                testDialog(A.debugmsg, "log");
 
+                return true;
+            }
+        });
 /*
         // -- DEBUGGING
         if (tilstand.debugging) {
