@@ -13,6 +13,19 @@ public class K {
     public static final int MODENHED_MODEN       = 5;
     public static final int SOMMERFERIE          = 6;
 
+    public static String modenhed(int m){
+        switch (m){
+            case 0: return "MODENHED_HELT_FRISK";
+            case 1: return "MODENHED_FØRSTE_DAG";
+            case 2: return "MODENHED_ANDEN_DAG";
+            case 3: return "MODENHED_TREDJE_DAG";
+            case 4: return "MODENHED_FJERDE_DAG";
+            case 5: return "MODENHED_MODEN";
+            case 6: return "SOMMERFERIE";
+        }
+        return "FEJL: Ugyldig modenhed: "+m;
+    }
+
     //Lyttersystem
     public static final int SYNLIGETEKSTER_OPDATERET = 1;
     public static final String ET = "SYNLIGETEKSTER_OPDATERET";
