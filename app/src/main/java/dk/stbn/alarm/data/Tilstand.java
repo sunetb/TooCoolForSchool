@@ -151,10 +151,11 @@ public class Tilstand {
         return K.MODENHED_MODEN;
     }
 
-    void gemModenhed(int værdi) {
+    public void gemModenhed(int værdi) {
         pref.edit().putInt(MODENHED, værdi).commit();
         p("gemModenhed() kaldt med værdi: " + værdi);
     }
+
 
 
 

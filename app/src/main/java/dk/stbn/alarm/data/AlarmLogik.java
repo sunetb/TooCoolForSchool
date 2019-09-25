@@ -47,7 +47,7 @@ public class AlarmLogik {
         p("sætAlarm() modtog dato: "+tidspunkt);
         p("nu er "+new DateTime());
 
-        Util.baglog("sætAlarm kaldt med "+ evtBesked + " Nu: "+new DateTime(), c);
+        Util.baglog("sætAlarm() kaldt med "+ evtBesked + " Nu: "+new DateTime(), c);
         Util.baglog("Alarmtid: "+tidspunkt, c);
 
 

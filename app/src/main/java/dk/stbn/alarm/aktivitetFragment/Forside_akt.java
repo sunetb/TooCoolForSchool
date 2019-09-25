@@ -212,6 +212,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 return true;
             }
         });
+        extras.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                tilstand.gemModenhed(tilstand.modenhed+1);
+
+                return true;
+            }
+        });
 /*
         // -- DEBUGGING
         if (tilstand.debugging) {
