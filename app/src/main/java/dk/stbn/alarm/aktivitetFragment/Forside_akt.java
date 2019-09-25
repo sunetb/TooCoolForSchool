@@ -513,11 +513,11 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 .setMessage("Appen tvinges til lukning")
                 .setCancelable(true)
                 .setNegativeButton("Fortryd", (dialog, id) -> {
-                    System.exit(0);
+                    dialog.cancel();
                 })
                 .setPositiveButton("OK", (dialog, id) -> {
+                    System.exit(0);
 
-                    dialog.cancel();
                 });
 
         AlertDialog alertDialog = alertDialogBuilder.create();

@@ -136,7 +136,6 @@ public class A extends Application implements Observatør {
 
         //Nulstil alle data ved ny version
 
-
         PackageInfo pInfo = null;
         try {
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -144,15 +143,20 @@ public class A extends Application implements Observatør {
             e.printStackTrace();
         }
 
-        String appVersion = pInfo.versionName + "1";
+        String appVersion = pInfo.versionName;
 
         boolean erNulstillet = pref.getBoolean(appVersion,false);
 
         if( ! erNulstillet ){
+            int tempModenhed = tilstand.modenhed;
             sletAlt();
 
-            pref.edit().putBoolean(appVersion, true).commit();
-            p("Data blev nulstillet");
+            pref.edit()
+                    .putInt("modenhed", tempModenhed)
+                    .putBoolean(appVersion, true).commit();
+
+            tilstand.gemModenhed(tempModenhed);
+            p(" Der er installeret en ny version af appen og data blev nulstillet");
 
         }
 
@@ -165,7 +169,7 @@ public class A extends Application implements Observatør {
         }
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
-        p("Gemt modenhed: " + pref.getInt("modenhed", -1));
+        p("Gemt modenhed: " + K.modenhed(pref.getInt("modenhed", -1)));
     }
 
     void init(){

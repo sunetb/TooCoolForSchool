@@ -13,6 +13,8 @@ public class K {
     public static final int MODENHED_MODEN       = 5;
     public static final int SOMMERFERIE          = 6;
 
+
+
     public static String modenhed(int m){
         switch (m){
             case 0: return "MODENHED_HELT_FRISK";
