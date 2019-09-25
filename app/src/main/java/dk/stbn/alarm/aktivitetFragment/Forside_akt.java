@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 
@@ -216,10 +217,12 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             @Override
             public boolean onLongClick(View v) {
                 tilstand.gemModenhed(tilstand.modenhed+1);
-
+                Toast.makeText(getApplicationContext(), "TESTFUNKTION: gemt modenhed sat til "+(tilstand.modenhed+1) + " "+K.modenhed(tilstand.modenhed+1), Toast.LENGTH_LONG).show();
+                killDialog();
                 return true;
             }
         });
+
 /*
         // -- DEBUGGING
         if (tilstand.debugging) {
@@ -490,9 +493,31 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 .setCancelable(false)
                 .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
-                        prefs.edit().putBoolean("vistestdialog", false).commit();
+                        //prefs.edit().putBoolean("vistestdialog", false).commit();
                         dialog.cancel();
                     }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.show();
+    }
+
+    //kun til test
+    private void killDialog () {
+
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Hård lukning?");
+        alertDialogBuilder
+                .setMessage("Appen tvinges til lukning")
+                .setCancelable(true)
+                .setNegativeButton("Fortryd", (dialog, id) -> {
+                    System.exit(0);
+                })
+                .setPositiveButton("OK", (dialog, id) -> {
+
+                    dialog.cancel();
                 });
 
         AlertDialog alertDialog = alertDialogBuilder.create();
