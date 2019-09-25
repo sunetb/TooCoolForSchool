@@ -204,6 +204,14 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 return true;
             }
         });
+        kontakt.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                testDialog(Util.getBaglog(getApplicationContext()), "BagLog");
+
+                return true;
+            }
+        });
 /*
         // -- DEBUGGING
         if (tilstand.debugging) {
@@ -470,7 +478,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle(overskrift);
         alertDialogBuilder
-                .setMessage(besked)
+                .setMessage(Html.fromHtml(besked))
                 .setCancelable(false)
                 .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {

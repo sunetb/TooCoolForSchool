@@ -28,7 +28,7 @@ public class Util {
         return (double) (System.currentTimeMillis()-starttid)/1000.0;
     }
 
-    public static boolean baglog = false; //Kun til test
+    public static boolean baglog = true; //Kun til test
 
 
     /**
