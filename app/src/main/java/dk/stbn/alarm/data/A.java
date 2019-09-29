@@ -145,10 +145,10 @@ public class A extends Application implements Observatør {
 
         String appVersion = pInfo.versionName;
 
-        boolean erNulstillet = pref.getBoolean(appVersion,false);
+/*        boolean erNulstillet = pref.getBoolean(appVersion,true);
 
         if( ! erNulstillet ){
-            int tempModenhed = tilstand.modenhed;
+            int tempModenhed = tilstand.getInstance(getApplicationContext()).modenhed;
             sletAlt();
 
             pref.edit()
@@ -161,12 +161,12 @@ public class A extends Application implements Observatør {
         }
 
         else {
-
+*/
             tilstand = Tilstand.getInstance(getApplicationContext());
             alarmlogik = AlarmLogik.getInstance();
             tekstlogik = Tekstlogik.getInstance(getApplicationContext());
             init();
-        }
+  //      }
 
         p("oncreate() færdig. tilstand.modenhed: (0=frisk, 1=første, 2=anden...) " + tilstand.modenhed);
         p("Gemt modenhed: " + K.modenhed(pref.getInt("modenhed", -1)));

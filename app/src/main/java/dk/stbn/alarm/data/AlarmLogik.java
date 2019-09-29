@@ -33,7 +33,7 @@ public class AlarmLogik {
     private AlarmManager alm;
     final String NOTIFICATION_CHANNEL_ID = "4565";
 
-    AlarmLogik(){
+    private AlarmLogik(){
 
     }
 
