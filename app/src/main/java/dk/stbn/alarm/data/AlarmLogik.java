@@ -71,7 +71,12 @@ public class AlarmLogik {
                 .setAction(action); //Fjollet hack som gør at det bliver forskellige intents hvis det er to notifikationer samtidig
 
         PendingIntent alarmIntent = PendingIntent.getBroadcast(c, 0, intentSomSendesMedPendingIntentet,  PendingIntent.FLAG_CANCEL_CURRENT);
-        alm.set(AlarmManager.RTC, tidspunkt.getMillis(), alarmIntent);
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            alm.setAndAllowWhileIdle(AlarmManager.RTC, tidspunkt.getMillis(), alarmIntent);
+        } else {
+            alm.set(AlarmManager.RTC, tidspunkt.getMillis(), alarmIntent);
+        }
     }
 
     void startAlarmLoop(Context c) {
