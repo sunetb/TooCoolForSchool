@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 
 import dk.stbn.alarm.R;
@@ -53,8 +55,6 @@ public class A extends Application implements Observatør {
 //////////-------------------------//////////
 
 
-    //DatabaseReference myRef;
-
     /*-----------------------------noter
 
     Tjekke om rækkefølgen har betydning
@@ -93,12 +93,6 @@ public class A extends Application implements Observatør {
     * MEn hvvordan gør den hvis appen allerede er åben og der alarmmodtageren kaldes?
     * Kan muligivs løses med lyttersystem..
     *
-    Refactoring
-    *
-    *
-
-
-
 
 
     Vi kan ikke teste noti-loop i sommerferien fordi modehed går fra 0 til 6.
@@ -114,19 +108,18 @@ public class A extends Application implements Observatør {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        p("%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%");
         p("%_%_%_%_%_%_%_%_%_%_%_% oncreate() kaldt  %_%_%_%_%_%_%_%_%_%_%_%");
+        p("%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%");
+
         boolean EMULATOR = Build.PRODUCT.contains("sdk") || Build.MODEL.contains("Emulator");
         if (!EMULATOR) {
             Fabric.with(getApplicationContext(), new Crashlytics());
-            //Util.baglog = true;
+            Util.baglog = true;
             p("Enhed: " + Build.MODEL + "  " + Build.PRODUCT);
             p("Androidversion: "+Build.VERSION.SDK_INT);
         }
-
-
-//        FirebaseApp.initializeApp(ctx);
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
-
         Util.starttid = System.currentTimeMillis();
 
         pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

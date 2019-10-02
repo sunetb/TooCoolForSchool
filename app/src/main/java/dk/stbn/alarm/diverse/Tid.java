@@ -67,4 +67,9 @@ public class Tid {
         p("test af syvdagefør slut");
 
     }
+
+    public static String kortTid(DateTime d){
+
+        return ""+d.toLocalDate() + " "+ d.getHourOfDay()+ ":" + d.getMinuteOfHour();
+    }
 }
