@@ -134,7 +134,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 startActivity(i);
             }
 
-        } else if (v == kontakt) {
+        }
+        else if (v == kontakt) {
             if (tilstand.testtilstand) {
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -170,15 +171,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         kontakt = (ImageButton) findViewById(R.id.redigerFeedback);
         kontakt.setOnClickListener(this);
 
-
-        if (tilstand.debugging) {
-
-        }
         extras = (ImageButton) findViewById(R.id.extras);
         extras.setOnClickListener(this);
-        if (tilstand.debugging) {
 
-        }
         if (!tilstand.hteksterKlar) {
             extras.setEnabled(false);
             extras.getBackground().setAlpha(100);
@@ -195,8 +190,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             public void onPageScrollStateChanged(int state) {}
         };
 
-
-
+ // Long-klik til testfunktioner
         del.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -205,6 +199,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 return true;
             }
         });
+
         kontakt.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -213,12 +208,13 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 return true;
             }
         });
+
         extras.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 tilstand.gemModenhed(tilstand.modenhed+1);
                 Toast.makeText(getApplicationContext(), "TESTFUNKTION: gemt modenhed sat til "+(tilstand.modenhed+1) + " "+K.modenhed(tilstand.modenhed+1), Toast.LENGTH_LONG).show();
-                killDialog();
+                dræberDialog();
                 return true;
             }
         });
@@ -288,7 +284,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
 
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -302,7 +297,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 }
             }, 110);
             finish();
-
         }
         else {
             Lyttersystem.getInstance().lyt(this);
@@ -315,11 +309,9 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             if (visPosition >= tl.synligeTekster.size()) visPosition = -1;
             if (visPosition == -1) visPosition = tl.synligeTekster.size() - 1;
             p("onstart visposition efter tjek: "+visPosition);
-
             vp.setCurrentItem(visPosition);
             knapstatus(visPosition, "onStart()");
         }
-
     }
 
     @Override
@@ -329,7 +321,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         vp.removeOnPageChangeListener(sideLytter);
         tilstand.aktivitetenVises = false;
         prefs.edit().putInt("senesteposition", vp.getCurrentItem()).commit();
-
     }
 
     public void knapstatus (int nu, String kaldtFra) {
@@ -372,10 +363,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
             pa.notifyDataSetChanged();
             vp.setCurrentItem(tl.synligeTekster.size()-1);
             knapstatus(tl.synligeTekster.size()-1, " opdater()");
-             new Handler().postDelayed(() -> {
-
-             }, 10);
-
         }
         else if (event == K.HTEKSTER_OPDATERET){
             if (hListeadapter != null) hListeadapter.notifyDataSetChanged();
@@ -452,13 +439,8 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                             tl.synligeTekster.add(t);
                             pa.notifyDataSetChanged();
                         }
-
                         prefs.edit().putInt("senesteposition", tl.synligeTekster.size()-1).commit();
                     }
-
-                   // vp.setCurrentItem(husk);
-                    //knapstatus(a.synligeTekster.size()-1, "tjekOpstartstype()");
-
                 }
                 Util.baglog("tjekOpstartsType(): Startet fra noti: "+ id + " " +startBundle.getString("overskrift"), this);
             }
@@ -504,7 +486,7 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
     }
 
     //kun til test
-    private void killDialog () {
+    private void dræberDialog() {
 
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -558,14 +540,13 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
                 }
 
             };
-
             IntentFilter filter = new IntentFilter(Intent.ACTION_LOCALE_CHANGED);
             registerReceiver(mLangReceiver, filter);
             p("Sproglytter oprettet");
         }
-
         return mLangReceiver;
     }
+
     //----Bygger en AlertDialog med listen over Ekstra-tekster
     boolean klikket = false; //Holder KUN dialogen i live hvis skærmen bliver vendt.
 
@@ -582,8 +563,6 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         p("Tester alarmflow: sætter alarm om 2 min");
         AlarmLogik.getInstance().sætAlarm(getApplicationContext(), Tilstand.getInstance(getApplicationContext()).masterDato.plusMinutes(2), "Test: 2 min");
 
-
-
         p("Dialog: htekster længde: "+tl.htekster.size());
         final AlertDialog.Builder extraliste = new AlertDialog.Builder(this);
 
@@ -592,31 +571,25 @@ public class Forside_akt extends AppCompatActivity implements View.OnClickListen
         t.setGravity(Gravity.CENTER);
         t.setPadding(10, 10, 10, 10);
         t.setTextSize(22);
-        //extraliste.setTitle("Extras");
         extraliste.setCustomTitle(t);
 
-        ArrayAdapter aad =
-                new ArrayAdapter(this, android.R.layout.simple_list_item_1, tl.hteksterOverskrifter); // ArrayAdapter slut
+        ArrayAdapter aad = new ArrayAdapter(this, android.R.layout.simple_list_item_1, tl.hteksterOverskrifter);
 
-        extraliste.setAdapter(aad,
-                new DialogInterface.OnClickListener() {
+        extraliste.setAdapter(aad, (dialog, valgt) -> {
+            Tekst valgtHTekst = tl.htekster.get(valgt);
 
-                    public void onClick(DialogInterface dialog, int valgt) {
-                        Tekst valgtHTekst = tl.htekster.get(valgt);
-
-                        if (!tl.synligeTekster.contains(valgtHTekst)) {
-                            tl.synligeTekster.add(valgtHTekst);
-                            Lyttersystem.getInstance().givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog");
-                            pa.notifyDataSetChanged();
-                            vp.setCurrentItem(tl.synligeTekster.size()-1);
-                        }
-                        else {
-                            vp.setCurrentItem(Tekstlogik.getInstance(getApplicationContext()).findTekstnr(valgtHTekst.overskrift));
-                        }
-                        hListeadapter = null;
-                        klikket = true;
-                    }
-                } );
+            if (!tl.synligeTekster.contains(valgtHTekst)) {
+                tl.synligeTekster.add(valgtHTekst);
+                Lyttersystem.getInstance().givBesked(K.SYNLIGETEKSTER_OPDATERET, "Forside, Dialog");
+                pa.notifyDataSetChanged();
+                vp.setCurrentItem(tl.synligeTekster.size()-1);
+            }
+            else {
+                vp.setCurrentItem(Tekstlogik.getInstance(getApplicationContext()).findTekstnr(valgtHTekst.overskrift));
+            }
+            hListeadapter = null;
+            klikket = true;
+        });
         hListeadapter = aad;
         if (klikket) {
             doKeepDialog(extraliste);
