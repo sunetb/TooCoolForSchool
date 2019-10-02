@@ -68,6 +68,11 @@ public class Tid {
 
     }
 
+    /**
+     * Returnerer en strengversion af en DateDime i formatet: 2019-10-02 19:15
+     * @param d
+     * @return strengversion af en DateDime i formatet: 2019-10-02 19:15
+     */
     public static String kortTid(DateTime d){
 
         return ""+d.toLocalDate() + " "+ d.getHourOfDay()+ ":" + d.getMinuteOfHour();

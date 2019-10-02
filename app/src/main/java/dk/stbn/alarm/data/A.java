@@ -135,10 +135,10 @@ public class A extends Application implements Observatør {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
+/*
         String appVersion = pInfo.versionName;
 
-/*        boolean erNulstillet = pref.getBoolean(appVersion,true);
+       boolean erNulstillet = pref.getBoolean(appVersion,true);
 
         if( ! erNulstillet ){
             int tempModenhed = tilstand.getInstance(getApplicationContext()).modenhed;

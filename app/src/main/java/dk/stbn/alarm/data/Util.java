@@ -17,6 +17,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import dk.stbn.alarm.diverse.Tid;
+
 /**
  * Created by sune on 6/3/16.
  */
@@ -280,6 +282,7 @@ public class Util {
         if (baglog) {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
             String log = sp.getString("baggrundslog", "");
+            log += Tid.kortTid(new DateTime()) + " | ";
             log += msg + "\n";
             sp.edit().putString("baggrundslog", log).apply();
         }
