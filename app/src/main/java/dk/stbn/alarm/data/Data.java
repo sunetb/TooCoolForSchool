@@ -1,8 +1,6 @@
 package dk.stbn.alarm.data;
 
-import android.arch.lifecycle.ViewModel;
-
-import java.util.ArrayList;
+import androidx.lifecycle.ViewModel;
 
 public class Data extends ViewModel {
 

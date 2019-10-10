@@ -1,27 +1,20 @@
 package dk.stbn.alarm.data;
 
-import android.app.AlarmManager;
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.VisibleForTesting;
 import android.widget.Toast;
 
 
 import com.crashlytics.android.Crashlytics;
 
-import org.joda.time.DateTime;
-
 import java.util.ArrayList;
 
-import dk.stbn.alarm.R;
 import dk.stbn.alarm.diverse.IO;
 import dk.stbn.alarm.diverse.K;
-import dk.stbn.alarm.diverse.Tid;
 import dk.stbn.alarm.lyttere.Lyttersystem;
 import dk.stbn.alarm.lyttere.Observatør;
 import io.fabric.sdk.android.Fabric;
