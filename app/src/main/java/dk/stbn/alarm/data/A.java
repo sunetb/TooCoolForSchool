@@ -98,9 +98,6 @@ public class A extends Application implements Observatør {
     Vi kan ikke teste noti-loop i sommerferien fordi modehed går fra 0 til 6.
     Løsning:
 
-
-
-
     *
     * */
 
@@ -169,21 +166,17 @@ public class A extends Application implements Observatør {
 
         tekstlogik.tjekSprog();
 
-        if (tilstand.modenhed == K.MODENHED_HELT_FRISK)
+        if (tilstand.modenhed == K.MODENHED_HELT_FRISK) {
+            p("Appen er helt nyinstalleret");
             tekstlogik.udvælgTekster();
+        }
         else {
             tekstlogik.tjekTekstversion("init()"); //Fyrer event og A.opdater() kaldes hvis der er nye tekster på nettet.
             tekstlogik.visCachedeTekster();
             tekstlogik.indlæsHtekster();
-
             alarmlogik.startAlarmLoop(this);
         }
-
-
-
     }
-
-
 
     //Observer-callback
     @Override
@@ -195,8 +188,6 @@ public class A extends Application implements Observatør {
             tekstlogik.udvælgTekster();
         else if (hændelse == K.HTEKSTER_OPDATERET)
             tilstand.hteksterKlar = true;
-
-
     }
 
 
@@ -252,9 +243,7 @@ public class A extends Application implements Observatør {
 */
 
 
-
-
-    //-- Kaldes når appen har kørt alle tekster igennnem og skal starte forfra med Otekst1
+    //-- Kaldes når appen har kørt alle tekster igennnem over et helt år og skal starte forfra med Otekst1
     void sletAlt() {
         p("sletAlt kaldt");
         sletDiskData();
@@ -265,8 +254,6 @@ public class A extends Application implements Observatør {
         alarmlogik = AlarmLogik.getInstance();
         tekstlogik = null;
         tekstlogik = Tekstlogik.getInstance(getApplicationContext());
-
-
        // tekstlogik.synligeTekster.clear();
         //tekstlogik.synligeTekster.add((Tekst) IO.læsObj(K.OTEKST_1, getApplicationContext()));
         //Lyttersystem.getInstance().givBesked(K.NYE_TEKSTER_ONLINE, "nulstillet");
@@ -288,9 +275,6 @@ public class A extends Application implements Observatør {
 
     }
 
-
-
-
     void t(String s) {
         Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
     }
@@ -299,7 +283,4 @@ public class A extends Application implements Observatør {
         String kl = this.getClass().getSimpleName() + ".";
         Util.p(kl + o);
     }
-
-
-
 }
